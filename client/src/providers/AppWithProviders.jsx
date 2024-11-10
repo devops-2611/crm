@@ -2,12 +2,15 @@ import QueryClientProviders from "./QueryClientProvider";
 import App from "../App";
 import MantineProviders from "./MantineProviders";
 import AppBasedContextProviders from "./AppBasedContextProviders";
+import { BrowserRouter } from "react-router-dom";
 function AppWithProviders() {
   return (
     <AppBasedContextProviders>
       <MantineProviders>
         <QueryClientProviders>
-          <App />
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
         </QueryClientProviders>
       </MantineProviders>
     </AppBasedContextProviders>
