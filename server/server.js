@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./Routes/authRoutes');
+const invoiceRoutes = require('./Routes/invoiceRoutes');
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 
 // Define API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api', invoiceRoutes);
 
 const PORT = process.env.PORT || 5000;
 

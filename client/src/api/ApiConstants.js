@@ -4,6 +4,7 @@ const ApiConstants = {
   //POST API
   REGISTER_USER: () => `/api/auth/register`,
   LOGIN_USER: () => `/api/auth/login`,
+  UPLOAD_CSV: () => `/api/upload-csv`,
 
   
   //GET API
