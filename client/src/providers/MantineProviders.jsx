@@ -7,7 +7,7 @@ import { Notifications } from "@mantine/notifications";
 export default function MantineProviders({ children }) {
   return (
     <MantineProvider>
-      <Notifications/>
+      <Notifications autoClose={5000} />
       {children}
     </MantineProvider>
   );
