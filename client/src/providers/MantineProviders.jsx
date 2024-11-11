@@ -3,7 +3,12 @@
 import "@mantine/core/styles.css";
 
 import { MantineProvider } from "@mantine/core";
-
+import { Notifications } from "@mantine/notifications";
 export default function MantineProviders({ children }) {
-  return <MantineProvider>{children}</MantineProvider>;
+  return (
+    <MantineProvider>
+      <Notifications/>
+      {children}
+    </MantineProvider>
+  );
 }
