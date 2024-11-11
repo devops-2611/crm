@@ -1,5 +1,6 @@
 import ApiHelpers from "../api/ApiHelpers";
 import ApiConstants from "../api/ApiConstants";
+import { FileUpload } from "../components/FileUpload"
 
 const Homepage = () => {
 
@@ -14,10 +15,15 @@ const Homepage = () => {
   }
 
   return (
+    <>
     <div>
       invoice - 
       <input type="file" onChange={handleChange}/>
     </div>
+    
+    <div>This will be the home page</div>
+    <FileUpload/>
+    </>
   )
 }
 
