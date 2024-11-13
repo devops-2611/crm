@@ -22,7 +22,7 @@ const Homepage = () => {
     </div>
     
     <div>This will be the home page</div>
-    <FileUpload/>
+    {/* <FileUpload/> */}
     </>
   )
 }
