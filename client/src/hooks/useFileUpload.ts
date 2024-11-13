@@ -3,7 +3,7 @@ import ApiConstants from "../api/ApiConstants";
 import { useMutation } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 
-const uploadFiles = async (files) => {
+const uploadFiles = async (files:File[]) => {
   console.log(files, "files inside mutation fun");
   if (!files || files.length === 0) {
     return;
@@ -19,7 +19,7 @@ const uploadFiles = async (files) => {
 
 export const useFileUpload = () => {
   return useMutation({
-    mutationFn: (data) => uploadFiles(data),
+    mutationFn: (data:File[]) => uploadFiles(data),
     retry: 0,
     onSuccess: (data) => notifications.show({
         title:'File Uploaded successfully',
