@@ -2,6 +2,10 @@
 const multer = require('multer');
 const csv = require('csv-parser');
 const stream = require('stream');
+const CustomerModel = require('../Models/customer');
+const InvoiceModal = require('../Models/invoice'); 
+const { calculateOrderValues, generateInvoiceId } = require('../Utils/utils');
+
 
 // Configure Multer to store files in memory
 const upload = multer({ storage: multer.memoryStorage() });
@@ -32,9 +36,19 @@ const expectedHeaders = [
 // Controller function to handle CSV upload and parsing directly from buffer
 const uploadAndParseCSV = async (req, res) => {
     try {
-        // Check if a file was uploaded
+
+        let { customerId, taxRate } = req.body;
+
+customerId = Number(customerId);
+ taxRate = Number(taxRate);
+
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const customer = await CustomerModel.findOne({ customerId });
+        if (!customer) {
+            return res.status(404).json({ error: 'Customer not found' });
         }
 
         const results = [];
@@ -69,9 +83,42 @@ const uploadAndParseCSV = async (req, res) => {
                 };
                 results.push(formattedRow);
             })
-            .on('end', () => {
-                // Send parsed data as JSON response after processing all rows
-                res.status(200).json({ data: results });
+            .on('end', async () => {
+
+                const calculationsByOrderType = calculateOrderValues(results, customer?.configDetails, 'orderType');
+
+                const calculationsByPaymentType = calculateOrderValues(results, customer?.configDetails, 'paymentType');
+
+                let totalSubTotal = 0;
+                let totalSalesValue = 0
+                for (const orderType in calculationsByOrderType) {
+                    totalSubTotal += calculationsByOrderType[orderType].amount;
+                    totalSalesValue += calculationsByOrderType[orderType].totalOrderValue;
+                }
+
+                const tax_amount = (taxRate * totalSubTotal) / 100;
+                const totalWithTax = totalSubTotal + tax_amount;
+
+                const finalData = {
+                    invoiceId: generateInvoiceId(customerId),
+                    customerId: customerId,
+                    calculationsByOrderType,
+                    calculationsByPaymentType,
+                    totalSubTotal,
+                    tax_amount,
+                    totalWithTax,
+                    totalSalesValue,
+                    amountToRecieve: totalSalesValue - totalWithTax,
+                    startDate: results[0].orderDate,
+                    endDate: results[results.length - 1].orderDate,
+                    storeName: results[0].branchName
+                }
+
+                const invoice = new InvoiceModal(finalData);
+                await invoice.save();
+
+                res.status(200).json(finalData);
+
             })
             .on('error', (error) => {
                 console.error("Error parsing CSV:", error);
