@@ -19,29 +19,15 @@ const calculateOrderValues = (orders, customer, type) => {
         let totalOrderValue = 0;
 
         groupedData[key].forEach((order) => {
-            // Apply config values if applicable
-            const serviceFee = customer.serviceFee
-                ? order.serviceFee
-                : 0;
-            const driverTip = customer.driverTip
-                ? order.driverTip
-                : 0;
-            const deliveryCharge = customer.deliveryCharge
-                ? order.deliveryCharge
-                : 0;
 
             // Calculate the total value for each order
             const totalForRow = order.subTotal
-                + serviceFee
-                + driverTip
-                + deliveryCharge
                 - order.orderDiscount
                 - order.promoDiscount;
 
             totalOrderValue += totalForRow;
         });
 
-        // Set commission rate based on the orderType
         let commissionRate = 0;
         if (key.toLowerCase() === 'delivery') {
             commissionRate = AppConstants.DELIVERY_COMMISSION;
@@ -49,10 +35,8 @@ const calculateOrderValues = (orders, customer, type) => {
             commissionRate = AppConstants.COLLECTION_COMMISSION;
         }
 
-        // Calculate commission amount
         const commissionAmount = (commissionRate * totalOrderValue) / 100;
 
-        // Add calculations to the result object
         if (type === 'orderType') {
             calculations[key] = {
                 totalOrderValue,
@@ -69,6 +53,37 @@ const calculateOrderValues = (orders, customer, type) => {
         }
         
     }
+
+    if(customer.serviceFee && type === 'orderType'){
+        const orderValue = orders.reduce((acc, order) => acc + order.serviceFee, 0)
+        calculations['SERVICE_FEE'] = {
+            totalOrderValue: orderValue,
+            totalOrders: orders.filter(order => order.serviceFee > 0).length,
+            commissionRate: 0,
+            amount: orderValue
+        }
+    }
+
+    if(customer.deliveryCharge && type === 'orderType'){
+        const orderValue = orders.reduce((acc, order) => acc + order.deliveryCharge, 0)
+        calculations['DELIVERY_CHARGE'] = {
+            totalOrderValue: orderValue,
+            totalOrders: orders.filter(order => order.deliveryCharge > 0).length,
+            commissionRate: 0,
+            amount: orderValue
+        }
+    }
+
+    if(customer.driverTip && type === 'orderType'){
+        const orderValue = orders.reduce((acc, order) => acc + order.driverTip, 0)
+        calculations['DRIVER_TIP'] = {
+            totalOrderValue: orderValue,
+            totalOrders: orders.filter(order => order.driverTip > 0).length,
+            commissionRate: 0,
+            amount: orderValue
+        }
+    }
+
 
     return calculations;
 };

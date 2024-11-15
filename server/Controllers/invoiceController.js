@@ -93,7 +93,9 @@ const uploadAndParseCSV = async (req, res) => {
                 let totalSalesValue = 0
                 for (const orderType in calculationsByOrderType) {
                     totalSubTotal += calculationsByOrderType[orderType].amount;
-                    totalSalesValue += calculationsByOrderType[orderType].totalOrderValue;
+                    if(orderType.toLowerCase() === 'delivery' || orderType.toLowerCase() === 'collection'){
+                        totalSalesValue += calculationsByOrderType[orderType].totalOrderValue;
+                    }      
                 }
 
                 const tax_amount = (taxRate * totalSubTotal) / 100;
