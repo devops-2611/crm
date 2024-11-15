@@ -3,7 +3,7 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const stream = require('stream');
 const CustomerModel = require('../Models/customer');
-const InvoiceModal = require('../Models/invoice'); 
+const InvoiceModal = require('../Models/invoice');
 const { calculateOrderValues, generateInvoiceId } = require('../Utils/utils');
 
 
@@ -39,8 +39,8 @@ const uploadAndParseCSV = async (req, res) => {
 
         let { customerId, taxRate } = req.body;
 
-customerId = Number(customerId);
- taxRate = Number(taxRate);
+        customerId = Number(customerId);
+        taxRate = Number(taxRate);
 
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
@@ -85,9 +85,9 @@ customerId = Number(customerId);
             })
             .on('end', async () => {
 
-                const calculationsByOrderType = calculateOrderValues(results, customer?.configDetails, 'orderType');
+                const calculationsByOrderType = calculateOrderValues(results, customer, 'orderType');
 
-                const calculationsByPaymentType = calculateOrderValues(results, customer?.configDetails, 'paymentType');
+                const calculationsByPaymentType = calculateOrderValues(results, customer, 'paymentType');
 
                 let totalSubTotal = 0;
                 let totalSalesValue = 0
@@ -100,7 +100,6 @@ customerId = Number(customerId);
                 const totalWithTax = totalSubTotal + tax_amount;
 
                 const finalData = {
-                    invoiceId: generateInvoiceId(customerId),
                     customerId: customerId,
                     calculationsByOrderType,
                     calculationsByPaymentType,
@@ -113,9 +112,6 @@ customerId = Number(customerId);
                     endDate: results[results.length - 1].orderDate,
                     storeName: results[0].branchName
                 }
-
-                const invoice = new InvoiceModal(finalData);
-                await invoice.save();
 
                 res.status(200).json(finalData);
 
@@ -130,4 +126,26 @@ customerId = Number(customerId);
     }
 };
 
-module.exports = { upload, uploadAndParseCSV };
+const saveInvoiceData = async (req, res) => {
+    try {
+
+        const finalData = req.body
+
+        if (!finalData) {
+            return res.status(400).json({ error: 'No data provided' });
+        }
+
+        finalData.invoiceId = generateInvoiceId(finalData.customerId);
+
+        const invoice = new InvoiceModal(finalData);
+        await invoice.save();
+
+        res.status(200).json({ message: 'Invoice data saved successfully', invoice });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+
+}
+
+module.exports = { upload, uploadAndParseCSV, saveInvoiceData };

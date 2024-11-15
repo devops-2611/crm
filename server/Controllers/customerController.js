@@ -1,7 +1,7 @@
 const CustomerModel = require('../Models/customer'); 
 
 exports.addCustomer = async (req, res) => {
-  const { customerId, customerName, customerEmail, customerMobile, customerAddress, configDetails } = req.body;
+  const { customerId, customerName, customerEmail, customerMobile, customerAddress, serviceFee, deliveryCharge, driverTip } = req.body;
   try {
     // Check if a customer with the same customerId already exists
     const existingCustomer = await CustomerModel.findOne({ customerId });
@@ -16,7 +16,9 @@ exports.addCustomer = async (req, res) => {
       customerEmail,
       customerMobile, 
       customerAddress,
-      configDetails,
+      serviceFee,
+      deliveryCharge,
+      driverTip
     });
 
     await customer.save();
@@ -49,7 +51,7 @@ exports.getAllCustomerList = async (req, res) => {
 
   exports.editCustomer = async (req, res) => {
     const { id } = req.params;
-    const { customerId, customerName, customerEmail, customerMobile, customerAddress, configDetails } = req.body;
+    const { customerId, customerName, customerEmail, customerMobile, customerAddress, serviceFee, deliveryCharge, driverTip } = req.body;
     try {
       const customer = await CustomerModel.findById(id);
       if (!customer) {
@@ -60,7 +62,9 @@ exports.getAllCustomerList = async (req, res) => {
       customer.customerEmail = customerEmail;
       customer.customerMobile = customerMobile;
       customer.customerAddress = customerAddress;   
-      customer.configDetails = configDetails;
+      customer.serviceFee = serviceFee;
+      customer.deliveryCharge = deliveryCharge;
+      customer.driverTip = driverTip;
       await customer.save();
       res.status(200).json({ message: 'Customer updated successfully', customer });
     } catch (err) {

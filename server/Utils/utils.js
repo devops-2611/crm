@@ -1,6 +1,6 @@
 const AppConstants = require("../constants");
 
-const calculateOrderValues = (orders, configDetails, type) => {
+const calculateOrderValues = (orders, customer, type) => {
     // Group data based on the type parameter (either orderType or paymentType)
     const groupedData = orders.reduce((acc, order) => {
         const key = order[type]; // Use the type parameter (orderType or paymentType)
@@ -20,14 +20,14 @@ const calculateOrderValues = (orders, configDetails, type) => {
 
         groupedData[key].forEach((order) => {
             // Apply config values if applicable
-            const serviceFee = configDetails.serviceFee.isApplicable
-                ? configDetails.serviceFee.value
+            const serviceFee = customer.serviceFee
+                ? order.serviceFee
                 : 0;
-            const driverTip = configDetails.driverTip.isApplicable
-                ? configDetails.driverTip.value
+            const driverTip = customer.driverTip
+                ? order.driverTip
                 : 0;
-            const deliveryCharge = configDetails.deliveryCharge.isApplicable
-                ? configDetails.deliveryCharge.value
+            const deliveryCharge = customer.deliveryCharge
+                ? order.deliveryCharge
                 : 0;
 
             // Calculate the total value for each order
@@ -83,8 +83,11 @@ const generateInvoiceId = (customerId) => {
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
     const year = currentDate.getFullYear().toString().slice(-2); // Get the last 2 digits of the year
 
+    // Get the last 4-6 digits of the timestamp
+    const timestamp = currentDate.getTime().toString().slice(-6); // Take the last 6 digits of the timestamp
+
     // Generate the invoice ID
-    const invoiceId = `SWSH-${customerIdFormatted}-${day}${month}${year}`;
+    const invoiceId = `SWSH-${customerIdFormatted}-${day}${month}${year}-${timestamp}`;
     
     return invoiceId;
 };

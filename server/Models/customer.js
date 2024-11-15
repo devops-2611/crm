@@ -22,37 +22,17 @@ const CustomerSchema = new mongoose.Schema(
     customerAddress: {
       type: String,
     },
-    configDetails: {
-      serviceFee: {
-        isApplicable: {
-          type: Boolean,
-          default: true,
-        },
-        value: {
-          type: Number,
-          default: 0,
-        },
-      },
-      deliveryCharge: {
-        isApplicable: {
-          type: Boolean,
-          default: true,
-        },
-        value: {
-          type: Number,
-          default: 0,
-        },
-      },
-      driverTip: {
-        isApplicable: {
-          type: Boolean,
-          default: true,
-        },
-        value: {
-          type: Number,
-          default: 0,
-        },
-      },
+    serviceFee: {
+      type: Boolean,
+      default: true
+    },
+    deliveryCharge: {
+      type: Boolean,
+      default: true
+    },
+    driverTip: {
+      type: Boolean,
+      default: true
     },
   },
   { timestamps: true }
