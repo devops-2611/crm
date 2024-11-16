@@ -1,18 +1,12 @@
-import ApiHelpers from "../api/ApiHelpers";
-import ApiConstants from "../api/ApiConstants";
-import { FileUpload } from "../components/FileUpload"
-import { PDFViewer } from '@react-pdf/renderer';
-import { MyDocument } from "./Mydocument";
+import { Container } from "@mantine/core";
+
 const Homepage = () => {
-
-
-
   return (
     <>
-    <FileUpload/>
-   
+      <Container>
+      </Container>
     </>
-  )
-}
+  );
+};
 
-export default Homepage
+export default Homepage;

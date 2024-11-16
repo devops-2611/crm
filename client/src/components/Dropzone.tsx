@@ -1,21 +1,23 @@
-import { Group, Text, rem, useMantineTheme, ActionIcon } from "@mantine/core";
+import { Group, Text, rem, useMantineTheme } from "@mantine/core";
 import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
-import { Dropzone, MIME_TYPES , FileRejection, FileWithPath, } from "@mantine/dropzone";
+import {
+  Dropzone,
+  MIME_TYPES,
+  FileRejection,
+  FileWithPath,
+} from "@mantine/dropzone";
 import { useCallback } from "react";
 import { notifications } from "@mantine/notifications";
 import { useFileUpload } from "../hooks/useFileUpload";
-import { useState } from "react";
-import { IconTrash } from "@tabler/icons-react";
-
+import { useFormikContext } from "formik";
 
 export function FileUpload() {
-
-
-  const { mutateAsync, status } = useFileUpload();
-  const [fileName, setFileName] = useState<string>();
+  const { values, setFieldValue } = useFormikContext();
+  const {  status } = useFileUpload();
   const theme = useMantineTheme();
+
   const handleReject = useCallback(
-    (fileRejections:FileRejection[]) => {
+    (fileRejections: FileRejection[]) => {
       if (fileRejections[0].errors[0].code === "file-invalid-type") {
         notifications.show({
           title: "Invalid File type",
@@ -27,19 +29,22 @@ export function FileUpload() {
     },
     [theme]
   );
-  const handleDrop = async (files:FileWithPath[]) => {
-    setFileName(files[0].name);
+
+  const handleDrop = async (files: FileWithPath[]) => {
     try {
-      const result = await mutateAsync(files);
-      console.log("File uploaded successfully:", result);
+      // const result = await mutateAsync(files);
+      // console.log("File uploaded successfully:", result);
+      setFieldValue("csvfile", files)
+      // / Set the file in Formik
     } catch (error) {
       console.error("Upload failed:", error);
+      
     }
   };
-//   const handleDelete = () => {
-//     // Reset the file state to remove the file
-//     setFileName(null);
-//   };
+
+  // const handleDelete = () => {
+  //   setFieldValue("csvfile", []); // Clear the file in Formik
+  // };
 
   return (
     <Dropzone
@@ -50,8 +55,10 @@ export function FileUpload() {
       multiple={false}
       maxFiles={1}
       loading={status === "pending"}
-      //   children={(vlaue)=><div>{vlaue.}</div>}
-      __size=""
+      name={"csvfile"}
+      style={{height:150, display:'flex', alignItems:'center', marginTop:'20px'}}
+
+      // disabled={!!values?.csvfile?.[0]?.name}
     >
       <Group
         justify="center"
@@ -78,7 +85,7 @@ export function FileUpload() {
             }}
             stroke={1.5}
           />
-          Rejected file format
+          Only CSV file format is allowed
         </Dropzone.Reject>
         <Dropzone.Idle>
           <IconPhoto
@@ -98,20 +105,11 @@ export function FileUpload() {
           <Text size="sm" c="dimmed" inline mt={7}>
             Attach a single file, file should not exceed 5mb
           </Text>
-          {fileName && (
-            <>
-              <div style={{ marginTop: 10, color: "green" }}>
-                Uploaded file: {fileName}
-              </div>
-              {/* <ActionIcon
-                color="red"
-                onClick={handleDelete}
-                title="Remove file"
-                style={{ marginLeft: 10 }}
-              >
-                <IconTrash size={16} />
-              </ActionIcon> */}
-            </>
+
+          {values?.csvfile && values.csvfile[0]?.name && (
+            <div style={{ marginTop: 10, color: "green" }}>
+              <div>Uploaded file: {values.csvfile[0].name}</div>
+            </div>
           )}
         </div>
       </Group>
