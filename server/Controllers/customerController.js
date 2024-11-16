@@ -1,14 +1,17 @@
 const CustomerModel = require('../Models/customer'); 
 
 exports.addCustomer = async (req, res) => {
-  const { customerId, customerName, customerEmail, customerMobile, customerAddress, serviceFee, deliveryCharge, driverTip } = req.body;
+  const { customerName, customerEmail, customerMobile, customerAddress, serviceFee, deliveryCharge, driverTip } = req.body;
   try {
     // Check if a customer with the same customerId already exists
-    const existingCustomer = await CustomerModel.findOne({ customerId });
+    const existingCustomer = await CustomerModel.findOne({ customerEmail });
     if (existingCustomer) {
-      return res.status(400).json({ message: 'Customer with this ID already exists' });
+      return res.status(400).json({ message: 'Customer with this Email already exists' });
     }
 
+    const lastCustomer = await CustomerModel.findOne().sort({ customerId: -1 });
+  
+    const customerId = lastCustomer ? lastCustomer.customerId + 1 : 1;
     // Create a new customer
     const customer = new CustomerModel({
       customerId,
@@ -22,7 +25,7 @@ exports.addCustomer = async (req, res) => {
     });
 
     await customer.save();
-    res.status(201).json({ message: 'Customer added successfully', customer });
+    res.status(200).json({ message: 'Customer added successfully', customer });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
@@ -53,7 +56,7 @@ exports.getAllCustomerList = async (req, res) => {
     const { id } = req.params;
     const { customerId, customerName, customerEmail, customerMobile, customerAddress, serviceFee, deliveryCharge, driverTip } = req.body;
     try {
-      const customer = await CustomerModel.findById(id);
+      const customer = await CustomerModel.findOne({ customerId: parseInt(id) });
       if (!customer) {
         return res.status(404).json({ message: 'Customer not found' });
       }
@@ -76,7 +79,7 @@ exports.getAllCustomerList = async (req, res) => {
   exports.deleteCustomer = async (req, res) => {    
     const { id } = req.params;
     try {
-      const customer = await CustomerModel.findByIdAndDelete(id);
+      const customer = await CustomerModel.findOneAndDelete({ customerId: parseInt(id) });
       if (!customer) {
         return res.status(404).json({ message: 'Customer not found' });
       }
