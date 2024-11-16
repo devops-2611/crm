@@ -4,14 +4,17 @@ import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import "./style.css"
+import ApiHelpers from '../../api/ApiHelpers'
 
 interface Customer {
-  id: number
-  name: string
-  address: string
-  serviceFeeApplicable: boolean
-  driverTipApplicable: boolean
-  deliveryChargeApplicable: boolean
+  customerId: number
+  customerName: string
+  customerAddress: string
+  customerEmail: string
+  customerMobile: string
+  serviceFee: boolean
+  driverTip: boolean
+  deliveryCharge: boolean
 }
 
 export default function CustomerManagement() {
@@ -21,11 +24,25 @@ export default function CustomerManagement() {
 
   const form = useForm({
     initialValues: {
-      name: '',
-      address: '',
-      serviceFeeApplicable: true,
-      driverTipApplicable: false,
-      deliveryChargeApplicable: false,
+      customerName: '',
+      customerAddress: '',
+      customerEmail:'',
+      customerMobile: '',
+      serviceFee: true,
+      driverTip: false,
+      deliveryCharge: false,
+    },
+  })
+
+  const formEdit = useForm({
+    initialValues: {
+      customerName: '',
+      customerAddress: '',
+      customerEmail:'',
+      customerMobile: '',
+      serviceFee: true,
+      driverTip: false,
+      deliveryCharge: false,
     },
   })
 
@@ -35,10 +52,11 @@ export default function CustomerManagement() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch('/api/customers')
-      if (!response.ok) throw new Error('Failed to fetch customers')
-      const data = await response.json()
-      setCustomers(data)
+      const response = await ApiHelpers.GET('/api/customer/getAllCustomerDetails')
+
+      if (response.status !== 200) throw new Error('Failed to fetch customers')
+        
+      setCustomers(response.data)
     } catch (error) {
       notifications.show({
         title: 'Error',
@@ -49,13 +67,19 @@ export default function CustomerManagement() {
   }
 
   const handleSubmit = async (values: typeof form.values) => {
+    const obj : any = {
+      customerName: values.customerName,
+      customerAddress: values.customerAddress,
+      customerEmail: values.customerEmail,
+      customerMobile: values.customerMobile,
+      serviceFee: values.serviceFee,
+      driverTip: values.driverTip,
+      deliveryCharge: values.deliveryCharge
+    }
     try {
-      const response = await fetch('/api/customers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      })
-      if (!response.ok) throw new Error('Failed to add customer')
+      const response = await ApiHelpers.POST('/api/customer/add-customer', obj)
+      if (response.status !== 200) throw new Error('Failed to add customer')
+      
       await fetchCustomers()
       form.reset()
       notifications.show({
@@ -74,20 +98,28 @@ export default function CustomerManagement() {
 
   const handleEdit = (customer: Customer) => {
     setEditingCustomer(customer)
-    form.setValues(customer)
+    formEdit.setValues(customer)
     setIsModalOpen(true)
   }
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (values: typeof formEdit.values) => {
     if (!editingCustomer) return
     try {
-      const response = await fetch(`/api/customers/${editingCustomer.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form.values),
-      })
-      if (!response.ok) throw new Error('Failed to update customer')
+
+      const obj : any = {
+        customerId: editingCustomer.customerId,
+        customerName: values.customerName,
+        customerAddress: values.customerAddress,
+        customerEmail: values.customerEmail,
+        customerMobile: values.customerMobile,
+        serviceFee: values.serviceFee,
+        driverTip: values.driverTip,
+        deliveryCharge: values.deliveryCharge
+      }
+      const response = await ApiHelpers.PUT(`/api/customer/edit-customer/${editingCustomer.customerId}`, obj)
+      if (response.status !== 200) throw new Error('Failed to update customer')
       await fetchCustomers()
+      form.reset()
       setIsModalOpen(false)
       setEditingCustomer(null)
       notifications.show({
@@ -106,10 +138,8 @@ export default function CustomerManagement() {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`/api/customers/${id}`, {
-        method: 'DELETE',
-      })
-      if (!response.ok) throw new Error('Failed to delete customer')
+      const response = await ApiHelpers.DELETE(`/api/customer/delete-customer/${id}`)
+      if (response.status !== 200) throw new Error('Failed to delete customer')
       await fetchCustomers()
       notifications.show({
         title: 'Success',
@@ -132,17 +162,29 @@ export default function CustomerManagement() {
           label="Customer Name"
           placeholder="Enter customer name"
           required
-          {...form.getInputProps('name')}
+          {...form.getInputProps('customerName')}
         />
         <TextInput
           label="Customer Address"
           placeholder="Enter customer address"
           required
-          {...form.getInputProps('address')}
+          {...form.getInputProps('customerAddress')}
         />
+        <TextInput
+            label="Customer Email"
+            placeholder="Enter customer email"
+            required
+            {...form.getInputProps('customerEmail')}
+          />
+          <TextInput
+            label="Customer Mobile"
+            placeholder="Enter customer mobile"
+            required
+            {...form.getInputProps('customerMobile')}
+          />
         <Radio.Group
           label="Service Fee Applicable"
-          {...form.getInputProps('serviceFeeApplicable')}
+          {...form.getInputProps('serviceFee')}
         >
           <Group mt="xs">
             <Radio value={"true"} label="Yes" />
@@ -151,7 +193,7 @@ export default function CustomerManagement() {
         </Radio.Group>
         <Radio.Group
           label="Driver Tip Applicable"
-          {...form.getInputProps('driverTipApplicable')}
+          {...form.getInputProps('driverTip')}
         >
           <Group mt="xs">
             <Radio value={"true"} label="Yes" />
@@ -160,7 +202,7 @@ export default function CustomerManagement() {
         </Radio.Group>
         <Radio.Group
           label="Delivery Charge Applicable"
-          {...form.getInputProps('deliveryChargeApplicable')}
+          {...form.getInputProps('deliveryCharge')}
         >
           <Group mt="xs">
             <Radio value={"true"} label="Yes" />
@@ -173,28 +215,34 @@ export default function CustomerManagement() {
       <Table>
         <thead>
           <tr>
+            <th>Sr.No</th>
             <th>Name</th>
             <th>Address</th>
-            <th>Service Fee</th>
-            <th>Driver Tip</th>
-            <th>Delivery Charge</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Service Fee (Is Applicable)</th>
+            <th>Driver Tip (Is Applicable)</th>
+            <th>Delivery Charge (Is Applicable)</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {customers.map((customer) => (
-            <tr key={customer.id}>
-              <td>{customer.name}</td>
-              <td>{customer.address}</td>
-              <td>{customer.serviceFeeApplicable ? 'Yes' : 'No'}</td>
-              <td>{customer.driverTipApplicable ? 'Yes' : 'No'}</td>
-              <td>{customer.deliveryChargeApplicable ? 'Yes' : 'No'}</td>
+          {customers.map((customer, index) => (
+            <tr key={customer.customerId}>
+              <td>{index + 1}</td>
+              <td>{customer.customerName}</td>
+              <td>{customer.customerAddress}</td>
+              <td>{customer.customerEmail}</td>
+              <td>{customer.customerMobile}</td>
+              <td>{customer.serviceFee ? 'Yes' : 'No'}</td>
+              <td>{customer.driverTip ? 'Yes' : 'No'}</td>
+              <td>{customer.deliveryCharge ? 'Yes' : 'No'}</td>
               <td>
                 <Group>
                   <Button onClick={() => handleEdit(customer)} variant="outline" size="xs">
                     <IconEdit size={16} />
                   </Button>
-                  <Button onClick={() => handleDelete(customer.id)} variant="outline" color="red" size="xs">
+                  <Button onClick={() => handleDelete(customer.customerId)} variant="outline" color="red" size="xs">
                     <IconTrash size={16} />
                   </Button>
                 </Group>
@@ -205,22 +253,34 @@ export default function CustomerManagement() {
       </Table>
 
       <Modal opened={isModalOpen} onClose={() => setIsModalOpen(false)} title="Edit Customer">
-        <form onSubmit={form.onSubmit(handleUpdate)} className="space-y-4">
+        <form onSubmit={formEdit.onSubmit(handleUpdate)} className="space-y-4">
           <TextInput
             label="Customer Name"
             placeholder="Enter customer name"
             required
-            {...form.getInputProps('name')}
+            {...formEdit.getInputProps('customerName')}
           />
           <TextInput
             label="Customer Address"
             placeholder="Enter customer address"
             required
-            {...form.getInputProps('address')}
+            {...formEdit.getInputProps('customerAddress')}
+          />
+          <TextInput
+            label="Customer Email"
+            placeholder="Enter customer email"
+            required
+            {...formEdit.getInputProps('customerEmail')}
+          />
+          <TextInput
+            label="Customer Mobile"
+            placeholder="Enter customer mobile"
+            required
+            {...formEdit.getInputProps('customerMobile')}
           />
           <Radio.Group
             label="Service Fee Applicable"
-            {...form.getInputProps('serviceFeeApplicable')}
+            {...formEdit.getInputProps('serviceFee')}
           >
             <Group mt="xs">
               <Radio value={"true"} label="Yes" />
@@ -229,7 +289,7 @@ export default function CustomerManagement() {
           </Radio.Group>
           <Radio.Group
             label="Driver Tip Applicable"
-            {...form.getInputProps('driverTipApplicable')}
+            {...formEdit.getInputProps('driverTip')}
           >
             <Group mt="xs">
               <Radio value={"true"} label="Yes" />
@@ -238,7 +298,7 @@ export default function CustomerManagement() {
           </Radio.Group>
           <Radio.Group
             label="Delivery Charge Applicable"
-            {...form.getInputProps('deliveryChargeApplicable')}
+            {...formEdit.getInputProps('deliveryCharge')}
           >
             <Group mt="xs">
               <Radio value={"true"} label="Yes" />
