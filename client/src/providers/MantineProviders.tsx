@@ -11,7 +11,7 @@ interface MantineProvidersProps {
 export default function MantineProviders({ children }:MantineProvidersProps) {
   return (
     <MantineProvider>
-      <Notifications autoClose={5000} />
+      <Notifications  zIndex={1000} />
       {children}
     </MantineProvider>
   );
