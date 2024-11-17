@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { AxiosResponse } from "axios";
 import { ParsedData } from "./useUplaodAndGetCsvData";
+import useAppBasedContext from "./useAppBasedContext";
 export interface EditAndSaveResponse {
   message: string;
   invoice: Invoice;
@@ -55,6 +56,7 @@ const saveEditedData = async (
 };
 
 export const useSaveSubmittedData = () => {
+    const{setTrackOldFormData} = useAppBasedContext()
   const queryClient = useQueryClient();
   return useMutation<AxiosResponse<EditAndSaveResponse>, Error, ParsedData>({
     mutationFn: (data: ParsedData) => saveEditedData(data),
@@ -65,7 +67,7 @@ export const useSaveSubmittedData = () => {
         message: "Some more text here",
         color: "green",
       });
-      queryClient.setQueryData(["EditedAndSavedData"], data?.data?.invoice);
+      setTrackOldFormData({step2:data?.data})
     },
     onError: (data) =>
       notifications.show({

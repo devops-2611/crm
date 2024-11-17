@@ -15,11 +15,9 @@ import { useSaveSubmittedData } from "../../hooks/useSaveSubmittedData";
 import { useEffect, useState } from "react";
 import { DateTimePicker } from "@mantine/dates";
 import { IconPhoto } from "@tabler/icons-react";
-import {
-  CalculationsByOrderType,
-  ParsedData,
-} from "../../hooks/useUplaodAndGetCsvData";
-
+import { CalculationsByOrderType } from "../../hooks/useUplaodAndGetCsvData";
+import useAppBasedContext from "../../hooks/useAppBasedContext";
+import React from 'react';
 interface InvoicePreviewProps {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -128,10 +126,8 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
   const { mutateAsync: saveEditedData, isSuccess: isSuccessInUpdatingData } =
     useSaveSubmittedData();
   const queryClient = useQueryClient();
-
-  const CalculatedData: ParsedData | undefined = queryClient.getQueryData([
-    "CalculatedData",
-  ]);
+  const {parsedData:CalculatedData}=useAppBasedContext()
+ 
   const formik = useFormik({
     initialValues: CalculatedData ?? {},
     onSubmit: (values) => {

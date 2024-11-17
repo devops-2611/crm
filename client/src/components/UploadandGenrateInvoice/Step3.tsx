@@ -102,11 +102,12 @@ const styles = StyleSheet.create({
 
 const InvoicePDF = () => {
   const queryClient = useQueryClient();
-  const FinalData: Invoice | undefined = queryClient.getQueryData([
-    "EditedAndSavedData",
-  ]);
-  const { customerConfig } = useAppBasedContext();
+  const {trackOldFormData}=useAppBasedContext()
 
+  const { customerConfig } = useAppBasedContext();
+const FinalData = trackOldFormData?.step2?.invoice
+const VATFromStep1 = trackOldFormData?.step1?.taxrate
+console.log(VATFromStep1,"VATFromStep1")
   const Variables = {
     invoiceId: FinalData?.invoiceId,
     storeName: FinalData?.storeName,
@@ -121,7 +122,7 @@ const InvoicePDF = () => {
       FinalData?.calculationsByOrderType?.COLLECTION?.commissionRate,
     Description_Collection_Commission_Rate_Deliver_Order_value:
       FinalData?.calculationsByOrderType?.COLLECTION?.totalOrderValue.toFixed(2),
-    Description_Collection_Commission_VAT: "TODO",
+    Description_Collection_Commission_VAT: VATFromStep1,
     Description_Collection_Commission_Amount:
       FinalData?.calculationsByOrderType?.COLLECTION?.amount?.toFixed(2),
     // Description_Delivery_Order
@@ -129,7 +130,7 @@ const InvoicePDF = () => {
       FinalData?.calculationsByOrderType?.DELIVERY?.commissionRate,
     Description_Delivery_Commission_Rate_Deliver_Order_value:
       FinalData?.calculationsByOrderType?.DELIVERY?.totalOrderValue.toFixed(2),
-    Description_Delivery_Commission_VAT: "20%",
+    Description_Delivery_Commission_VAT: VATFromStep1,
     Description_Delivery_Commission_Amount:
       FinalData?.calculationsByOrderType?.DELIVERY?.amount?.toFixed(2),
 
@@ -137,23 +138,21 @@ const InvoicePDF = () => {
     Description_ServiceFees_Commission_Rate:
       FinalData?.calculationsByOrderType?.SERVICE_FEE?.commissionRate,
     Description_ServiceFees_TotalOrders:
-      FinalData?.calculationsByOrderType?.SERVICE_FEE?.totalOrderValue?.toFixed(
-        2
-      ),
-    Description_ServiceFees_Commission_VAT: "20%",
+      FinalData?.calculationsByOrderType?.SERVICE_FEE?.totalOrders,
+    Description_ServiceFees_Commission_VAT: VATFromStep1,
     Description_ServiceFees_Amount:
       FinalData?.calculationsByOrderType?.SERVICE_FEE?.amount?.toFixed(2),
     // Delivery Fees Section
     Description_DeliveryFees_TotalOrder:
       FinalData?.calculationsByOrderType?.DELIVERY_CHARGE?.totalOrders,
-    Description_DeliveryFees_VAT: "20%",
+    Description_DeliveryFees_VAT: VATFromStep1,
     Description_DeliveryFees_Amount:
       FinalData?.calculationsByOrderType?.DELIVERY_CHARGE?.amount?.toFixed(2),
 
     // Driver Fees Section
     Description_DriverFees_TotalOrder:
       FinalData?.calculationsByOrderType?.DRIVER_TIP?.totalOrders,
-    Description_DriverFees_VAT: "20%",
+    Description_DriverFees_VAT: VATFromStep1,
     Description_DriverFees_Amount:
       FinalData?.calculationsByOrderType?.DRIVER_TIP?.amount?.toFixed(2),
 
@@ -225,7 +224,7 @@ const InvoicePDF = () => {
                 {
                   Variables?.Description_Collection_Commission_Rate_Deliver_Order_value
                 }{" "}
-                (VAT @ 20%)
+                (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
               </Text>
               <Text style={styles.tableCellAmount}>
                 £{Variables?.Description_Collection_Commission_Amount}
@@ -238,7 +237,7 @@ const InvoicePDF = () => {
                 {
                   Variables?.Description_Delivery_Commission_Rate_Deliver_Order_value
                 }{" "}
-                (VAT @ 20%)
+                (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
               </Text>
               <Text style={styles.tableCellAmount}>
                 £{Variables?.Description_Delivery_Commission_Amount}
@@ -248,8 +247,8 @@ const InvoicePDF = () => {
             {FinalData?.calculationsByOrderType?.SERVICE_FEE && (
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>
-                  Service Fees ({Variables?.Description_ServiceFees_TotalOrders}
-                  ) (VAT @ 20%)
+                  Service Fees ({Variables?.Description_ServiceFees_TotalOrders} Orders
+                  ) (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
                 </Text>
                 <Text style={styles.tableCellAmount}>
                   £{Variables?.Description_ServiceFees_Amount}
@@ -259,8 +258,8 @@ const InvoicePDF = () => {
             {FinalData?.calculationsByOrderType?.DELIVERY_CHARGE && (
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>
-                  Delivery Fees Withheld (1{" "}
-                  {Variables?.Description_DeliveryFees_TotalOrder}) (VAT @{" "}
+                  Delivery Fees Withheld (
+                  {Variables?.Description_DeliveryFees_TotalOrder} Orders) (VAT @{" "}
                   {Variables?.Description_DeliveryFees_VAT}%)
                 </Text>
                 <Text style={styles.tableCellAmount}>
@@ -273,7 +272,7 @@ const InvoicePDF = () => {
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>
                   Driver Tip
-                  {Variables?.Description_DriverFees_TotalOrder} (VAT @{" "}
+                  ({Variables?.Description_DriverFees_TotalOrder} Orders)  (VAT @{" "}
                   {Variables?.Description_DriverFees_VAT}%)
                 </Text>
                 <Text style={styles.tableCellAmount}>

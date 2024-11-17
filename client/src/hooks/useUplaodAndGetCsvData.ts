@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { FormValueTypes } from "../components/UploadandGenrateInvoice/Step1";
 import { AxiosResponse } from "axios";
+import useAppBasedContext from "./useAppBasedContext";
 interface CalculationDetails {
     totalOrderValue: number;
     totalOrders: number;
@@ -60,17 +61,23 @@ const uploadFiles  = async (formValues:FormValueTypes):AxiosResponse<ParsedData>
 };
 
 export const useUploadandGetCsvData = () => {
+    const{setParsedData, setTrackOldFormData} = useAppBasedContext()
+    // const SaveParsedDataInContext =(data:ParsedData)=>{
+    //   setParsedData(data)
+    // }
 const queryClient = useQueryClient();
   return useMutation<AxiosResponse<ParsedData>, Error, FormValueTypes>({
     mutationFn: (data:FormValueTypes) => uploadFiles(data),
     retry: 0,
-    onSuccess: (data) => {notifications.show({
+    onSuccess: (data,postedData) => {notifications.show({
         title:'File Uploaded successfully',
         message:'Some more text here',
         color:'green',
         autoClose:2000,
     });
-    queryClient.setQueryData(['CalculatedData'], data?.data)
+    setParsedData(data?.data)
+    setTrackOldFormData({step1:postedData})
+    // queryClient.setQueryData(['CalculatedData'], data?.data)
 },
     onError: (data) =>  notifications.show({
         title:'File Upload Failed',

@@ -36,7 +36,7 @@ interface DemoPropTypes {
 export default function Demo(props: DemoPropTypes) {
   const { setActiveStep } = props;
   const { data: customerList } = useGetAllCustomerList();
-
+  
   const getCutomersOptions = useMemo(
     () =>
       customerList?.data?.map((item) => ({
