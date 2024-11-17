@@ -180,11 +180,14 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
                   clearable
                   valueFormat="DD MMM YYYY hh:mm A"
                   placeholder="Pick date and time"
+                  value={new Date(formik.values.startDate)}
                 />
-                <TextInput
+                <DateTimePicker
                   label="End Date"
-                  {...formik.getFieldProps("endDate")}
-                  mt="md"
+                  clearable
+                  valueFormat="DD MMM YYYY hh:mm A"
+                  placeholder="Pick date and time"
+                  value={new Date(formik.values.endDate)}
                 />
               </Accordion.Panel>
             </Accordion.Item>

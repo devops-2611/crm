@@ -111,7 +111,7 @@ export default function Demo(props: DemoPropTypes) {
                 mt="md"
                 name={"taxrate"}
                 allowNegative={false}
-                onChange={Formikprops.handleChange}
+                onChange={(val)=>Formikprops.setFieldValue("taxrate",val)}
                 error={
                   Formikprops.touched.taxrate && Formikprops.errors?.taxrate
                 }

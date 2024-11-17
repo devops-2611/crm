@@ -54,12 +54,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   summaryRow: {
-    display:"flex",
+    display: "flex",
     flexDirection: "row",
     gap: 40,
     justifyContent: "flex-end",
     marginVertical: 5,
-    width:"100%",
+    width: "100%",
   },
   footer: {
     marginTop: 20,
@@ -101,13 +101,12 @@ const styles = StyleSheet.create({
 });
 
 const InvoicePDF = () => {
-  const queryClient = useQueryClient();
-  const {trackOldFormData}=useAppBasedContext()
+  const { trackOldFormData } = useAppBasedContext();
 
   const { customerConfig } = useAppBasedContext();
-const FinalData = trackOldFormData?.step2?.invoice
-const VATFromStep1 = trackOldFormData?.step1?.taxrate
-console.log(VATFromStep1,"VATFromStep1")
+  const FinalData = trackOldFormData?.step2?.invoice;
+  const VATFromStep1 = trackOldFormData?.step1?.taxrate;
+  console.log(VATFromStep1, "VATFromStep1");
   const Variables = {
     invoiceId: FinalData?.invoiceId,
     storeName: FinalData?.storeName,
@@ -121,7 +120,9 @@ console.log(VATFromStep1,"VATFromStep1")
     Description_Collection_Commission_Rate:
       FinalData?.calculationsByOrderType?.COLLECTION?.commissionRate,
     Description_Collection_Commission_Rate_Deliver_Order_value:
-      FinalData?.calculationsByOrderType?.COLLECTION?.totalOrderValue.toFixed(2),
+      FinalData?.calculationsByOrderType?.COLLECTION?.totalOrderValue.toFixed(
+        2
+      ),
     Description_Collection_Commission_VAT: VATFromStep1,
     Description_Collection_Commission_Amount:
       FinalData?.calculationsByOrderType?.COLLECTION?.amount?.toFixed(2),
@@ -163,7 +164,7 @@ console.log(VATFromStep1,"VATFromStep1")
   };
   console.log(FinalData, "FinalData");
   return (
-    <PDFViewer style={{ width: "100%", height: "100vh" }}>
+    <PDFViewer style={{ width: "100%", height: "100vh", marginTop:'20px' }}>
       <Document>
         {/* Page 1 */}
         <Page size="A4" style={styles.page}>
@@ -247,8 +248,9 @@ console.log(VATFromStep1,"VATFromStep1")
             {FinalData?.calculationsByOrderType?.SERVICE_FEE && (
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>
-                  Service Fees ({Variables?.Description_ServiceFees_TotalOrders} Orders
-                  ) (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
+                  Service Fees ({Variables?.Description_ServiceFees_TotalOrders}{" "}
+                  Orders ) (VAT @{" "}
+                  {Variables?.Description_Delivery_Commission_VAT}%)
                 </Text>
                 <Text style={styles.tableCellAmount}>
                   £{Variables?.Description_ServiceFees_Amount}
@@ -259,8 +261,8 @@ console.log(VATFromStep1,"VATFromStep1")
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>
                   Delivery Fees Withheld (
-                  {Variables?.Description_DeliveryFees_TotalOrder} Orders) (VAT @{" "}
-                  {Variables?.Description_DeliveryFees_VAT}%)
+                  {Variables?.Description_DeliveryFees_TotalOrder} Orders) (VAT
+                  @ {Variables?.Description_DeliveryFees_VAT}%)
                 </Text>
                 <Text style={styles.tableCellAmount}>
                   £{Variables?.Description_DeliveryFees_Amount}
@@ -271,9 +273,8 @@ console.log(VATFromStep1,"VATFromStep1")
             {FinalData?.calculationsByOrderType?.DRIVER_TIP && (
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>
-                  Driver Tip
-                  ({Variables?.Description_DriverFees_TotalOrder} Orders)  (VAT @{" "}
-                  {Variables?.Description_DriverFees_VAT}%)
+                  Driver Tip ({Variables?.Description_DriverFees_TotalOrder}{" "}
+                  Orders) (VAT @ {Variables?.Description_DriverFees_VAT}%)
                 </Text>
                 <Text style={styles.tableCellAmount}>
                   £{Variables?.Description_DriverFees_Amount}
@@ -283,9 +284,11 @@ console.log(VATFromStep1,"VATFromStep1")
           </View>
 
           {/* Totals Section */}
-          <View style={{marginTop:"20px"}}>
+          <View style={{ marginTop: "20px" }}>
             <View style={styles.summaryRow}>
-              <Text style={{...styles.boldText, gap:"20px"}}>Sub-Total:</Text>
+              <Text style={{ ...styles.boldText, gap: "20px" }}>
+                Sub-Total:
+              </Text>
               <Text style={styles.boldText}>£{Variables?.Subtotal}</Text>
             </View>
             <View style={styles.summaryRow}>

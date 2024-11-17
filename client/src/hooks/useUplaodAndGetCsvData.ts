@@ -1,6 +1,6 @@
 import ApiHelpers from "../api/ApiHelpers";
 import ApiConstants from "../api/ApiConstants";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { FormValueTypes } from "../components/UploadandGenrateInvoice/Step1";
 import { AxiosResponse } from "axios";
@@ -62,10 +62,6 @@ const uploadFiles  = async (formValues:FormValueTypes):AxiosResponse<ParsedData>
 
 export const useUploadandGetCsvData = () => {
     const{setParsedData, setTrackOldFormData} = useAppBasedContext()
-    // const SaveParsedDataInContext =(data:ParsedData)=>{
-    //   setParsedData(data)
-    // }
-const queryClient = useQueryClient();
   return useMutation<AxiosResponse<ParsedData>, Error, FormValueTypes>({
     mutationFn: (data:FormValueTypes) => uploadFiles(data),
     retry: 0,
@@ -77,7 +73,6 @@ const queryClient = useQueryClient();
     });
     setParsedData(data?.data)
     setTrackOldFormData({step1:postedData})
-    // queryClient.setQueryData(['CalculatedData'], data?.data)
 },
     onError: (data) =>  notifications.show({
         title:'File Upload Failed',
