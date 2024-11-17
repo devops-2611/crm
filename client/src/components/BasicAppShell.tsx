@@ -1,18 +1,17 @@
 import {
+  ActionIcon,
   AppShell,
   Burger,
-  Button,
   Group,
   NavLink,
-  ScrollArea,
   Transition,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Link, Route, Routes, useLocation } from "react-router-dom";
-import Homepage from "../pages/Homepage";
+import { Link, useLocation } from "react-router-dom";
 import AppRoutes from "../routes/Routes";
 import { useState } from "react";
-import { Notifications } from "@mantine/notifications";
+import { IconChevronUp } from "@tabler/icons-react";
+import { IconChevronDown } from "@tabler/icons-react";
 export function BasicAppShell() {
   const [opened, { toggle }] = useDisclosure();
   const [navbarCollapsed, { toggle: toggleNavbar }] = useDisclosure();
@@ -30,7 +29,7 @@ export function BasicAppShell() {
     },
   ];
   const handleSubmenuToggle = (label: string) => {
-    console.log(label, "label")
+    console.log(label, "label");
     setExpandedMenu((prev) => (prev === label ? null : label));
   };
   return (
@@ -70,15 +69,17 @@ export function BasicAppShell() {
                 } // Highlight parent if active
                 rightSection={
                   link.submenu ? (
-                    <Button
+                    <ActionIcon
                       size="xs"
-                      variant="outline"
-                      // compact
-                      
+                      variant="transparent"
                       onClick={() => handleSubmenuToggle(link.label)}
                     >
-                      {expandedMenu === link.label ? "−" : "+"}
-                    </Button>
+                      {expandedMenu === link.label ? (
+                        <IconChevronDown size={12} stroke={2} />
+                      ) : (
+                        <IconChevronUp size={12} stroke={2} />
+                      )}
+                    </ActionIcon>
                   ) : null
                 }
                 onClick={() => link.submenu && handleSubmenuToggle(link.label)}

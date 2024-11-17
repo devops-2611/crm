@@ -15,5 +15,6 @@ export const useGetAllCustomerList = () => {
     queryFn: () => fetchCustomerList(),
     retry: 2,
     refetchOnWindowFocus: false,
+    staleTime:Infinity
   });
 };
