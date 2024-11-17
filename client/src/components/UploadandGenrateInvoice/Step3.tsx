@@ -54,10 +54,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   summaryRow: {
+    display:"flex",
     flexDirection: "row",
+    gap: 40,
     justifyContent: "flex-end",
     marginVertical: 5,
-    width:"100%"
+    width:"100%",
   },
   footer: {
     marginTop: 20,
@@ -118,7 +120,7 @@ const InvoicePDF = () => {
     Description_Collection_Commission_Rate:
       FinalData?.calculationsByOrderType?.COLLECTION?.commissionRate,
     Description_Collection_Commission_Rate_Deliver_Order_value:
-      FinalData?.calculationsByOrderType?.COLLECTION?.totalOrderValue,
+      FinalData?.calculationsByOrderType?.COLLECTION?.totalOrderValue.toFixed(2),
     Description_Collection_Commission_VAT: "TODO",
     Description_Collection_Commission_Amount:
       FinalData?.calculationsByOrderType?.COLLECTION?.amount?.toFixed(2),
@@ -126,7 +128,7 @@ const InvoicePDF = () => {
     Description_Delivery_Commission_Rate:
       FinalData?.calculationsByOrderType?.DELIVERY?.commissionRate,
     Description_Delivery_Commission_Rate_Deliver_Order_value:
-      FinalData?.calculationsByOrderType?.DELIVERY?.totalOrderValue,
+      FinalData?.calculationsByOrderType?.DELIVERY?.totalOrderValue.toFixed(2),
     Description_Delivery_Commission_VAT: "20%",
     Description_Delivery_Commission_Amount:
       FinalData?.calculationsByOrderType?.DELIVERY?.amount?.toFixed(2),
@@ -282,9 +284,9 @@ const InvoicePDF = () => {
           </View>
 
           {/* Totals Section */}
-          <View>
+          <View style={{marginTop:"20px"}}>
             <View style={styles.summaryRow}>
-              <Text style={styles.boldText}>Subtotal:</Text>
+              <Text style={{...styles.boldText, gap:"20px"}}>Sub-Total:</Text>
               <Text style={styles.boldText}>£{Variables?.Subtotal}</Text>
             </View>
             <View style={styles.summaryRow}>
