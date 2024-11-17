@@ -2,12 +2,13 @@ import {
   Page,
   Text,
   Document,
-  StyleSheet, View,
-  PDFViewer
+  StyleSheet,
+  View,
+  PDFViewer,
 } from "@react-pdf/renderer";
 import { useQueryClient } from "@tanstack/react-query";
 import { Invoice } from "../../hooks/useSaveSubmittedData";
-import moment from 'moment';
+import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
 // Registering the font (optional)
 // Font.register({
@@ -54,8 +55,9 @@ const styles = StyleSheet.create({
   },
   summaryRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     marginVertical: 5,
+    width:"100%"
   },
   footer: {
     marginTop: 20,
@@ -90,10 +92,10 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "space-between",
   },
-  FooterText:{
-    display:"flex",
-    justifyContent:"center"
-  }
+  FooterText: {
+    display: "flex",
+    justifyContent: "center",
+  },
 });
 
 const InvoicePDF = () => {
@@ -101,7 +103,7 @@ const InvoicePDF = () => {
   const FinalData: Invoice | undefined = queryClient.getQueryData([
     "EditedAndSavedData",
   ]);
-const {customerConfig}=useAppBasedContext()
+  const { customerConfig } = useAppBasedContext();
 
   const Variables = {
     invoiceId: FinalData?.invoiceId,
@@ -110,8 +112,8 @@ const {customerConfig}=useAppBasedContext()
     chester: "Dont know mapping key",
     postcode: "Dont know mapping key",
     invoiceDate: moment(FinalData?.createdAt).format("Do MMMM YYYY"),
-    Period_startDate: FinalData?.startDate,
-    Period_EndDate: FinalData?.endDate,
+    Period_startDate: moment(FinalData?.startDate).format("Do MMMM YYYY"),
+    Period_EndDate: moment(FinalData?.endDate).format("Do MMMM YYYY"),
     // Description_Collection_Order
     Description_Collection_Commission_Rate:
       FinalData?.calculationsByOrderType?.COLLECTION?.commissionRate,
@@ -133,7 +135,9 @@ const {customerConfig}=useAppBasedContext()
     Description_ServiceFees_Commission_Rate:
       FinalData?.calculationsByOrderType?.SERVICE_FEE?.commissionRate,
     Description_ServiceFees_TotalOrders:
-      FinalData?.calculationsByOrderType?.SERVICE_FEE?.totalOrderValue?.toFixed(2),
+      FinalData?.calculationsByOrderType?.SERVICE_FEE?.totalOrderValue?.toFixed(
+        2
+      ),
     Description_ServiceFees_Commission_VAT: "20%",
     Description_ServiceFees_Amount:
       FinalData?.calculationsByOrderType?.SERVICE_FEE?.amount?.toFixed(2),
@@ -144,12 +148,19 @@ const {customerConfig}=useAppBasedContext()
     Description_DeliveryFees_Amount:
       FinalData?.calculationsByOrderType?.DELIVERY_CHARGE?.amount?.toFixed(2),
 
+    // Driver Fees Section
+    Description_DriverFees_TotalOrder:
+      FinalData?.calculationsByOrderType?.DRIVER_TIP?.totalOrders,
+    Description_DriverFees_VAT: "20%",
+    Description_DriverFees_Amount:
+      FinalData?.calculationsByOrderType?.DRIVER_TIP?.amount?.toFixed(2),
+
     // TotalSections
     Subtotal: FinalData?.totalSubTotal?.toFixed(2),
     VAT: FinalData?.tax_amount?.toFixed(2),
     Total_INC_VAT: FinalData?.totalWithTax?.toFixed(2),
   };
-  console.log(FinalData,"FinalData")
+  console.log(FinalData, "FinalData");
   return (
     <PDFViewer style={{ width: "100%", height: "100vh" }}>
       <Document>
@@ -198,14 +209,21 @@ const {customerConfig}=useAppBasedContext()
           {/* Description Table */}
           <View>
             <View style={styles.tableHeader}>
-              <Text style={styles.tableCell}>Description</Text>
-              <Text style={styles.tableCellAmount}>Amount</Text>
+              <Text style={{ ...styles.tableCell, fontWeight: "bold" }}>
+                Description
+              </Text>
+              <Text style={{ ...styles.tableCellAmount, fontWeight: "bold" }}>
+                Amount
+              </Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>
                 {Variables?.Description_Collection_Commission_Rate}% Commission
-                On Delivery Order Value £
-                {Variables?.Description_Collection_Commission_Rate} (VAT @ 20%)
+                On Collection Order Value £
+                {
+                  Variables?.Description_Collection_Commission_Rate_Deliver_Order_value
+                }{" "}
+                (VAT @ 20%)
               </Text>
               <Text style={styles.tableCellAmount}>
                 £{Variables?.Description_Collection_Commission_Amount}
@@ -215,38 +233,59 @@ const {customerConfig}=useAppBasedContext()
               <Text style={styles.tableCell}>
                 {Variables?.Description_Delivery_Commission_Rate}% Commission On
                 Delivery Order Value £
-                {Variables?.Description_Delivery_Commission_Rate} (VAT @ 20%)
+                {
+                  Variables?.Description_Delivery_Commission_Rate_Deliver_Order_value
+                }{" "}
+                (VAT @ 20%)
               </Text>
               <Text style={styles.tableCellAmount}>
                 £{Variables?.Description_Delivery_Commission_Amount}
               </Text>
             </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>
-                Service Fees ({Variables?.Description_ServiceFees_TotalOrders})
-                (VAT @ 20%)
-              </Text>
-              <Text style={styles.tableCellAmount}>
-                £{Variables?.Description_ServiceFees_Amount}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>
-                Delivery Fees Withheld (1{" "}
-                {Variables?.Description_DeliveryFees_TotalOrder}) (VAT @{" "}
-                {Variables?.Description_DeliveryFees_VAT}%)
-              </Text>
-              <Text style={styles.tableCellAmount}>
-                £{Variables?.Description_DeliveryFees_Amount}
-              </Text>
-            </View>
+
+            {FinalData?.calculationsByOrderType?.SERVICE_FEE && (
+              <View style={styles.tableRow}>
+                <Text style={styles.tableCell}>
+                  Service Fees ({Variables?.Description_ServiceFees_TotalOrders}
+                  ) (VAT @ 20%)
+                </Text>
+                <Text style={styles.tableCellAmount}>
+                  £{Variables?.Description_ServiceFees_Amount}
+                </Text>
+              </View>
+            )}
+            {FinalData?.calculationsByOrderType?.DELIVERY_CHARGE && (
+              <View style={styles.tableRow}>
+                <Text style={styles.tableCell}>
+                  Delivery Fees Withheld (1{" "}
+                  {Variables?.Description_DeliveryFees_TotalOrder}) (VAT @{" "}
+                  {Variables?.Description_DeliveryFees_VAT}%)
+                </Text>
+                <Text style={styles.tableCellAmount}>
+                  £{Variables?.Description_DeliveryFees_Amount}
+                </Text>
+              </View>
+            )}
+
+            {FinalData?.calculationsByOrderType?.DRIVER_TIP && (
+              <View style={styles.tableRow}>
+                <Text style={styles.tableCell}>
+                  Driver Tip
+                  {Variables?.Description_DriverFees_TotalOrder} (VAT @{" "}
+                  {Variables?.Description_DriverFees_VAT}%)
+                </Text>
+                <Text style={styles.tableCellAmount}>
+                  £{Variables?.Description_DriverFees_Amount}
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Totals Section */}
           <View>
             <View style={styles.summaryRow}>
-              <Text>Subtotal:</Text>
-              <Text>£{Variables?.Subtotal}</Text>
+              <Text style={styles.boldText}>Subtotal:</Text>
+              <Text style={styles.boldText}>£{Variables?.Subtotal}</Text>
             </View>
             <View style={styles.summaryRow}>
               <Text>VAT:</Text>
@@ -257,8 +296,10 @@ const {customerConfig}=useAppBasedContext()
               <Text style={styles.boldText}>£{Variables?.Total_INC_VAT}</Text>
             </View>
           </View>
-          <View style={styles.FooterText}>You don’t need to do anything, this will automatically be deducted in your Swishr Account statement
-          128 City Road, London, EC1V 2NX</View>
+          <View style={styles.FooterText}>
+            You don’t need to do anything, this will automatically be deducted
+            in your Swishr Account statement 128 City Road, London, EC1V 2NX
+          </View>
           <View style={styles.FooterText}>Page 1 of 2</View>
         </Page>
 
