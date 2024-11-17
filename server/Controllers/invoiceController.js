@@ -4,7 +4,7 @@ const csv = require('csv-parser');
 const stream = require('stream');
 const CustomerModel = require('../Models/customer');
 const InvoiceModal = require('../Models/invoice');
-const { calculateOrderValues, generateInvoiceId } = require('../Utils/utils');
+const { calculateOrderValues, generateInvoiceId, getWeekBoundaries } = require('../Utils/utils');
 
 
 // Configure Multer to store files in memory
@@ -101,6 +101,8 @@ const uploadAndParseCSV = async (req, res) => {
                 const tax_amount = (taxRate * totalSubTotal) / 100;
                 const totalWithTax = totalSubTotal + tax_amount;
 
+                const {startOfWeek, endOfWeek} = getWeekBoundaries(results[0].orderDate, results[results.length - 1].orderDate);
+
                 const finalData = {
                     customerId: customerId,
                     calculationsByOrderType,
@@ -110,9 +112,10 @@ const uploadAndParseCSV = async (req, res) => {
                     totalWithTax,
                     totalSalesValue,
                     amountToRecieve: totalSalesValue - totalWithTax,
-                    startDate: results[0].orderDate,
-                    endDate: results[results.length - 1].orderDate,
-                    storeName: results[0].branchName
+                    startDate: startOfWeek,
+                    endDate: endOfWeek,
+                    storeName: results[0].branchName, 
+                    taxRate: taxRate
                 }
 
                 res.status(200).json(finalData);

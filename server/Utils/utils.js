@@ -107,5 +107,46 @@ const generateInvoiceId = (customerId) => {
     return invoiceId;
 };
 
+const getWeekBoundaries = (startDateStr, endDateStr) => {
+    const parseDate = (dateStr) => new Date(dateStr.replace(" ", "T")); // Ensure ISO-8601 format
+  
+    // Parse input dates
+    const startDate = parseDate(startDateStr);
+    const endDate = parseDate(endDateStr);
+  
+    // Function to calculate the Monday before or on the given date
+    const getMonday = (date) => {
+      const day = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const diff = day === 0 ? -6 : 1 - day; // Adjust to the Monday of the current week
+      const monday = new Date(date);
+      monday.setDate(date.getDate() + diff);
+      return monday;
+    };
+  
+    // Function to calculate the Sunday after or on the given date
+    const getSunday = (date) => {
+      const day = date.getDay();
+      const diff = day === 0 ? 0 : 7 - day; // Adjust to the Sunday of the current week
+      const sunday = new Date(date);
+      sunday.setDate(date.getDate() + diff);
+      return sunday;
+    };
+  
+    // Get the desired Monday and Sunday
+    const monday = getMonday(startDate);
+    const sunday = getSunday(endDate);
+  
+    // Format dates as "YYYY-MM-DD HH:mm:ss.s"
+    const formatDate = (date) => {
+      const pad = (n) => (n < 10 ? `0${n}` : n);
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${Math.floor(date.getMilliseconds() / 100)}`;
+    };
+  
+    return {
+      startOfWeek: formatDate(monday),
+      endOfWeek: formatDate(sunday),
+    };
+  };
+  
 
-module.exports = {calculateOrderValues, generateInvoiceId};
+module.exports = {calculateOrderValues, generateInvoiceId, getWeekBoundaries};

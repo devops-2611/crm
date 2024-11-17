@@ -1,7 +1,7 @@
 const CustomerModel = require('../Models/customer'); 
 
 exports.addCustomer = async (req, res) => {
-  const { customerName, customerEmail, customerMobile, customerAddress, serviceFee, deliveryCharge, driverTip } = req.body;
+  const { customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip } = req.body;
   try {
     // Check if a customer with the same customerId already exists
     const existingCustomer = await CustomerModel.findOne({ customerEmail });
@@ -11,7 +11,7 @@ exports.addCustomer = async (req, res) => {
 
     const lastCustomer = await CustomerModel.findOne().sort({ customerId: -1 });
   
-    const customerId = lastCustomer ? lastCustomer.customerId + 1 : 1;
+    const customerId = lastCustomer ? lastCustomer.customerId + 1 : 101;
     // Create a new customer
     const customer = new CustomerModel({
       customerId,
@@ -19,6 +19,8 @@ exports.addCustomer = async (req, res) => {
       customerEmail,
       customerMobile, 
       customerAddress,
+      customerArea,
+      customerPost,
       serviceFee,
       deliveryCharge,
       driverTip
@@ -54,7 +56,7 @@ exports.getAllCustomerList = async (req, res) => {
 
   exports.editCustomer = async (req, res) => {
     const { id } = req.params;
-    const { customerId, customerName, customerEmail, customerMobile, customerAddress, serviceFee, deliveryCharge, driverTip } = req.body;
+    const { customerId, customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip } = req.body;
     try {
       const customer = await CustomerModel.findOne({ customerId: parseInt(id) });
       if (!customer) {
@@ -65,6 +67,8 @@ exports.getAllCustomerList = async (req, res) => {
       customer.customerEmail = customerEmail;
       customer.customerMobile = customerMobile;
       customer.customerAddress = customerAddress;   
+      customer.customerArea = customerArea;
+      customer.customerPost = customerPost;
       customer.serviceFee = serviceFee;
       customer.deliveryCharge = deliveryCharge;
       customer.driverTip = driverTip;

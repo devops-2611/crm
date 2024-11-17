@@ -22,6 +22,12 @@ const CustomerSchema = new mongoose.Schema(
     customerAddress: {
       type: String,
     },
+    customerArea: {
+      type: String,
+    },
+    customerPost: {
+      type: mongoose.Schema.Types.Mixed, // Allows any type
+    },
     serviceFee: {
       type: Boolean,
       default: true

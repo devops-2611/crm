@@ -10,6 +10,8 @@ interface Customer {
   customerId: number
   customerName: string
   customerAddress: string
+  customerArea: string
+  customerPost: number | null | string
   customerEmail: string
   customerMobile: string
   serviceFee: boolean
@@ -26,7 +28,9 @@ export default function CustomerManagement() {
     initialValues: {
       customerName: '',
       customerAddress: '',
-      customerEmail:'',
+      customerArea: '',
+      customerPost: null,
+      customerEmail: '',
       customerMobile: '',
       serviceFee: true,
       driverTip: false,
@@ -38,7 +42,9 @@ export default function CustomerManagement() {
     initialValues: {
       customerName: '',
       customerAddress: '',
-      customerEmail:'',
+      customerArea: '',
+      customerPost: null,
+      customerEmail: '',
       customerMobile: '',
       serviceFee: true,
       driverTip: false,
@@ -55,7 +61,7 @@ export default function CustomerManagement() {
       const response = await ApiHelpers.GET('/api/customer/getAllCustomerDetails')
 
       if (response.status !== 200) throw new Error('Failed to fetch customers')
-        
+
       setCustomers(response.data)
     } catch (error) {
       notifications.show({
@@ -67,9 +73,11 @@ export default function CustomerManagement() {
   }
 
   const handleSubmit = async (values: typeof form.values) => {
-    const obj : any = {
+    const obj: any = {
       customerName: values.customerName,
       customerAddress: values.customerAddress,
+      customerArea: values.customerArea,
+      customerPost: values.customerPost,
       customerEmail: values.customerEmail,
       customerMobile: values.customerMobile,
       serviceFee: values.serviceFee,
@@ -79,7 +87,7 @@ export default function CustomerManagement() {
     try {
       const response = await ApiHelpers.POST('/api/customer/add-customer', obj)
       if (response.status !== 200) throw new Error('Failed to add customer')
-      
+
       await fetchCustomers()
       form.reset()
       notifications.show({
@@ -106,10 +114,12 @@ export default function CustomerManagement() {
     if (!editingCustomer) return
     try {
 
-      const obj : any = {
+      const obj: any = {
         customerId: editingCustomer.customerId,
         customerName: values.customerName,
         customerAddress: values.customerAddress,
+        customerArea: values.customerArea,
+        customerPost: values.customerPost,
         customerEmail: values.customerEmail,
         customerMobile: values.customerMobile,
         serviceFee: values.serviceFee,
@@ -171,17 +181,29 @@ export default function CustomerManagement() {
           {...form.getInputProps('customerAddress')}
         />
         <TextInput
-            label="Customer Email"
-            placeholder="Enter customer email"
-            required
-            {...form.getInputProps('customerEmail')}
-          />
-          <TextInput
-            label="Customer Mobile"
-            placeholder="Enter customer mobile"
-            required
-            {...form.getInputProps('customerMobile')}
-          />
+          label="Customer Area"
+          placeholder="Enter customer area"
+          required
+          {...form.getInputProps('customerArea')}
+        />
+        <TextInput
+          label="Customer Post Code"
+          placeholder="Enter customer post code"
+          required
+          {...form.getInputProps('customerPost')}
+        />
+        <TextInput
+          label="Customer Email"
+          placeholder="Enter customer email"
+          required
+          {...form.getInputProps('customerEmail')}
+        />
+        <TextInput
+          label="Customer Mobile"
+          placeholder="Enter customer mobile"
+          required
+          {...form.getInputProps('customerMobile')}
+        />
         <Radio.Group
           label="Service Fee Applicable"
           {...form.getInputProps('serviceFee')}
@@ -218,6 +240,8 @@ export default function CustomerManagement() {
             <th>Sr.No</th>
             <th>Name</th>
             <th>Address</th>
+            <th>Area</th>
+            <th>Post Code</th>
             <th>Email</th>
             <th>Mobile</th>
             <th>Service Fee (Is Applicable)</th>
@@ -232,6 +256,8 @@ export default function CustomerManagement() {
               <td>{index + 1}</td>
               <td>{customer.customerName}</td>
               <td>{customer.customerAddress}</td>
+              <td>{customer.customerArea}</td>
+              <td>{customer.customerPost}</td>
               <td>{customer.customerEmail}</td>
               <td>{customer.customerMobile}</td>
               <td>{customer.serviceFee ? 'Yes' : 'No'}</td>
@@ -265,6 +291,18 @@ export default function CustomerManagement() {
             placeholder="Enter customer address"
             required
             {...formEdit.getInputProps('customerAddress')}
+          />
+          <TextInput
+            label="Customer Area"
+            placeholder="Enter customer area"
+            required
+            {...form.getInputProps('customerArea')}
+          />
+          <TextInput
+            label="Customer Post Code"
+            placeholder="Enter customer post code"
+            required
+            {...form.getInputProps('customerPost')}
           />
           <TextInput
             label="Customer Email"
