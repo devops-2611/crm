@@ -17,7 +17,7 @@ interface ConfigDetails {
   };
 }
 
-interface CustomerData {
+export interface CustomerData {
   configDetails: ConfigDetails;
   _id: string;
   customerId: number;

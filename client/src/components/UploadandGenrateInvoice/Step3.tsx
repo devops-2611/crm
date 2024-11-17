@@ -6,9 +6,9 @@ import {
   PDFViewer
 } from "@react-pdf/renderer";
 import { useQueryClient } from "@tanstack/react-query";
-import { ParsedData } from "../../hooks/useUplaodAndGetCsvData";
 import { Invoice } from "../../hooks/useSaveSubmittedData";
 import moment from 'moment';
+import useAppBasedContext from "../../hooks/useAppBasedContext";
 // Registering the font (optional)
 // Font.register({
 //   family: 'Roboto',
@@ -101,14 +101,12 @@ const InvoicePDF = () => {
   const FinalData: Invoice | undefined = queryClient.getQueryData([
     "EditedAndSavedData",
   ]);
-  const InitialFormData: ParsedData | undefined = queryClient.getQueryData([
-    "CalculatedData",
-  ]);
-  console.log(FinalData, "FinalData");
+const {customerConfig}=useAppBasedContext()
+
   const Variables = {
     invoiceId: FinalData?.invoiceId,
     storeName: FinalData?.storeName,
-    address: "Dont know mapping key",
+    address: customerConfig.customerAddress,
     chester: "Dont know mapping key",
     postcode: "Dont know mapping key",
     invoiceDate: moment(FinalData?.createdAt).format("Do MMMM YYYY"),

@@ -42,10 +42,6 @@ export function FileUpload() {
     }
   };
 
-  // const handleDelete = () => {
-  //   setFieldValue("csvfile", []); // Clear the file in Formik
-  // };
-
   return (
     <Dropzone
       onDrop={handleDrop}
