@@ -35,13 +35,12 @@ const expectedHeaders = [
 // Controller function to handle CSV upload and parsing directly from buffer
 const uploadAndParseCSV = async (req, res) => {
     try {
-
         let { customerId, taxRate } = req.body;
 
         customerId = Number(customerId);
         taxRate = Number(taxRate);
 
-        if (!req.file) {
+        if (!req.file || req.files?.length === 0) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
@@ -51,13 +50,19 @@ const uploadAndParseCSV = async (req, res) => {
         }
 
         const results = [];
+        let files;
+        if (req.files) {
+            files = req.files
+        }
+        else {
+            files = [req.file]
+        }
 
-        const processFile = (file) => {
-            return new Promise((resolve, reject) => {
-                const fileResults = [];
-                const bufferStream = new stream.PassThrough();
-                bufferStream.end(file.buffer);
+        for (const file of files) {
+            const bufferStream = new stream.PassThrough();
+            bufferStream.end(file.buffer);
 
+            await new Promise((resolve, reject) => {
                 bufferStream
                     .pipe(csv({ headers: expectedHeaders, skipLines: 1 }))
                     .on('data', (row) => {
@@ -83,25 +88,18 @@ const uploadAndParseCSV = async (req, res) => {
                             taxes: parseFloat(row['Taxes']) || 0,
                             total: parseFloat(row['Total']) || 0,
                         };
-                        fileResults.push(formattedRow);
+                        results.push(formattedRow);
                     })
-                    .on('end', () => resolve(fileResults))
-                    .on('error', (error) => reject(error));
+                    .on('end', resolve)
+                    .on('error', reject);
             });
-        };
-
-        // Process all files
-        for (const file of req.files) {
-            const fileData = await processFile(file);
-            results.push(...fileData);
         }
 
         const calculationsByOrderType = calculateOrderValues(results, customer, 'orderType');
-
         const calculationsByPaymentType = calculateOrderValues(results, customer, 'paymentType');
 
         let totalSubTotal = 0;
-        let totalSalesValue = 0
+        let totalSalesValue = 0;
         for (const orderType in calculationsByOrderType) {
             totalSubTotal += calculationsByOrderType[orderType].amount;
             if (orderType.toLowerCase() === 'delivery' || orderType.toLowerCase() === 'collection') {
@@ -125,16 +123,17 @@ const uploadAndParseCSV = async (req, res) => {
             amountToRecieve: totalSalesValue - totalWithTax,
             startDate: startOfWeek,
             endDate: endOfWeek,
-            taxRate: taxRate
-        }
+            storeName: results[0].branchName,
+            taxRate: taxRate,
+        };
 
         res.status(200).json(finalData);
-
     } catch (error) {
-        console.error("Server error:", error);
-        res.status(500).json({ error: 'Server error' });
+        console.error("Error parsing CSV:", error);
+        res.status(500).json({ error: 'Error parsing CSV file' });
     }
 };
+
 
 const saveInvoiceData = async (req, res) => {
     try {
@@ -188,7 +187,7 @@ const uploadManualData = async (req, res) => {
                 deliveryCharge: parseFloat(order.deliveryCharge) || 0,
                 serviceFee: parseFloat(order.serviceFee) || 0,
                 surCharge: parseFloat(order.surCharge) || 0,
-                subTotal: (parseFloat(order.subTotal) || 0)               
+                subTotal: (parseFloat(order.subTotal) || 0)
             };
         });
 
@@ -235,15 +234,15 @@ const uploadManualData = async (req, res) => {
 const getInvoiceByCustomerId = async (req, res) => {
     const { id } = req.params; // Assuming 'id' is actually the 'customerId'
     try {
-        const invoices = await InvoiceModal.find({ customerId : id });
+        const invoices = await InvoiceModal.find({ customerId: id });
         if (invoices.length === 0) {
             return res.status(404).json({ message: "No invoices found for this customer" });
         }
-      res.status(200).json(invoices);
+        res.status(200).json(invoices);
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+        console.error(err.message);
+        res.status(500).send('Server error');
     }
-  };
+};
 
 module.exports = { upload, uploadAndParseCSV, saveInvoiceData, getInvoiceByCustomerId, uploadManualData };
