@@ -30,9 +30,6 @@ export function FileUpload() {
   );
 
   const handleDrop = async (files: FileWithPath[]) => {
-    if (files?.length > 0) {
-      return;
-    }
     setFieldValue("csvfile", files);
   };
 
