@@ -1,4 +1,4 @@
-import { FileUpload } from "../Dropzone";
+import { FileUpload } from "../../components/Dropzone";
 import { Button, Container, NumberInput } from "@mantine/core";
 import { Select, Stack } from "@mantine/core";
 import { useGetAllCustomerList } from "../../hooks/useGetAllCustomerList";
@@ -33,10 +33,10 @@ const validationSchema = Yup.object().shape({
 interface DemoPropTypes {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
-export default function Demo(props: DemoPropTypes) {
+export default function Demo(props: Readonly<DemoPropTypes>) {
   const { setActiveStep } = props;
   const { data: customerList } = useGetAllCustomerList();
-  
+
   const getCutomersOptions = useMemo(
     () =>
       customerList?.data?.map((item) => ({
@@ -56,9 +56,9 @@ export default function Demo(props: DemoPropTypes) {
     }
   }, [isSuccesinUploadingData, setActiveStep]);
 
-  const handleSubmit = (values: FormValueTypes) => {
+  const handleSubmit = async(values: FormValueTypes) => {
     try {
-      SubmitFormDataAndCSV(values);
+      await SubmitFormDataAndCSV(values);
     } catch (error) {
       console.log("error occured");
     }
@@ -71,29 +71,18 @@ export default function Demo(props: DemoPropTypes) {
           handleSubmit(values);
         }}
         validationSchema={validationSchema}
+        validateOnBlur={true}
       >
         {(Formikprops) => (
           <Form onSubmit={Formikprops.handleSubmit}>
-            <Stack
-              bg="var(--mantine-color-body)"
-              // align="stretch"
-              justify="center"
-              gap="md"
-            >
-              {/* <Text
-              size="xl"
-              fw={900}
-              variant="gradient"
-              gradient={{ from: "blue", to: "cyan", deg: 90 }}
-            >
-              Generate Your Client`s Invoice here
-            </Text> */}
+            <Stack bg="var(--mantine-color-body)" justify="center" gap="md">
               <Select
                 data={getCutomersOptions}
                 value={Formikprops.values.customerid}
                 onChange={(value) =>
                   Formikprops.setFieldValue("customerid", value)
                 }
+                onBlur={() => Formikprops.setFieldTouched("customerid", true)}
                 label={"Select your customer"}
                 checked={false}
                 name={"customerid"}
@@ -101,6 +90,8 @@ export default function Demo(props: DemoPropTypes) {
                 error={
                   Formikprops.touched.customerid &&
                   Formikprops.errors?.customerid
+                    ? Formikprops?.errors?.customerid
+                    : undefined
                 }
               />
               <NumberInput
@@ -111,15 +102,14 @@ export default function Demo(props: DemoPropTypes) {
                 mt="md"
                 name={"taxrate"}
                 allowNegative={false}
-                onChange={(val)=>Formikprops.setFieldValue("taxrate",val)}
+                onChange={(val) => Formikprops.setFieldValue("taxrate", val)}
                 error={
                   Formikprops.touched.taxrate && Formikprops.errors?.taxrate
                 }
-                max={100}
+                onBlur={() => Formikprops.setFieldTouched("taxrate", true)}
               />
 
               <FileUpload />
-              {/* <Flex justify={"center"}> */}
               <Button
                 variant="filled"
                 disabled={
@@ -130,7 +120,6 @@ export default function Demo(props: DemoPropTypes) {
                 Next
               </Button>
               <FetchandSaveCustomerConfig />
-              {/* </Flex> */}
             </Stack>
           </Form>
         )}

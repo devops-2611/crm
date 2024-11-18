@@ -2,7 +2,7 @@ import { ReactNode, useMemo, useState } from "react";
 import { AppBasedContext } from "./AppContexts";
 import { CustomerData } from "../hooks/useGetCustomerConfigbyID";
 import { ParsedData } from "../hooks/useUplaodAndGetCsvData";
-import { FormValueTypes } from "../components/UploadandGenrateInvoice/Step1";
+import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
 import { EditAndSaveResponse } from "../hooks/useSaveSubmittedData";
 interface AppBAsedProvidersProps {
   children: ReactNode;

@@ -10,14 +10,14 @@ import {
   Table,
   Text,
 } from "@mantine/core";
-import { useQueryClient } from "@tanstack/react-query";
 import { useSaveSubmittedData } from "../../hooks/useSaveSubmittedData";
-import { useEffect, useState } from "react";
+import { React,useEffect, useState } from "react";
 import { DateTimePicker } from "@mantine/dates";
 import { IconPhoto } from "@tabler/icons-react";
 import { CalculationsByOrderType } from "../../hooks/useUplaodAndGetCsvData";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
-import React from 'react';
+
+
 interface InvoicePreviewProps {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -125,7 +125,6 @@ const EditableTable = ({
 const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
   const { mutateAsync: saveEditedData, isSuccess: isSuccessInUpdatingData } =
     useSaveSubmittedData();
-  const queryClient = useQueryClient();
   const {parsedData:CalculatedData}=useAppBasedContext()
  
   const formik = useFormik({

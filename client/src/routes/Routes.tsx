@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Homepage from "../pages/Homepage";
-import FormWrapper from "../components/UploadandGenrateInvoice/FormWrapper";
+import FormWrapper from "../pages/UploadandGenrateInvoice/FormWrapper";
 import CustomerManagement from "../pages/admin/CustomerManagement";
 
 const AppRoutes = () => {

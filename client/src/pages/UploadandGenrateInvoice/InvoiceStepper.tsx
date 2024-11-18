@@ -6,8 +6,8 @@ interface InvoiceStepperTypes{
 const InvoiceStepper = (props:InvoiceStepperTypes) => {
     const {active, setActiveStep}=props
   return (
-    <Stepper active={active}>
-      <Stepper.Step label="Step 1" description="Upload CSV..." />
+    <Stepper active={active} iconPosition="left">
+      <Stepper.Step label="Step 1" description="Upload CSV file" />
       <Stepper.Step
         label="Step 2"
         description="Verify Details"

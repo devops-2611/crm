@@ -8,12 +8,11 @@ import {
 } from "@mantine/dropzone";
 import { useCallback } from "react";
 import { notifications } from "@mantine/notifications";
-import { useFileUpload } from "../hooks/useFileUpload";
 import { useFormikContext } from "formik";
+import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
 
 export function FileUpload() {
-  const { values, setFieldValue } = useFormikContext();
-  const {  status } = useFileUpload();
+  const { values, setFieldValue } = useFormikContext<FormValueTypes>();
   const theme = useMantineTheme();
 
   const handleReject = useCallback(
@@ -31,15 +30,10 @@ export function FileUpload() {
   );
 
   const handleDrop = async (files: FileWithPath[]) => {
-    try {
-      // const result = await mutateAsync(files);
-      // console.log("File uploaded successfully:", result);
-      setFieldValue("csvfile", files)
-      // / Set the file in Formik
-    } catch (error) {
-      console.error("Upload failed:", error);
-      
+    if (files?.length > 0) {
+      return;
     }
+    setFieldValue("csvfile", files);
   };
 
   return (
@@ -50,11 +44,13 @@ export function FileUpload() {
       accept={[MIME_TYPES.csv]}
       multiple={false}
       maxFiles={1}
-      loading={status === "pending"}
       name={"csvfile"}
-      style={{height:150, display:'flex', alignItems:'center', marginTop:'20px'}}
-
-      // disabled={!!values?.csvfile?.[0]?.name}
+      style={{
+        height: 150,
+        display: "flex",
+        alignItems: "center",
+        marginTop: "20px",
+      }}
     >
       <Group
         justify="center"
@@ -102,7 +98,7 @@ export function FileUpload() {
             Attach a single file, file should not exceed 5mb
           </Text>
 
-          {values?.csvfile && values.csvfile[0]?.name && (
+          {values?.csvfile?.[0]?.name && (
             <div style={{ marginTop: 10, color: "green" }}>
               <div>Uploaded file: {values.csvfile[0].name}</div>
             </div>

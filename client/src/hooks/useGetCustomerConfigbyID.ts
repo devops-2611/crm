@@ -31,7 +31,7 @@ export interface CustomerData {
 }
 
 function fetchCustomerConfig(
-  id: string | null
+  id: string
 ): Promise<AxiosResponse<CustomerData>> {
   return ApiHelpers.GET(ApiConstants.GET_CUSTOMER_CONFIG(id));
 }
@@ -42,5 +42,6 @@ export const useGetCustomerConfigbyID = (id: string | null) => {
     queryFn: () => fetchCustomerConfig(id),
     refetchOnWindowFocus: false,
     enabled: !!id,
+  
   });
 };

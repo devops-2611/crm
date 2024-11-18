@@ -2,7 +2,7 @@ import ApiHelpers from "../api/ApiHelpers";
 import ApiConstants from "../api/ApiConstants";
 import { useMutation } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { FormValueTypes } from "../components/UploadandGenrateInvoice/Step1";
+import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
 import { AxiosResponse } from "axios";
 import useAppBasedContext from "./useAppBasedContext";
 interface CalculationDetails {
@@ -20,9 +20,9 @@ interface CalculationDetails {
   export interface CalculationsByOrderType {
     DELIVERY: CalculationDetails;
     COLLECTION: CalculationDetails;
-    SERVICE_FEE: CalculationDetails;
-    DELIVERY_CHARGE: CalculationDetails;
-    DRIVER_TIP: CalculationDetails;
+    SERVICE_FEE?: CalculationDetails;
+    DELIVERY_CHARGE?: CalculationDetails;
+    DRIVER_TIP?: CalculationDetails;
   }
   
   interface CalculationsByPaymentType {
