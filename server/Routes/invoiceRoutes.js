@@ -1,10 +1,12 @@
 const express = require('express');
-const { upload, uploadAndParseCSV , saveInvoiceData} = require('../Controllers/invoiceController');
+const { upload, uploadAndParseCSV , uploadManualData, saveInvoiceData, getInvoiceByCustomerId} = require('../Controllers/invoiceController');
 const router = express.Router();
 
 
 router.post('/uploadAndGetInvoiceData', upload.single('file'), uploadAndParseCSV);
+router.post('/uploadManuallyAndGetInvoiceData', upload.none(), uploadManualData);
 router.post('/saveInvoiceData', saveInvoiceData);
+router.get('/getInvoiceByCustomerId/:id', getInvoiceByCustomerId);
 
 
 

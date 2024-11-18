@@ -48,10 +48,6 @@ const invoiceSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    storeName: {
-        type: String,
-        required: true
-    },
     taxRate: {
         type: Number,
         required: true
