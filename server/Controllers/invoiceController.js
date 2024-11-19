@@ -2,6 +2,7 @@
 const multer = require('multer');
 const csv = require('csv-parser');
 const stream = require('stream');
+const moment = require("moment");
 const CustomerModel = require('../Models/customer');
 const InvoiceModal = require('../Models/invoice');
 const { calculateOrderValues, generateInvoiceId, getWeekBoundaries } = require('../Utils/utils');
@@ -32,6 +33,13 @@ const expectedHeaders = [
     'Total',
 ];
 
+const requiredFields = [
+    'Order Date', 'Order Type', 'Payment Type', 'Payment Status', 'Confirmation Status',
+    'Promo Discount', 'Order Discount', 'Driver Tip', 
+    'Delivery Charge', 'Service Fee', 'SurCharge', 
+    'Sub Total',
+];
+
 // Controller function to handle CSV upload and parsing directly from buffer
 const uploadAndParseCSV = async (req, res) => {
     try {
@@ -40,7 +48,7 @@ const uploadAndParseCSV = async (req, res) => {
         customerId = Number(customerId);
         taxRate = Number(taxRate);
 
-        if (!req.file || req.files?.length === 0) {
+        if (req.files?.length === 0) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
@@ -50,15 +58,8 @@ const uploadAndParseCSV = async (req, res) => {
         }
 
         const results = [];
-        let files;
-        if (req.files) {
-            files = req.files
-        }
-        else {
-            files = [req.file]
-        }
 
-        for (const file of files) {
+        for (const file of req.files) {
             const bufferStream = new stream.PassThrough();
             bufferStream.end(file.buffer);
 
@@ -66,7 +67,37 @@ const uploadAndParseCSV = async (req, res) => {
                 bufferStream
                     .pipe(csv({ headers: expectedHeaders, skipLines: 1 }))
                     .on('data', (row) => {
-                        // Map and format each row
+
+                        for (const field of requiredFields) {
+                            if (!row[field] || row[field].trim() === '') {
+                                reject(
+                                    new Error(
+                                        JSON.stringify({
+                                            fileName: file.originalname,
+                                            invalidField: field,
+                                            row: row,
+                                        })
+                                    )
+                                );
+                            }
+                        }
+
+                        // Validate date fields
+                        const orderDateStr = row["Order Date"];
+                        const isOrderDateValid = moment(orderDateStr, "YYYY-MM-DD HH:mm:ss.S", true).isValid();
+                        if (!isOrderDateValid) {
+                            reject(
+                                new Error(
+                                    JSON.stringify({
+                                        fileName: file.originalname,
+                                        invalidField: "Order Date",
+                                        invalidValue: orderDateStr,
+                                        row: row,
+                                    })
+                                )
+                            );
+                        }
+
                         const formattedRow = {
                             orderId: row['Order ID'],
                             orderDate: row['Order Date'],
@@ -93,6 +124,10 @@ const uploadAndParseCSV = async (req, res) => {
                     .on('end', resolve)
                     .on('error', reject);
             });
+        }
+
+        if (results.length === 0) {
+            return res.status(400).json({ error: 'No valid data found in uploaded files' });
         }
 
         const calculationsByOrderType = calculateOrderValues(results, customer, 'orderType');
@@ -129,8 +164,17 @@ const uploadAndParseCSV = async (req, res) => {
 
         res.status(200).json(finalData);
     } catch (error) {
-        console.error("Error parsing CSV:", error);
-        res.status(500).json({ error: 'Error parsing CSV file' });
+        console.error("Error parsing CSV:", error.message);
+        try {
+            const parsedError = JSON.parse(error.message);
+            return res.status(400).json({
+                error: `Invalid data in file: ${parsedError.fileName}`,
+                invalidField: parsedError.invalidField,
+                row: parsedError.row,
+            });
+        } catch (parseError) {
+            return res.status(400).json({ error: error.message });
+        }
     }
 };
 
@@ -175,6 +219,37 @@ const uploadManualData = async (req, res) => {
         }
 
         const results = orderData.map((order) => {
+
+            for (const field of requiredFields) {
+                if (!order[field] || order[field].trim() === '') {
+                    reject(
+                        new Error(
+                            JSON.stringify({
+                                fileName: file.originalname,
+                                invalidField: field,
+                                row: order,
+                            })
+                        )
+                    );
+                }
+            }
+
+            // Validate date fields
+            const orderDateStr = order["Order Date"];
+            const isOrderDateValid = moment(orderDateStr, "YYYY-MM-DD HH:mm:ss.S", true).isValid();
+            if (!isOrderDateValid) {
+                reject(
+                    new Error(
+                        JSON.stringify({
+                            fileName: file.originalname,
+                            invalidField: "Order Date",
+                            invalidValue: orderDateStr,
+                            row: order,
+                        })
+                    )
+                );
+            }
+
             return {
                 orderDate: order.orderDate,
                 orderType: order.orderType,
@@ -190,6 +265,10 @@ const uploadManualData = async (req, res) => {
                 subTotal: (parseFloat(order.subTotal) || 0)
             };
         });
+
+        if (results.length === 0) {
+            return res.status(400).json({ error: 'No valid data found in files' });
+        }
 
         const calculationsByOrderType = calculateOrderValues(results, customer, 'orderType');
 
@@ -227,7 +306,16 @@ const uploadManualData = async (req, res) => {
 
     } catch (error) {
         console.error("Server error:", error);
-        res.status(500).json({ error: 'Server error' });
+        try {
+            const parsedError = JSON.parse(error.message);
+            return res.status(400).json({
+                error: `Invalid data in file: ${parsedError.fileName}`,
+                invalidField: parsedError.invalidField,
+                row: parsedError.row,
+            });
+        } catch (parseError) {
+            return res.status(400).json({ error: error.message });
+        }
     }
 }
 
