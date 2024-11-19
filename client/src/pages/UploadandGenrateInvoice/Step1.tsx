@@ -75,6 +75,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
       >
         {(Formikprops) => (
           <Form onSubmit={Formikprops.handleSubmit}>
+
             <Stack bg="var(--mantine-color-body)" justify="center" gap="md">
               <Select
                 data={getCutomersOptions}
@@ -94,6 +95,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
                     : undefined
                 }
               />
+
               <NumberInput
                 label="Enter Tax Rate"
                 placeholder="Percents"

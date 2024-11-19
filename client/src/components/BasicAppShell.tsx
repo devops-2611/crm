@@ -12,22 +12,40 @@ import AppRoutes from "../routes/Routes";
 import { useState } from "react";
 import { IconChevronUp } from "@tabler/icons-react";
 import { IconChevronDown } from "@tabler/icons-react";
+import { IconEye } from "@tabler/icons-react";
+import { IconLayoutDashboard } from "@tabler/icons-react";
+import { IconFileInvoice } from "@tabler/icons-react";
+import { IconFilePlus } from "@tabler/icons-react";
 export function BasicAppShell() {
   const [opened, { toggle }] = useDisclosure();
   const [navbarCollapsed, { toggle: toggleNavbar }] = useDisclosure();
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null); // Track expanded submenu
   const location = useLocation(); // To get the current route
   const navLinks = [
-    { label: "Dashboard", path: "/" },
+    {
+      label: "Dashboard",
+      path: "/",
+      logo: <IconLayoutDashboard style={{ color: "#007BFF" }} stroke={2} />,
+    },
     {
       label: "Invoices",
       path: "/Invoices",
+      logo: <IconFileInvoice style={{ color: "#20B2AA" }} />,
       submenu: [
-        { label: "View Invoice", path: "/reports/viewinvoice" },
-        { label: "Generate Invoice", path: "/reports/generate" },
+        {
+          label: "View Invoice",
+          path: "/reports/viewinvoice",
+          logo: <IconEye style={{ color: "#28A745" }} />,
+        },
+        {
+          label: "Generate Invoice",
+          path: "/reports/generate",
+          logo: <IconFilePlus style={{ color: "#FF7F50" }} />,
+        },
       ],
     },
   ];
+
   const handleSubmenuToggle = (label: string) => {
     console.log(label, "label");
     setExpandedMenu((prev) => (prev === label ? null : label));
@@ -61,12 +79,13 @@ export function BasicAppShell() {
               <NavLink
                 key={link.path}
                 component={link.submenu ? undefined : Link}
-                to={link.submenu ? undefined : link.path}
+                to={link.submenu ? link.submenu[0]?.path : link.path}
                 label={link.label}
                 active={
                   location.pathname === link.path ||
                   link.submenu?.some((sub) => location.pathname === sub.path)
                 } // Highlight parent if active
+                leftSection={link.logo}
                 rightSection={
                   link.submenu ? (
                     <ActionIcon
@@ -86,13 +105,14 @@ export function BasicAppShell() {
                 styles={(theme) => ({
                   root: {
                     borderRadius: theme.radius.sm,
-                    backgroundColor:
-                      location.pathname === link.path ||
-                      link.submenu?.some(
-                        (sub) => location.pathname === sub.path
-                      )
-                        ? theme.colors.blue[0]
-                        : "transparent",
+                    // backgroundColor:
+                    //   location.pathname === link.path ||
+                    //   link.submenu?.some(
+                    //     (sub) => location.pathname === sub.path
+                    //   )
+                    //     ? theme.colors.cyan[0]
+                    //     : "transparent",
+
                     color:
                       location.pathname === link.path ||
                       link.submenu?.some(
@@ -100,13 +120,13 @@ export function BasicAppShell() {
                       )
                         ? theme.colors.blue[7]
                         : theme.colors.dark[7],
-                    fontWeight:
-                      location.pathname === link.path ||
-                      link.submenu?.some(
-                        (sub) => location.pathname === sub.path
-                      )
-                        ? 700
-                        : 500,
+                    // fontWeight:
+                    //   location.pathname === link.path ||
+                    //   link.submenu?.some(
+                    //     (sub) => location.pathname === sub.path
+                    //   )
+                    //     ? 700
+                    //     : 500,
                   },
                 })}
               >
@@ -120,20 +140,21 @@ export function BasicAppShell() {
                       to={subLink.path}
                       label={subLink.label}
                       active={location.pathname === subLink.path}
+                      leftSection={subLink.logo}
                       styles={(theme) => ({
                         root: {
-                          marginLeft: theme.spacing.md,
+                          // marginLeft: theme.spacing.md,
                           borderRadius: theme.radius.sm,
-                          backgroundColor:
-                            location.pathname === subLink.path
-                              ? theme.colors.blue[1]
-                              : "transparent",
+                          // backgroundColor:
+                          //   location.pathname === subLink.path
+                          //     ? theme.colors.blue[1]
+                          //     : "transparent",
                           color:
                             location.pathname === subLink.path
                               ? theme.colors.blue[7]
                               : theme.colors.dark[6],
-                          fontWeight:
-                            location.pathname === subLink.path ? 600 : 400,
+                          // fontWeight:
+                          //   location.pathname === subLink.path ? 600 : 400,
                         },
                       })}
                     />
