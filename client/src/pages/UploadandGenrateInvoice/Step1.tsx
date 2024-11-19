@@ -9,6 +9,8 @@ import { FileWithPath } from "@mantine/dropzone";
 import React from "react";
 import * as Yup from "yup";
 import FetchandSaveCustomerConfig from "./FetchandSaveCustomerConfig";
+import { useIsFetching } from "@tanstack/react-query";
+import useAppBasedContext from "../../hooks/useAppBasedContext";
 
 export interface FormValueTypes {
   customerid: string;
@@ -34,9 +36,11 @@ interface DemoPropTypes {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
 export default function Demo(props: Readonly<DemoPropTypes>) {
+  const {trackOldFormData} = useAppBasedContext()
+  
   const { setActiveStep } = props;
   const { data: customerList } = useGetAllCustomerList();
-
+  const isFetchingCustomerList = useIsFetching({ queryKey: ["customerlist"] });
   const getCutomersOptions = useMemo(
     () =>
       customerList?.data?.map((item) => ({
@@ -48,6 +52,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
   const {
     mutateAsync: SubmitFormDataAndCSV,
     isSuccess: isSuccesinUploadingData,
+    isPending,
   } = useUploadandGetCsvData();
 
   useEffect(() => {
@@ -56,7 +61,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
     }
   }, [isSuccesinUploadingData, setActiveStep]);
 
-  const handleSubmit = async(values: FormValueTypes) => {
+  const handleSubmit = async (values: FormValueTypes) => {
     try {
       await SubmitFormDataAndCSV(values);
     } catch (error) {
@@ -66,7 +71,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
   return (
     <Container p={20}>
       <Formik
-        initialValues={initalValues}
+        initialValues={trackOldFormData?.step1 ?? initalValues}
         onSubmit={(values) => {
           handleSubmit(values);
         }}
@@ -75,7 +80,6 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
       >
         {(Formikprops) => (
           <Form onSubmit={Formikprops.handleSubmit}>
-
             <Stack bg="var(--mantine-color-body)" justify="center" gap="md">
               <Select
                 data={getCutomersOptions}
@@ -115,9 +119,12 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
               <Button
                 variant="filled"
                 disabled={
-                  !Formikprops.values.customerid || !Formikprops.values.csvfile
+                  !Formikprops.values.customerid ||
+                  !Formikprops.values.csvfile ||
+                  Boolean(isFetchingCustomerList)
                 }
                 type={"submit"}
+                loading={isPending}
               >
                 Next
               </Button>
