@@ -36,12 +36,13 @@ function fetchCustomerConfig(
   return ApiHelpers.GET(ApiConstants.GET_CUSTOMER_CONFIG(id));
 }
 
-export const useGetCustomerConfigbyID = (id: string | null) => {
+export const useGetCustomerConfigbyID = (id: string) => {
   return useQuery({
     queryKey: ["customerlist", id],
     queryFn: () => fetchCustomerConfig(id),
     refetchOnWindowFocus: false,
     enabled: !!id,
+    refetchOnMount:false
   
   });
 };

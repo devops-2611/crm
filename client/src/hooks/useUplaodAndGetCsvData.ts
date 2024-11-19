@@ -83,8 +83,10 @@ export const useUploadandGetCsvData = () => {
     onError: (data) => {
       if (data instanceof AxiosError) {
         notifications.show({
-          title: "File Upload Failed",
-          message: data?.response?.data?.error ?? "Something went wrong",
+          title: data?.response?.data?.error ?? "Request Failed",
+          message: data?.response?.data?.invalidField
+            ? `Invalid Field: ${data?.response?.data?.invalidField}`
+            : "Something went wrong",
           color: "red",
           autoClose: 5000,
         });
