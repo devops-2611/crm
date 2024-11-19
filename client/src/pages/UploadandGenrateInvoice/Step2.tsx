@@ -11,13 +11,19 @@ import {
   Text,
 } from "@mantine/core";
 import { useSaveSubmittedData } from "../../hooks/useSaveSubmittedData";
-import { React,useEffect, useState } from "react";
-import { DateTimePicker } from "@mantine/dates";
-import { IconPhoto } from "@tabler/icons-react";
+import React,{ useEffect, useState } from "react";
+import {
+  IconChevronRight,
+  IconChevronLeft,
+  IconTruckDelivery,
+  IconCreditCardPay,
+  IconInfoSquareRounded,
+  IconCoinPound,
+} from "@tabler/icons-react";
 import { CalculationsByOrderType } from "../../hooks/useUplaodAndGetCsvData";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
-
-
+import { modals } from "@mantine/modals";
+import { DateTimePicker } from "@mantine/dates";
 interface InvoicePreviewProps {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -38,17 +44,17 @@ const EditableTable = ({
   tableKey,
   labels,
   columnsHeaders,
-  isPayMentType=false,
+  isPayMentType = false,
 }: {
   data: any;
   formik: any;
   tableKey: string;
   labels: Record<string, string>;
   columnsHeaders: string[];
-  isPayMentType?:boolean
+  isPayMentType?: boolean;
 }) => {
   return (
-    <Table striped highlightOnHover withColumnBorders  >
+    <Table striped highlightOnHover withColumnBorders>
       <thead>
         <tr>
           {columnsHeaders?.map((header) => (
@@ -89,31 +95,33 @@ const EditableTable = ({
               </td>
               {!isPayMentType && (
                 <>
-                <td>
-                <NumberInput
-                  value={calculation.commissionRate}
-                  onChange={(val) =>
-                    formik.setFieldValue(
-                      `${tableKey}.${key}.commissionRate`,
-                      val
-                    )
-                  }
-                  hideControls
-                  decimalScale={2}
-                  fixedDecimalScale
-                />
-              </td>
-              <td>
-                <NumberInput
-                  value={calculation.amount?.toFixed(2)}
-                  onChange={(val) =>
-                    formik.setFieldValue(`${tableKey}.${key}.amount`, val)
-                  }
-                  hideControls
-                  decimalScale={2}
-                  fixedDecimalScale
-                />
-              </td></>)}
+                  <td>
+                    <NumberInput
+                      value={calculation.commissionRate}
+                      onChange={(val) =>
+                        formik.setFieldValue(
+                          `${tableKey}.${key}.commissionRate`,
+                          val
+                        )
+                      }
+                      hideControls
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                  </td>
+                  <td>
+                    <NumberInput
+                      value={calculation.amount?.toFixed(2)}
+                      onChange={(val) =>
+                        formik.setFieldValue(`${tableKey}.${key}.amount`, val)
+                      }
+                      hideControls
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                  </td>
+                </>
+              )}
             </tr>
           );
         })}
@@ -123,15 +131,29 @@ const EditableTable = ({
 };
 
 const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
-  const { mutateAsync: saveEditedData, isSuccess: isSuccessInUpdatingData } =
-    useSaveSubmittedData();
-  const {parsedData:CalculatedData}=useAppBasedContext()
- 
+  const {
+    mutateAsync: saveEditedData,
+    isSuccess: isSuccessInUpdatingData,
+    isPending,
+  } = useSaveSubmittedData();
+  const { parsedData: CalculatedData } = useAppBasedContext();
+
   const formik = useFormik({
     initialValues: CalculatedData ?? {},
     onSubmit: (values) => {
       if (values) {
-        saveEditedData(values);
+        modals.openConfirmModal({
+          title: "Please confirm your action",
+          children: (
+            <Text size="sm">
+              This action is so important that you are required to confirm it
+              with a modal. Please click one of these buttons to proceed.
+            </Text>
+          ),
+          labels: { confirm: "Confirm", cancel: "Cancel" },
+          onCancel: () => console.log("Cancel"),
+          onConfirm: () => saveEditedData(values),
+        });
       }
     },
   });
@@ -144,15 +166,21 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
   const [accordianValue, setAccordianValue] = useState<string[]>([]);
   return (
     <Box mx="auto" mt="xl">
-      <Accordion variant="contained" multiple={true} value={accordianValue} onChange={setAccordianValue}>
+      <Accordion
+        variant="contained"
+        multiple={true}
+        value={accordianValue}
+        onChange={setAccordianValue}
+        transitionDuration={400}
+      >
         {Object.keys(formik.values)?.length > 0 && (
           <form onSubmit={formik.handleSubmit}>
             <Accordion.Item value="photos">
               <Accordion.Control
                 icon={
-                  <IconPhoto
+                  <IconInfoSquareRounded
                     style={{
-                      color: "var(--mantine-color-red-6)",
+                      color: "blue",
                       width: rem(20),
                       height: rem(20),
                     }}
@@ -194,9 +222,9 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
             <Accordion.Item value="Calculations by Order Type">
               <Accordion.Control
                 icon={
-                  <IconPhoto
+                  <IconTruckDelivery
                     style={{
-                      color: "var(--mantine-color-red-6)",
+                      color: "#9b59b6",
                       width: rem(20),
                       height: rem(20),
                     }}
@@ -225,9 +253,9 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
             <Accordion.Item value="Calculations by Payment Type">
               <Accordion.Control
                 icon={
-                  <IconPhoto
+                  <IconCreditCardPay
                     style={{
-                      color: "var(--mantine-color-red-6)",
+                      color: "#1abc9c",
                       width: rem(20),
                       height: rem(20),
                     }}
@@ -251,9 +279,9 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
             <Accordion.Item value="Order Summary">
               <Accordion.Control
                 icon={
-                  <IconPhoto
+                  <IconCoinPound
                     style={{
-                      color: "var(--mantine-color-red-6)",
+                      color: "#34495e",
                       width: rem(20),
                       height: rem(20),
                     }}
@@ -297,9 +325,25 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
                 </Group>
               </Accordion.Panel>
             </Accordion.Item>
-            <Button type="submit" mt="xl" fullWidth>
-              Proceed to Generate Invoice
-            </Button>
+            <Group justify="center">
+              <Button
+                type="button"
+                mt="xl"
+                onClick={() => setActiveStep((prev: number) => prev - 1)}
+                loading={isPending}
+                leftSection={<IconChevronLeft />}
+              >
+                Go Back
+              </Button>
+              <Button
+                type="submit"
+                mt="xl"
+                loading={isPending}
+                rightSection={<IconChevronRight />}
+              >
+                Proceed to Generate Invoice
+              </Button>
+            </Group>
           </form>
         )}
       </Accordion>

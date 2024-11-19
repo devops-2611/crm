@@ -5,9 +5,8 @@ import {
   StyleSheet,
   View,
   PDFViewer,
+  Image,
 } from "@react-pdf/renderer";
-import { useQueryClient } from "@tanstack/react-query";
-import { Invoice } from "../../hooks/useSaveSubmittedData";
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
 // Registering the font (optional)
@@ -77,10 +76,13 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 5,
+    borderBottom: "1px solid black",
   },
   tableCell: {
     flex: 3,
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+    padding: "5",
   },
   tableCellDate: {
     flex: 1,
@@ -89,6 +91,7 @@ const styles = StyleSheet.create({
   tableCellAmount: {
     flex: 1,
     textAlign: "right",
+    borderRight: "1px solid black",
   },
   BasicInfo: {
     display: "flex",
@@ -97,6 +100,7 @@ const styles = StyleSheet.create({
   FooterText: {
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
   },
 });
 
@@ -164,22 +168,22 @@ const InvoicePDF = () => {
   };
   console.log(FinalData, "FinalData");
   return (
-    <PDFViewer style={{ width: "100%", height: "100vh", marginTop:'20px' }}>
+    <PDFViewer style={{ width: "100%", height: "100vh", marginTop: "20px" }}>
       <Document>
         {/* Page 1 */}
         <Page size="A4" style={styles.page}>
           {/* Header Section */}
           <View style={styles.header}>
-            {/* <Image
-            src="https://i.imgur.com/6oyvQbQ.png" // Replace this with your logo URL
-            style={styles.logo}
-          /> */}
             <View>
               <Text style={styles.boldText}>
                 Invoice no. {Variables?.invoiceId}
               </Text>
               <Text>Invoice date: {Variables?.invoiceDate}</Text>
             </View>
+            <Image
+              src="https://i.imgur.com/6oyvQbQ.png" // Replace this with your logo URL
+              style={styles.logo}
+            />
           </View>
 
           {/* Store and Swishr Details */}
@@ -301,10 +305,14 @@ const InvoicePDF = () => {
             </View>
           </View>
           <View style={styles.FooterText}>
-            You don’t need to do anything, this will automatically be deducted
-            in your Swishr Account statement 128 City Road, London, EC1V 2NX
+            <Text>
+              You don’t need to do anything, this will automatically be deducted
+              in your Swishr Account statement 128 City Road, London, EC1V 2NX
+            </Text>
           </View>
-          <View style={styles.FooterText}>Page 1 of 2</View>
+          <View style={{ ...styles.FooterText, width: "100%" }}>
+            <Text>Page 1 of 2</Text>
+          </View>
         </Page>
 
         {/* Page 2 */}

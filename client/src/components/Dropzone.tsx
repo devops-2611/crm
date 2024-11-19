@@ -67,8 +67,7 @@ export function FileUpload() {
         });
         return;
       }
-
-      setFieldValue("csvfile", [...values.csvfile, files]);
+      setFieldValue("csvfile", [...values.csvfile, ...files]);
       return;
     }
     setFieldValue("csvfile", files);
@@ -161,7 +160,7 @@ export function FileUpload() {
               >
                 Uploaded file:{" "}
                 {values?.csvfile.map((file) => (
-                  <List.Item key={file.name}>
+                  <List.Item key={file.name + `${file.size}`}>
                     <Group align="center">
                       <Box>{file.name}</Box>
                       <ActionIcon
