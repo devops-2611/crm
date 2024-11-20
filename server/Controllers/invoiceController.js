@@ -58,10 +58,12 @@ const uploadAndParseCSV = async (req, res) => {
         }
 
         const results = [];
+        const errors = [];
 
         for (const file of req.files) {
             const bufferStream = new stream.PassThrough();
             bufferStream.end(file.buffer);
+            const fileErrors = new Set();
 
             await new Promise((resolve, reject) => {
                 bufferStream
@@ -70,14 +72,12 @@ const uploadAndParseCSV = async (req, res) => {
 
                         for (const field of requiredFields) {
                             if (!row[field] || row[field].trim() === '') {
-                                reject(
-                                    new Error(
-                                        JSON.stringify({
-                                            fileName: file.originalname,
-                                            invalidField: field,
-                                            row: row,
-                                        })
-                                    )
+                                fileErrors.add(
+                                    JSON.stringify({
+                                        fileName: file.originalname,
+                                        invalidField: field,
+                                        invalidValue: row[field],
+                                    })
                                 );
                             }
                         }
@@ -86,17 +86,16 @@ const uploadAndParseCSV = async (req, res) => {
                         const orderDateStr = row["Order Date"];
                         const isOrderDateValid = moment(orderDateStr, "YYYY-MM-DD HH:mm:ss.S", true).isValid();
                         if (!isOrderDateValid) {
-                            reject(
-                                new Error(
-                                    JSON.stringify({
-                                        fileName: file.originalname,
-                                        invalidField: "Order Date",
-                                        invalidValue: orderDateStr,
-                                        row: row,
-                                    })
-                                )
+                            fileErrors.add(
+                                JSON.stringify({
+                                    fileName: file.originalname,
+                                    invalidField: "Order Date",
+                                    invalidValue: orderDateStr,
+                                })
                             );
                         }
+
+                        if (fileErrors.size === 0){
 
                         const formattedRow = {
                             orderId: row['Order ID'],
@@ -120,9 +119,26 @@ const uploadAndParseCSV = async (req, res) => {
                             total: parseFloat(row['Total']) || 0,
                         };
                         results.push(formattedRow);
+                    }
                     })
-                    .on('end', resolve)
+                    .on("end", () => {
+                        if (fileErrors.size > 0) {
+                            const uniqueErrors = [...fileErrors].map((error) => JSON.parse(error));
+                            errors.push({
+                                fileName: file.originalname,
+                                issues: uniqueErrors,
+                            });
+                        }
+                        resolve();
+                    })
                     .on('error', reject);
+            });
+        }
+
+        if (errors.length > 0) {
+            return res.status(400).json({
+                error: "Invalid data found in uploaded files",
+                details: errors,
             });
         }
 
@@ -165,16 +181,7 @@ const uploadAndParseCSV = async (req, res) => {
         res.status(200).json(finalData);
     } catch (error) {
         console.error("Error parsing CSV:", error.message);
-        try {
-            const parsedError = JSON.parse(error.message);
-            return res.status(400).json({
-                error: `Invalid data in file: ${parsedError.fileName}`,
-                invalidField: parsedError.invalidField,
-                row: parsedError.row,
-            });
-        } catch (parseError) {
-            return res.status(400).json({ error: error.message });
-        }
+        return res.status(500).json({ error: error.message });
     }
 };
 
@@ -219,36 +226,6 @@ const uploadManualData = async (req, res) => {
         }
 
         const results = orderData.map((order) => {
-
-            for (const field of requiredFields) {
-                if (!order[field] || order[field].trim() === '') {
-                    reject(
-                        new Error(
-                            JSON.stringify({
-                                fileName: file.originalname,
-                                invalidField: field,
-                                row: order,
-                            })
-                        )
-                    );
-                }
-            }
-
-            // Validate date fields
-            const orderDateStr = order["Order Date"];
-            const isOrderDateValid = moment(orderDateStr, "YYYY-MM-DD HH:mm:ss.S", true).isValid();
-            if (!isOrderDateValid) {
-                reject(
-                    new Error(
-                        JSON.stringify({
-                            fileName: file.originalname,
-                            invalidField: "Order Date",
-                            invalidValue: orderDateStr,
-                            row: order,
-                        })
-                    )
-                );
-            }
 
             return {
                 orderDate: order.orderDate,
@@ -306,16 +283,7 @@ const uploadManualData = async (req, res) => {
 
     } catch (error) {
         console.error("Server error:", error);
-        try {
-            const parsedError = JSON.parse(error.message);
-            return res.status(400).json({
-                error: `Invalid data in file: ${parsedError.fileName}`,
-                invalidField: parsedError.invalidField,
-                row: parsedError.row,
-            });
-        } catch (parseError) {
-            return res.status(400).json({ error: error.message });
-        }
+        res.status(500).json({ error: 'Server error' });
     }
 }
 
