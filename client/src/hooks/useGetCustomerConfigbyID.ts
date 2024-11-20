@@ -25,14 +25,17 @@ export interface CustomerData {
   customerEmail: string;
   customerMobile: string;
   customerAddress: string;
-  createdAt: string; // Use Date type if parsing into actual Date objects
-  updatedAt: string; // Use Date type if parsing into actual Date objects
+  createdAt: string;
+  updatedAt: string;
+  customerArea: string;
+  customerPost: number;
+  serviceFee: boolean;
+  deliveryCharge: boolean;
+  driverTip: boolean;
   __v: number;
 }
 
-function fetchCustomerConfig(
-  id: string
-): Promise<AxiosResponse<CustomerData>> {
+function fetchCustomerConfig(id: string): Promise<AxiosResponse<CustomerData>> {
   return ApiHelpers.GET(ApiConstants.GET_CUSTOMER_CONFIG(id));
 }
 
@@ -42,7 +45,6 @@ export const useGetCustomerConfigbyID = (id: string) => {
     queryFn: () => fetchCustomerConfig(id),
     refetchOnWindowFocus: false,
     enabled: !!id,
-    refetchOnMount:false
-  
+    refetchOnMount: false,
   });
 };

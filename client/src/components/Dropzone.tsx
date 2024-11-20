@@ -1,20 +1,5 @@
-import {
-  ActionIcon,
-  Box,
-  Group,
-  List,
-  Text,
-  ThemeIcon,
-  rem,
-  useMantineTheme,
-} from "@mantine/core";
-import {
-  IconUpload,
-  IconPhoto,
-  IconX,
-  IconCircleCheck,
-  IconTrash,
-} from "@tabler/icons-react";
+import { ActionIcon, Box, Group, List, Text, ThemeIcon, rem, useMantineTheme } from "@mantine/core";
+import { IconUpload, IconPhoto, IconX, IconTrash, IconCircleCheck } from "@tabler/icons-react";
 import {
   Dropzone,
   MIME_TYPES,
@@ -33,10 +18,31 @@ function findCommonStrings(array1: string[], array2: string[]) {
 
   return commonStrings;
 }
-export function FileUpload() {
-  const { values, setFieldValue } = useFormikContext<FormValueTypes>();
-  const theme = useMantineTheme();
 
+
+
+function findDuplicates(arr: string[]) {
+  const duplicates = [];
+  const seen = new Set();
+  const seenDuplicates = new Set();
+
+  for (const str of arr) {
+    if (seen.has(str)) {
+      if (!seenDuplicates.has(str)) {
+        duplicates.push(str);
+        seenDuplicates.add(str);
+      }
+    } else {
+      seen.add(str);
+    }
+  }
+
+  return duplicates;
+}
+export function FileUpload() {
+  const { values, setFieldValue, errors } = useFormikContext<FormValueTypes>();
+  const theme = useMantineTheme();
+console.log(errors?.csvfile,"checknowwwwww")
   const handleReject = useCallback(
     (fileRejections: FileRejection[]) => {
       if (fileRejections[0].errors[0].code === "file-invalid-type") {
@@ -52,8 +58,18 @@ export function FileUpload() {
   );
 
   const handleDrop = async (files: FileWithPath[]) => {
+    const getDuplicateFilesInBulkUpload = findDuplicates(
+      files?.map((file) => file.name)
+    );
+    if (getDuplicateFilesInBulkUpload?.length) {
+      notifications?.show({
+        title: "Dupllicate Files",
+        message: getDuplicateFilesInBulkUpload?.toString(),
+        color: "red",
+      });
+      return;
+    }
     if (values?.csvfile && values?.csvfile?.length > 0) {
-      console.log("inside if");
       const existingFileNames = values?.csvfile?.map((file) => file.name);
       const Duplicates = findCommonStrings(
         files?.map((file) => file.name),
@@ -61,7 +77,7 @@ export function FileUpload() {
       );
       if (Duplicates?.length > 0) {
         notifications.show({
-          title: "Duplicate File",
+          title: "You have already added some files",
           message: Duplicates?.toString(),
           color: "red",
         });
@@ -86,14 +102,19 @@ export function FileUpload() {
     }
     setFieldValue("csvfile", updatedFiles);
   };
-
+  // const displayErrors =(e,fileName:string)=>{
+  //   e.stopPropagation();
+  //   console.log(errors?.csvfile.details)
+  //   const check = errors?.csvfile.details?.find((file)=>file.fileName ===fileName)
+  //   console.log(check)
+  // }
   return (
     <Dropzone
       onDrop={handleDrop}
       onReject={handleReject}
       maxSize={5 * 1024 ** 2}
       maxFiles={10}
-      accept={[MIME_TYPES.csv]}
+      accept={[MIME_TYPES.csv,MIME_TYPES.xlsx, MIME_TYPES.xls]}
       name={"csvfile"}
       style={{
         display: "flex",
@@ -155,7 +176,9 @@ export function FileUpload() {
                     <IconCircleCheck
                       style={{ width: rem(16), height: rem(16) }}
                     />
+                    
                   </ThemeIcon>
+                  
                 }
               >
                 Uploaded file:{" "}
@@ -172,6 +195,7 @@ export function FileUpload() {
                       >
                         <IconTrash />
                       </ActionIcon>
+                      {/* <ActionIcon  style={{ pointerEvents: "all" }} onClick={(e)=>displayErrors(e,file.name)}    key={file.name}><IconCircleX style={{ width: rem(20), height: rem(20) }} /></ActionIcon> */}
                     </Group>
                   </List.Item>
                 ))}

@@ -5,6 +5,23 @@ import { notifications } from "@mantine/notifications";
 import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
 import { AxiosError, AxiosResponse } from "axios";
 import useAppBasedContext from "./useAppBasedContext";
+
+interface ValidationErrorDetail {
+  fileName: string;
+  issues: Issue[];
+}
+
+interface Issue {
+  fileName: string;
+  invalidField: string;
+  invalidValue: string;
+}
+
+export interface ValidationErrorResponse {
+  error: string;
+  details: ValidationErrorDetail[];
+}
+
 interface CalculationDetails {
   totalOrderValue: number;
   totalOrders: number;
@@ -67,7 +84,7 @@ const uploadFiles = async (
 
 export const useUploadandGetCsvData = () => {
   const { setParsedData, setTrackOldFormData } = useAppBasedContext();
-  return useMutation<AxiosResponse<ParsedData>, Error, FormValueTypes>({
+  return useMutation<AxiosResponse<ParsedData>, AxiosError<ValidationErrorResponse>, FormValueTypes>({
     mutationFn: (data: FormValueTypes) => uploadFiles(data),
     retry: 0,
     onSuccess: (data, postedData) => {
@@ -84,9 +101,7 @@ export const useUploadandGetCsvData = () => {
       if (data instanceof AxiosError) {
         notifications.show({
           title: data?.response?.data?.error ?? "Request Failed",
-          message: data?.response?.data?.invalidField
-            ? `Invalid Field: ${data?.response?.data?.invalidField}`
-            : "Something went wrong",
+          message: 'TODO',
           color: "red",
           autoClose: 5000,
         });

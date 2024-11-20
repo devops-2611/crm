@@ -102,21 +102,94 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  PageNoText: {
+    position: "absolute", // Fixes the footer position
+    bottom: 10, // Distance from the bottom of the page
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    fontSize: 10,
+  },
 });
+const styles_page2 = StyleSheet.create({
+  page: {
+    fontFamily: "Helvetica",
+    padding: 20,
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  logo: {
+    fontSize: 12,
+    marginBottom: 5,
+  },
+  table: {
+    display: "flex",
+    width: "auto",
+    borderStyle: "solid",
+    borderWidth: 1,
+    marginTop: 20,
+  },
+  tableRow: {
+    flexDirection: "row",
+  },
+  tableCell: {
+    borderStyle: "solid",
+    borderWidth: 1,
+    padding: 5,
+    fontSize: 10,
+    flex: 1,
+    textAlign: "left",
+  },
+  tableHeader: {
+    backgroundColor: "#f2f2f2",
+    fontWeight: "bold",
+  },
+  summaryTitle: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  accountStateMentTitle: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
 
+  footer: {
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 10,
+  },
+  PageNoText: {
+    position: "absolute", // Fixes the footer position
+    bottom: 10, // Distance from the bottom of the page
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    fontSize: 10,
+  },
+});
 const InvoicePDF = () => {
   const { trackOldFormData } = useAppBasedContext();
 
   const { customerConfig } = useAppBasedContext();
   const FinalData = trackOldFormData?.step2?.invoice;
-  const VATFromStep1 = trackOldFormData?.step1?.taxrate;
-  console.log(VATFromStep1, "VATFromStep1");
+
   const Variables = {
     invoiceId: FinalData?.invoiceId,
     storeName: FinalData?.storeName,
     address: customerConfig.customerAddress,
     chester: "Dont know mapping key",
-    postcode: "Dont know mapping key",
+    postcode: customerConfig?.customerPost,
     invoiceDate: moment(FinalData?.createdAt).format("Do MMMM YYYY"),
     Period_startDate: moment(FinalData?.startDate).format("Do MMMM YYYY"),
     Period_EndDate: moment(FinalData?.endDate).format("Do MMMM YYYY"),
@@ -127,7 +200,7 @@ const InvoicePDF = () => {
       FinalData?.calculationsByOrderType?.COLLECTION?.totalOrderValue.toFixed(
         2
       ),
-    Description_Collection_Commission_VAT: VATFromStep1,
+    Description_Collection_Commission_VAT: FinalData?.taxRate,
     Description_Collection_Commission_Amount:
       FinalData?.calculationsByOrderType?.COLLECTION?.amount?.toFixed(2),
     // Description_Delivery_Order
@@ -135,7 +208,7 @@ const InvoicePDF = () => {
       FinalData?.calculationsByOrderType?.DELIVERY?.commissionRate,
     Description_Delivery_Commission_Rate_Deliver_Order_value:
       FinalData?.calculationsByOrderType?.DELIVERY?.totalOrderValue.toFixed(2),
-    Description_Delivery_Commission_VAT: VATFromStep1,
+    Description_Delivery_Commission_VAT: FinalData?.taxRate,
     Description_Delivery_Commission_Amount:
       FinalData?.calculationsByOrderType?.DELIVERY?.amount?.toFixed(2),
 
@@ -144,20 +217,20 @@ const InvoicePDF = () => {
       FinalData?.calculationsByOrderType?.SERVICE_FEE?.commissionRate,
     Description_ServiceFees_TotalOrders:
       FinalData?.calculationsByOrderType?.SERVICE_FEE?.totalOrders,
-    Description_ServiceFees_Commission_VAT: VATFromStep1,
+    Description_ServiceFees_Commission_VAT: FinalData?.taxRate,
     Description_ServiceFees_Amount:
       FinalData?.calculationsByOrderType?.SERVICE_FEE?.amount?.toFixed(2),
     // Delivery Fees Section
     Description_DeliveryFees_TotalOrder:
       FinalData?.calculationsByOrderType?.DELIVERY_CHARGE?.totalOrders,
-    Description_DeliveryFees_VAT: VATFromStep1,
+    Description_DeliveryFees_VAT: FinalData?.taxRate,
     Description_DeliveryFees_Amount:
       FinalData?.calculationsByOrderType?.DELIVERY_CHARGE?.amount?.toFixed(2),
 
     // Driver Fees Section
     Description_DriverFees_TotalOrder:
       FinalData?.calculationsByOrderType?.DRIVER_TIP?.totalOrders,
-    Description_DriverFees_VAT: VATFromStep1,
+    Description_DriverFees_VAT: FinalData?.taxRate,
     Description_DriverFees_Amount:
       FinalData?.calculationsByOrderType?.DRIVER_TIP?.amount?.toFixed(2),
 
@@ -222,32 +295,36 @@ const InvoicePDF = () => {
                 Amount
               </Text>
             </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>
-                {Variables?.Description_Collection_Commission_Rate}% Commission
-                On Collection Order Value £
-                {
-                  Variables?.Description_Collection_Commission_Rate_Deliver_Order_value
-                }{" "}
-                (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
-              </Text>
-              <Text style={styles.tableCellAmount}>
-                £{Variables?.Description_Collection_Commission_Amount}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>
-                {Variables?.Description_Delivery_Commission_Rate}% Commission On
-                Delivery Order Value £
-                {
-                  Variables?.Description_Delivery_Commission_Rate_Deliver_Order_value
-                }{" "}
-                (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
-              </Text>
-              <Text style={styles.tableCellAmount}>
-                £{Variables?.Description_Delivery_Commission_Amount}
-              </Text>
-            </View>
+            {FinalData?.calculationsByOrderType?.COLLECTION && (
+              <View style={styles.tableRow}>
+                <Text style={styles.tableCell}>
+                  {Variables?.Description_Collection_Commission_Rate}%
+                  Commission On Collection Order Value £
+                  {
+                    Variables?.Description_Collection_Commission_Rate_Deliver_Order_value
+                  }{" "}
+                  (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
+                </Text>
+                <Text style={styles.tableCellAmount}>
+                  £{Variables?.Description_Collection_Commission_Amount}
+                </Text>
+              </View>
+            )}
+            {FinalData?.calculationsByOrderType?.DELIVERY && (
+              <View style={styles.tableRow}>
+                <Text style={styles.tableCell}>
+                  {Variables?.Description_Delivery_Commission_Rate}% Commission
+                  On Delivery Order Value £
+                  {
+                    Variables?.Description_Delivery_Commission_Rate_Deliver_Order_value
+                  }{" "}
+                  (VAT @ {Variables?.Description_Delivery_Commission_VAT}%)
+                </Text>
+                <Text style={styles.tableCellAmount}>
+                  £{Variables?.Description_Delivery_Commission_Amount}
+                </Text>
+              </View>
+            )}
 
             {FinalData?.calculationsByOrderType?.SERVICE_FEE && (
               <View style={styles.tableRow}>
@@ -310,79 +387,111 @@ const InvoicePDF = () => {
               in your Swishr Account statement 128 City Road, London, EC1V 2NX
             </Text>
           </View>
-          <View style={{ ...styles.FooterText, width: "100%" }}>
-            <Text>Page 1 of 2</Text>
-          </View>
+
+          <Text style={styles.PageNoText}>Page 1 of 2</Text>
         </Page>
 
         {/* Page 2 */}
         <Page size="A4" style={styles.page}>
-          {/* Header Section */}
-          <View style={styles.header}>
-            {/* <Image
-            src="https://i.imgur.com/6oyvQbQ.png" // Replace this with your logo URL
-            style={styles.logo}
-          /> */}
+          {/* Header */}
+          <View style={styles_page2.header}>
+            <Text style={styles_page2.logo}>SWISHR</Text>
+            <Text style={styles_page2.title}>
+              Period: 28th October 2024 - 3rd November 2024
+            </Text>
+            <Text>Restaurant ID: 0000</Text>
+            <Text>Account Ref: SWSH-0000-0000</Text>
           </View>
-
-          {/* Period Section */}
-          <Text style={styles.centerText}>
-            Period: 23rd September 2024 - 29th September 2024
-          </Text>
-          <Text style={styles.centerText}>
-            Restaurant ID: 5205 | Account Ref: SWSH-230324-0003
-          </Text>
 
           {/* Summary Section */}
-          <View style={styles.summarySection}>
-            <Text style={styles.boldText}>Summary</Text>
-            <View style={styles.summaryRow}>
-              <Text>Total Orders</Text>
-              <Text>2</Text>
+          <Text style={styles_page2.summaryTitle}>Summary</Text>
+
+          {/* Table */}
+          <View style={styles_page2.table}>
+            <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
+              <Text style={styles_page2.tableCell}>Total Orders</Text>
+              <Text style={styles_page2.tableCell}>10</Text>
             </View>
-            <View style={styles.summaryRow}>
-              <Text>1 Delivery Order</Text>
-              <Text>1 Collection Order</Text>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>Delivery Orders</Text>
+              <Text style={styles_page2.tableCell}>7</Text>
             </View>
-            <View style={styles.summaryRow}>
-              <Text>Total Sales Inc. Fees</Text>
-              <Text>£51.83</Text>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>Collections Orders</Text>
+              <Text style={styles_page2.tableCell}>3</Text>
             </View>
-            <View style={styles.summaryRow}>
-              <Text>Total Paid By Swishr</Text>
-              <Text>£36.06</Text>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>10 Card Payments</Text>
+              <Text style={styles_page2.tableCell}>£157.37</Text>
             </View>
-            <View style={styles.summaryRow}>
-              <Text>Paid Weekly</Text>
-              <Text>£36.06 Via Bank Transfer</Text>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>
+                0 Cash Payments (Including Service Fee)
+              </Text>
+              <Text style={styles_page2.tableCell}>£0.00</Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>Food & Drink Value</Text>
+              <Text style={styles_page2.tableCell}>£157.37</Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>Total Sales</Text>
+              <Text style={styles_page2.tableCell}>£157.37</Text>
+            </View>
+          </View>
+          {/* Account Statement Section */}
+          <Text style={styles_page2.accountStateMentTitle}>
+            Account Statement
+          </Text>
+          {/* Account Balance */}
+
+          <View style={styles_page2.table}>
+            <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
+              <Text style={styles_page2.tableCell}>Account Balance</Text>
+              <Text style={styles_page2.tableCell}>£0</Text>
+            </View>
+          </View>
+          <View style={styles_page2.table}>
+            <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
+              <Text style={styles_page2.tableCell}>Date</Text>
+              <Text style={styles_page2.tableCell}>Description</Text>
+              <Text style={styles_page2.tableCell}>Amount</Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>21st October 2024</Text>
+              <Text style={styles_page2.tableCell}>Opening Balance</Text>
+              <Text style={styles_page2.tableCell}>£0</Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>27th October 2024</Text>
+              <Text style={styles_page2.tableCell}>
+                Card Order Payments Received
+              </Text>
+              <Text style={styles_page2.tableCell}>£157.37</Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>27th October 2024</Text>
+              <Text style={styles_page2.tableCell}>Invoice 157 Due</Text>
+              <Text style={styles_page2.tableCell}>-£38.41</Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>30th October 2024</Text>
+              <Text style={styles_page2.tableCell}>
+                Remaining Balance Bank Transferred to Merchant
+              </Text>
+              <Text style={styles_page2.tableCell}>-£118.96</Text>
             </View>
           </View>
 
-          {/* Account Statement Section */}
-          <Text style={[styles.boldText, { marginTop: 20 }]}>
-            Account Statement
-          </Text>
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={styles.tableCell}>Description</Text>
-              <Text style={styles.tableCellDate}>Date</Text>
-              <Text style={styles.tableCellAmount}>Amount</Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>
-                (23rd September 24 - 29th September 24)
-              </Text>
-              <Text style={styles.tableCellDate}>—</Text>
-              <Text style={styles.tableCellAmount}>—</Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={styles.tableCell}>
-                Swishr Paid Sales By Bank Transfer
-              </Text>
-              <Text style={styles.tableCellDate}>02/10/24</Text>
-              <Text style={styles.tableCellAmount}>£36.06</Text>
+          {/* Closing Balance */}
+          <View style={styles_page2.table}>
+            <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
+              <Text style={styles_page2.tableCell}>Closing Balance</Text>
+              <Text style={styles_page2.tableCell}>£0</Text>
             </View>
           </View>
+          {/* Footer Section */}
+          <Text style={styles_page2.PageNoText}>Page No 2</Text>
         </Page>
       </Document>
     </PDFViewer>

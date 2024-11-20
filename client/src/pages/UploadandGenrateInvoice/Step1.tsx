@@ -1,17 +1,70 @@
 import { FileUpload } from "../../components/Dropzone";
-import { Button, Container, NumberInput } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Container,
+  NumberInput,
+  Table,
+  Title,
+  Text,
+} from "@mantine/core";
 import { Select, Stack } from "@mantine/core";
 import { useGetAllCustomerList } from "../../hooks/useGetAllCustomerList";
-import { useEffect, useMemo } from "react";
-import { Form, Formik } from "formik";
-import { useUploadandGetCsvData } from "../../hooks/useUplaodAndGetCsvData";
+import { useEffect, useMemo, useRef } from "react";
+import { Form, Formik, FormikProps } from "formik";
+import {
+  useUploadandGetCsvData,
+  ValidationErrorResponse,
+} from "../../hooks/useUplaodAndGetCsvData";
 import { FileWithPath } from "@mantine/dropzone";
 import React from "react";
 import * as Yup from "yup";
 import FetchandSaveCustomerConfig from "./FetchandSaveCustomerConfig";
 import { useIsFetching } from "@tanstack/react-query";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
+// const ErrorDetails = ({
+//   errorData,
+// }: {
+//   errorData: ValidationErrorResponse | undefined;
+// }) => {
+//   if (!errorData) {
+//     return null;
+//   }
+//   return (
+//     <Container>
+//       <Title order={2}>{errorData.error}</Title>
+//       {errorData.details.map((fileData, index) => (
+//         <Card
+//           key={index}
+//           shadow="sm"
+//           padding="lg"
+//           style={{ marginBottom: "20px" }}
+//         >
+//           <Text>File: {fileData.fileName}</Text>
 
+//           {fileData.issues.length > 0 && (
+//             <Table striped highlightOnHover cellSpacing={'xs'} bgcolor="red">
+//               <thead>
+//                 <tr>
+//                   <th>Invalid Field</th>
+//                   <th>Invalid Value</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {fileData.issues.map((issue, issueIndex) => (
+//                   <tr key={issueIndex}>
+//                     <td>{issue.invalidField}</td>
+//                     <td>{issue.invalidValue}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </Table>
+//           )}
+//         </Card>
+//       ))}
+//     </Container>
+//   );
+// };
 export interface FormValueTypes {
   customerid: string;
   taxrate: number;
@@ -54,7 +107,6 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
     isSuccess: isSuccesinUploadingData,
     isPending,
   } = useUploadandGetCsvData();
-
   useEffect(() => {
     if (isSuccesinUploadingData) {
       setActiveStep((prev) => prev + 1);
@@ -133,6 +185,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
           </Form>
         )}
       </Formik>
+      {/* <ErrorDetails errorData={ErrorOnUploadingFiles?.response?.data} /> */}
     </Container>
   );
 }

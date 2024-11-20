@@ -35,6 +35,7 @@ export interface Invoice {
   _id: string;
   createdAt: string;
   __v: number;
+  taxRate: number;
 }
 
 interface OrderTypeDetails {
@@ -56,7 +57,7 @@ const saveEditedData = async (
 };
 
 export const useSaveSubmittedData = () => {
-    const{setTrackOldFormData} = useAppBasedContext()
+  const { setTrackOldFormData } = useAppBasedContext();
   const queryClient = useQueryClient();
   return useMutation<AxiosResponse<EditAndSaveResponse>, Error, ParsedData>({
     mutationFn: (data: ParsedData) => saveEditedData(data),
@@ -67,7 +68,7 @@ export const useSaveSubmittedData = () => {
         message: "Some more text here",
         color: "green",
       });
-      setTrackOldFormData({step2:data?.data})
+      setTrackOldFormData({ step2: data?.data });
     },
     onError: (data) =>
       notifications.show({
