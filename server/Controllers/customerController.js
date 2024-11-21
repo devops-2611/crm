@@ -1,7 +1,7 @@
 const CustomerModel = require('../Models/customer'); 
 
 exports.addCustomer = async (req, res) => {
-  const { customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip } = req.body;
+  const { customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip, deliveryOrdersComission, collectionOrdersComission, eatInComission } = req.body;
   try {
     // Check if a customer with the same customerId already exists
     const existingCustomer = await CustomerModel.findOne({ customerEmail });
@@ -23,7 +23,10 @@ exports.addCustomer = async (req, res) => {
       customerPost,
       serviceFee,
       deliveryCharge,
-      driverTip
+      driverTip,
+      deliveryOrdersComission,
+      collectionOrdersComission,
+      eatInComission
     });
 
     await customer.save();
@@ -56,7 +59,7 @@ exports.getAllCustomerList = async (req, res) => {
 
   exports.editCustomer = async (req, res) => {
     const { id } = req.params;
-    const { customerId, customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip } = req.body;
+    const { customerId, customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip, deliveryOrdersComission, collectionOrdersComission, eatInComission } = req.body;
     try {
       const customer = await CustomerModel.findOne({ customerId: parseInt(id) });
       if (!customer) {
@@ -72,6 +75,9 @@ exports.getAllCustomerList = async (req, res) => {
       customer.serviceFee = serviceFee;
       customer.deliveryCharge = deliveryCharge;
       customer.driverTip = driverTip;
+      customer.deliveryOrdersComission = deliveryOrdersComission;
+      customer.collectionOrdersComission = collectionOrdersComission;
+      customer.eatInComission = eatInComission;
       await customer.save();
       res.status(200).json({ message: 'Customer updated successfully', customer });
     } catch (err) {

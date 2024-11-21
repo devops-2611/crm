@@ -17,6 +17,9 @@ interface Customer {
   serviceFee: boolean
   driverTip: boolean
   deliveryCharge: boolean
+    deliveryOrdersComission: number
+    collectionOrdersComission: number
+    eatInComission: number
 }
 
 export default function CustomerManagement() {
@@ -35,6 +38,9 @@ export default function CustomerManagement() {
       serviceFee: true,
       driverTip: false,
       deliveryCharge: false,
+        deliveryOrdersComission: 0,
+        collectionOrdersComission: 0,
+        eatInComission: 0,
     },
   })
 
@@ -49,6 +55,9 @@ export default function CustomerManagement() {
       serviceFee: true,
       driverTip: false,
       deliveryCharge: false,
+        deliveryOrdersComission: 0,
+        collectionOrdersComission: 0,
+        eatInComission: 0,
     },
   })
 
@@ -82,7 +91,10 @@ export default function CustomerManagement() {
       customerMobile: values.customerMobile,
       serviceFee: values.serviceFee,
       driverTip: values.driverTip,
-      deliveryCharge: values.deliveryCharge
+      deliveryCharge: values.deliveryCharge,
+        deliveryOrdersComission: values.deliveryOrdersComission,
+        collectionOrdersComission: values.collectionOrdersComission,
+        eatInComission: values.eatInComission
     }
     try {
       const response = await ApiHelpers.POST('/api/customer/add-customer', obj)
@@ -124,7 +136,10 @@ export default function CustomerManagement() {
         customerMobile: values.customerMobile,
         serviceFee: values.serviceFee,
         driverTip: values.driverTip,
-        deliveryCharge: values.deliveryCharge
+        deliveryCharge: values.deliveryCharge,
+        deliveryOrdersComission: values.deliveryOrdersComission,
+        collectionOrdersComission: values.collectionOrdersComission,
+        eatInComission: values.eatInComission
       }
       const response = await ApiHelpers.PUT(`/api/customer/edit-customer/${editingCustomer.customerId}`, obj)
       if (response.status !== 200) throw new Error('Failed to update customer')
@@ -204,6 +219,28 @@ export default function CustomerManagement() {
           required
           {...form.getInputProps('customerMobile')}
         />
+        <TextInput
+  label="Delivery Orders Commission"
+  placeholder="Enter delivery orders commission"
+  type="number"
+  required
+  {...form.getInputProps('commissionRate.deliveryOrdersComission')}
+/>
+<TextInput
+  label="Collection Orders Commission"
+  placeholder="Enter collection orders commission"
+  type="number"
+  required
+  {...form.getInputProps('commissionRate.collectionOrdersComission')}
+/>
+<TextInput
+  label="Eat-In Commission"
+  placeholder="Enter eat-in commission"
+  type="number"
+  required
+  {...form.getInputProps('commissionRate.eatInComission')}
+/>
+
         <Radio.Group
           label="Service Fee Applicable"
           {...form.getInputProps('serviceFee')}
@@ -244,6 +281,9 @@ export default function CustomerManagement() {
             <th>Post Code</th>
             <th>Email</th>
             <th>Mobile</th>
+            <th>Delivery Orders Commission</th>
+            <th>Collection Orders Commission</th>
+            <th>Eat-In Commission</th>
             <th>Service Fee (Is Applicable)</th>
             <th>Driver Tip (Is Applicable)</th>
             <th>Delivery Charge (Is Applicable)</th>
@@ -260,6 +300,9 @@ export default function CustomerManagement() {
               <td>{customer.customerPost}</td>
               <td>{customer.customerEmail}</td>
               <td>{customer.customerMobile}</td>
+              <td>{customer.deliveryOrdersComission}</td>
+              <td>{customer.collectionOrdersComission}</td>
+              <td>{customer.eatInComission}</td>
               <td>{customer.serviceFee ? 'Yes' : 'No'}</td>
               <td>{customer.driverTip ? 'Yes' : 'No'}</td>
               <td>{customer.deliveryCharge ? 'Yes' : 'No'}</td>
@@ -316,6 +359,28 @@ export default function CustomerManagement() {
             required
             {...formEdit.getInputProps('customerMobile')}
           />
+          <TextInput
+  label="Delivery Orders Commission"
+  placeholder="Enter delivery orders commission"
+  type="number"
+  required
+  {...formEdit.getInputProps('commissionRate.deliveryOrdersComission')}
+/>
+<TextInput
+  label="Collection Orders Commission"
+  placeholder="Enter collection orders commission"
+  type="number"
+  required
+  {...formEdit.getInputProps('commissionRate.collectionOrdersComission')}
+/>
+<TextInput
+  label="Eat-In Commission"
+  placeholder="Enter eat-in commission"
+  type="number"
+  required
+  {...formEdit.getInputProps('commissionRate.eatInComission')}
+/>
+
           <Radio.Group
             label="Service Fee Applicable"
             {...formEdit.getInputProps('serviceFee')}
