@@ -9,9 +9,11 @@ import {
   rem,
   Table,
   Text,
+  Stack,
+  Divider,
 } from "@mantine/core";
 import { useSaveSubmittedData } from "../../hooks/useSaveSubmittedData";
-import React,{ useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IconChevronRight,
   IconChevronLeft,
@@ -23,11 +25,23 @@ import {
 import { CalculationsByOrderType } from "../../hooks/useUplaodAndGetCsvData";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
 import { modals } from "@mantine/modals";
-import { DateTimePicker } from "@mantine/dates";
+import { DateTimePicker, DateValue } from "@mantine/dates";
 interface InvoicePreviewProps {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
+const convertDate = (inputDateString: DateValue) => {
+  const date = new Date(String(inputDateString));
 
+  // Format the date to the desired output
+  const formattedDate = `${date.getFullYear()}-${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(
+    date.getHours()
+  ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(
+    date.getSeconds()
+  ).padStart(2, "0")}.0`;
+  return formattedDate;
+};
 type CalculationsByOrderTypeKeys = keyof CalculationsByOrderType;
 
 const Labels: Record<CalculationsByOrderTypeKeys, string> = {
@@ -137,7 +151,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
     isPending,
   } = useSaveSubmittedData();
   const { parsedData: CalculatedData } = useAppBasedContext();
-
+console.log(CalculatedData,"CalculatedData")
   const formik = useFormik({
     initialValues: CalculatedData ?? {},
     onSubmit: (values) => {
@@ -203,18 +217,29 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
                   mt="md"
                 />
                 <DateTimePicker
+                  name="startDate"
                   label="Start Date"
                   clearable
                   valueFormat="DD MMM YYYY hh:mm A"
                   placeholder="Pick date and time"
-                  value={new Date(formik.values.startDate)}
+                  value={new Date(formik.values?.startDate)}
+                  popoverProps={{ width: "target" }}
+                  onChange={(value) =>
+                    formik.setFieldValue("startDate", convertDate(value))
+                  }
                 />
                 <DateTimePicker
                   label="End Date"
                   clearable
                   valueFormat="DD MMM YYYY hh:mm A"
                   placeholder="Pick date and time"
-                  value={new Date(formik.values.endDate)}
+                  value={new Date(formik?.values?.endDate)}
+                  key={"endDate"}
+                  name={'endDate'}
+                  popoverProps={{ width: "target" }}
+                  onChange={(value) =>
+                    formik.setFieldValue("endDate", convertDate(value))
+                  }
                 />
               </Accordion.Panel>
             </Accordion.Item>
@@ -291,38 +316,57 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
                 Order Summary
               </Accordion.Control>
               <Accordion.Panel>
-                <Group grow mt="sm">
-                  <NumberInput
-                    decimalScale={2}
-                    fixedDecimalScale
-                    label="Sub-Total"
-                    {...formik.getFieldProps("totalSubTotal")}
-                  />
-                  <NumberInput
-                    label="VAT (Amount)"
-                    {...formik.getFieldProps("tax_amount")}
-                    decimalScale={2}
-                    fixedDecimalScale
-                  />
-                  <NumberInput
-                    label="Total with Tax"
-                    {...formik.getFieldProps("totalWithTax")}
-                    decimalScale={2}
-                    fixedDecimalScale
-                  />
-                  <NumberInput
-                    label="Total Sales Value"
-                    {...formik.getFieldProps("totalSalesValue")}
-                    decimalScale={2}
-                    fixedDecimalScale
-                  />
-                  <NumberInput
-                    label="Amount to Receive"
-                    {...formik.getFieldProps("amountToRecieve")}
-                    decimalScale={2}
-                    fixedDecimalScale
-                  />
-                </Group>
+                <Stack>
+                  <Text>Some text</Text>
+                  <Group mt="sm" wrap={"wrap"}>
+                    <NumberInput
+                      decimalScale={2}
+                      fixedDecimalScale
+                      label="Sub-Total"
+                      {...formik.getFieldProps("totalSubTotal")}
+                    />
+                    <NumberInput
+                      label="VAT (Amount)"
+                      {...formik.getFieldProps("tax_amount")}
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                    <NumberInput
+                      label="Total with Tax"
+                      {...formik.getFieldProps("totalWithTax")}
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                    <NumberInput
+                      label="Total Sales Value"
+                      {...formik.getFieldProps("totalSalesValue")}
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                  </Group>
+                  <Divider/>
+                  <Text>Amount to Receive</Text>
+                  <Group mt="sm" wrap={"wrap"}>
+                    <NumberInput
+                      label="Cash Payment"
+                      {...formik.getFieldProps("amountToRecieve.cashPayment")}
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                    <NumberInput
+                      label="Bank Payment"
+                      {...formik.getFieldProps("amountToRecieve.bankPayment")}
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                    <NumberInput
+                      label="Total"
+                      {...formik.getFieldProps("amountToRecieve.total")}
+                      decimalScale={2}
+                      fixedDecimalScale
+                    />
+                  </Group>
+                </Stack>
               </Accordion.Panel>
             </Accordion.Item>
             <Group justify="center">
