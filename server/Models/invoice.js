@@ -37,8 +37,9 @@ const invoiceSchema = new mongoose.Schema({
         required: true
     },
     amountToRecieve: {
-        type: Number,
-        required: true
+        total : { type: Number},
+        cashPayment : { type: Number},
+        bankPayment: { type: Number },
     },
     startDate: {
         type: String,
@@ -49,6 +50,10 @@ const invoiceSchema = new mongoose.Schema({
         required: true
     },
     taxRate: {
+        type: Number,
+        required: true
+    },
+    totalFoodValue: {
         type: Number,
         required: true
     },

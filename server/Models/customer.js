@@ -40,6 +40,11 @@ const CustomerSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    comissionRate: {
+      deliveryOrdersComission: { type: Number },
+      collectionOrdersComission: { type: Number },
+      eatInComission: { type: Number },
+    },
   },
   { timestamps: true }
 );

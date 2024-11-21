@@ -1,6 +1,7 @@
 
 const multer = require('multer');
 const csv = require('csv-parser');
+const xlsx = require('xlsx');
 const stream = require('stream');
 const moment = require("moment");
 const CustomerModel = require('../Models/customer');
@@ -35,11 +36,64 @@ const expectedHeaders = [
 
 const requiredFields = [
     'Order Date', 'Order Type', 'Payment Type', 'Payment Status', 'Confirmation Status',
-    'Promo Discount', 'Order Discount', 'Driver Tip', 
-    'Delivery Charge', 'Service Fee', 'SurCharge', 
+    'Promo Discount', 'Order Discount', 'Driver Tip',
+    'Delivery Charge', 'Service Fee', 'SurCharge',
     'Sub Total',
 ];
 
+const processRow = (row, fileErrors, fileName) => {
+    
+    const isEmptyRow = Object.values(row).every((value) => !value);
+    if (isEmptyRow) return null;
+
+    for (const field of requiredFields) {
+        if (!row[field] && row[field] !== 0) {
+            fileErrors.add(
+                JSON.stringify({
+                    fileName,
+                    invalidField: field,
+                    invalidValue: row[field],
+                })
+            );
+        }
+    }
+
+    // Validate date fields
+    const orderDateStr = row["Order Date"];
+    const isOrderDateValid = moment(orderDateStr, "YYYY-MM-DD HH:mm:ss.S", true).isValid();
+    if (!isOrderDateValid) {
+        fileErrors.add(
+            JSON.stringify({
+                fileName,
+                invalidField: "Order Date",
+                invalidValue: orderDateStr,
+            })
+        );
+    }
+
+    if (fileErrors.size > 0) return null;
+    return {
+        orderId: row['Order ID'],
+        orderDate: row['Order Date'],
+        customerId: row['Customer ID'] || '',
+        customerFirstname: row['Customer FirstName'] || '',
+        customerLastname: row['Customer LastName'] || '',
+        orderType: row['Order Type'],
+        paymentType: row['Payment Type'],
+        paymentStatus: row['Payment Status'],
+        confirmationStatus: row['Confirmation Status'],
+        promoCode: row['Promo Code'] || '',
+        promoDiscount: parseFloat(row['Promo Discount']) || 0,
+        orderDiscount: parseFloat(row['Order Discount']) || 0,
+        driverTip: parseFloat(row['Driver Tip']) || 0,
+        deliveryCharge: parseFloat(row['Delivery Charge']) || 0,
+        serviceFee: parseFloat(row['Service Fee']) || 0,
+        surCharge: parseFloat(row['SurCharge']) || 0,
+        subTotal: parseFloat(row['Sub Total']) || 0,
+        taxes: parseFloat(row['Taxes']) || 0,
+        total: parseFloat(row['Total']) || 0,
+    };
+};
 // Controller function to handle CSV upload and parsing directly from buffer
 const uploadAndParseCSV = async (req, res) => {
     try {
@@ -61,78 +115,59 @@ const uploadAndParseCSV = async (req, res) => {
         const errors = [];
 
         for (const file of req.files) {
-            const bufferStream = new stream.PassThrough();
-            bufferStream.end(file.buffer);
+            const resultsForFile = [];
             const fileErrors = new Set();
 
-            await new Promise((resolve, reject) => {
-                bufferStream
-                    .pipe(csv({ headers: expectedHeaders, skipLines: 1 }))
-                    .on('data', (row) => {
+            if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+                const bufferStream = new stream.PassThrough();
+                bufferStream.end(file.buffer);
+                
 
-                        for (const field of requiredFields) {
-                            if (!row[field] || row[field].trim() === '') {
-                                fileErrors.add(
-                                    JSON.stringify({
-                                        fileName: file.originalname,
-                                        invalidField: field,
-                                        invalidValue: row[field],
-                                    })
-                                );
-                            }
-                        }
+                await new Promise((resolve, reject) => {
+                    bufferStream
+                        .pipe(csv({ headers: expectedHeaders, skipLines: 1 }))
+                        .on('data', (row) => {
 
-                        // Validate date fields
-                        const orderDateStr = row["Order Date"];
-                        const isOrderDateValid = moment(orderDateStr, "YYYY-MM-DD HH:mm:ss.S", true).isValid();
-                        if (!isOrderDateValid) {
-                            fileErrors.add(
-                                JSON.stringify({
-                                    fileName: file.originalname,
-                                    invalidField: "Order Date",
-                                    invalidValue: orderDateStr,
-                                })
-                            );
-                        }
+                            const formattedRow = processRow(row, fileErrors, file.originalname);
+                            if (formattedRow) resultsForFile.push(formattedRow);
 
-                        if (fileErrors.size === 0){
+                        })
+                        .on('end', resolve)
+                        .on('error', reject);
+                });
+            }
+            else if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.originalname.endsWith('.xlsx')){
+                const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
 
-                        const formattedRow = {
-                            orderId: row['Order ID'],
-                            orderDate: row['Order Date'],
-                            customerId: row['Customer ID'],
-                            customerFirstname: row['Customer FirstName'],
-                            customerLastname: row['Customer LastName'],
-                            orderType: row['Order Type'],
-                            paymentType: row['Payment Type'],
-                            paymentStatus: row['Payment Status'],
-                            confirmationStatus: row['Confirmation Status'],
-                            promoCode: row['Promo Code'],
-                            promoDiscount: parseFloat(row['Promo Discount']) || 0,
-                            orderDiscount: parseFloat(row['Order Discount']) || 0,
-                            driverTip: parseFloat(row['Driver Tip']) || 0,
-                            deliveryCharge: parseFloat(row['Delivery Charge']) || 0,
-                            serviceFee: parseFloat(row['Service Fee']) || 0,
-                            surCharge: parseFloat(row['SurCharge']) || 0,
-                            subTotal: parseFloat(row['Sub Total']) || 0,
-                            taxes: parseFloat(row['Taxes']) || 0,
-                            total: parseFloat(row['Total']) || 0,
-                        };
-                        results.push(formattedRow);
-                    }
-                    })
-                    .on("end", () => {
-                        if (fileErrors.size > 0) {
-                            const uniqueErrors = [...fileErrors].map((error) => JSON.parse(error));
-                            errors.push({
-                                fileName: file.originalname,
-                                issues: uniqueErrors,
-                            });
-                        }
-                        resolve();
-                    })
-                    .on('error', reject);
-            });
+                const createRowObject = (row, headers) => {
+                    const rowObject = {};
+                    headers.forEach((header, index) => {    
+                        rowObject[header] = row[index] !== undefined ? row[index] : '';
+                    });
+                    return rowObject;
+                };
+                rows.forEach((row, index) => {
+                    if (index === 0) return; // Skip header row
+
+                    const rowObject = createRowObject(row, expectedHeaders);
+                    const formattedRow = processRow(rowObject, fileErrors, file.originalname);
+                    if (formattedRow) resultsForFile.push(formattedRow);
+                });
+            }
+
+            if (fileErrors.size > 0) {
+                const uniqueErrors = [...fileErrors].map((error) => JSON.parse(error));
+                errors.push({
+                    fileName: file.originalname,
+                    issues: uniqueErrors,
+                });
+            }
+
+            results.push(...resultsForFile);
+
         }
 
         if (errors.length > 0) {
@@ -146,22 +181,38 @@ const uploadAndParseCSV = async (req, res) => {
             return res.status(400).json({ error: 'No valid data found in uploaded files' });
         }
 
+
         const calculationsByOrderType = calculateOrderValues(results, customer, 'orderType');
         const calculationsByPaymentType = calculateOrderValues(results, customer, 'paymentType');
 
         let totalSubTotal = 0;
         let totalSalesValue = 0;
+        let serviceFeeCash = 0;
+        let totalFoodValue = 0;
+
         for (const orderType in calculationsByOrderType) {
             totalSubTotal += calculationsByOrderType[orderType].amount;
             if (orderType.toLowerCase() === 'delivery' || orderType.toLowerCase() === 'collection') {
-                totalSalesValue += calculationsByOrderType[orderType].totalOrderValue;
+                totalFoodValue += calculationsByOrderType[orderType].totalOrderValue;
             }
         }
+        if(calculationsByOrderType['SERVICE_FEE'] && calculationsByOrderType['SERVICE_FEE'].isCashOrders){
+            serviceFeeCash = calculationsByOrderType['SERVICE_FEE'].amount;           
+        }
+
+        totalSalesValue = totalFoodValue + serviceFeeCash;
 
         const tax_amount = (taxRate * totalSubTotal) / 100;
         const totalWithTax = totalSubTotal + tax_amount;
 
         const { startOfWeek, endOfWeek } = getWeekBoundaries(results[0].orderDate, results[results.length - 1].orderDate);
+
+        const totalCashPayment = calculationsByPaymentType['CASH']?.totalOrderValue || 0
+        const amountReceive = {
+            total :  totalSalesValue - totalWithTax,
+            cashPayment : totalCashPayment,
+            bankPayment: totalSalesValue - totalWithTax - totalCashPayment,
+        }
 
         const finalData = {
             customerId: customerId,
@@ -171,11 +222,11 @@ const uploadAndParseCSV = async (req, res) => {
             tax_amount,
             totalWithTax,
             totalSalesValue,
-            amountToRecieve: totalSalesValue - totalWithTax,
+            amountToRecieve: amountReceive,
             startDate: startOfWeek,
             endDate: endOfWeek,
-            storeName: results[0].branchName,
             taxRate: taxRate,
+            totalFoodValue
         };
 
         res.status(200).json(finalData);
@@ -252,18 +303,33 @@ const uploadManualData = async (req, res) => {
         const calculationsByPaymentType = calculateOrderValues(results, customer, 'paymentType');
 
         let totalSubTotal = 0;
-        let totalSalesValue = 0
+        let totalSalesValue = 0;
+        let serviceFeeCash = 0;
+        let totalFoodValue = 0;
+
         for (const orderType in calculationsByOrderType) {
             totalSubTotal += calculationsByOrderType[orderType].amount;
             if (orderType.toLowerCase() === 'delivery' || orderType.toLowerCase() === 'collection') {
-                totalSalesValue += calculationsByOrderType[orderType].totalOrderValue;
+                totalFoodValue += calculationsByOrderType[orderType].totalOrderValue;
             }
         }
+        if(calculationsByOrderType['SERVICE_FEE'] && calculationsByOrderType['SERVICE_FEE'].isCashOrders){
+            serviceFeeCash = calculationsByOrderType['SERVICE_FEE'].amount;           
+        }
+
+        totalSalesValue = totalFoodValue + serviceFeeCash;
 
         const tax_amount = (taxRate * totalSubTotal) / 100;
         const totalWithTax = totalSubTotal + tax_amount;
 
         const { startOfWeek, endOfWeek } = getWeekBoundaries(results[0].orderDate, results[results.length - 1].orderDate);
+
+        const totalCashPayment = calculationsByPaymentType['CASH']?.totalOrderValue || 0
+        const amountReceive = {
+            total :  totalSalesValue - totalWithTax,
+            cashPayment : totalCashPayment,
+            bankPayment: totalSalesValue - totalWithTax - totalCashPayment,
+        }
 
         const finalData = {
             customerId: customerId,
@@ -273,11 +339,12 @@ const uploadManualData = async (req, res) => {
             tax_amount,
             totalWithTax,
             totalSalesValue,
-            amountToRecieve: totalSalesValue - totalWithTax,
+            amountToRecieve: amountReceive,
             startDate: startOfWeek,
             endDate: endOfWeek,
-            taxRate: taxRate
-        }
+            taxRate: taxRate,
+            totalFoodValue
+        };
 
         res.status(200).json(finalData);
 

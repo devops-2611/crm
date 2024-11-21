@@ -37,6 +37,14 @@ const calculateOrderValues = (orders, customer, type) => {
 
         const commissionAmount = (commissionRate * totalOrderValue) / 100;
 
+        let totalCashOrdersWithServiceFee = 0;
+        let cashOrderValueService = 0;
+
+        if(!customer.serviceFee && type === 'paymentType' && orders.some(order => order.paymentType === 'CASH' && order.serviceFee > 0)){
+             totalCashOrdersWithServiceFee = orders.filter(order => order.paymentType === 'CASH' && order.serviceFee > 0)?.length 
+             cashOrderValueService = orders.filter(order => order.paymentType === 'CASH' && order.serviceFee > 0).reduce((acc, order) => acc + order.serviceFee, 0)
+        }
+
         if (type === 'orderType') {
             calculations[key] = {
                 totalOrderValue,
@@ -47,9 +55,12 @@ const calculateOrderValues = (orders, customer, type) => {
         }
         else if(type === 'paymentType') {
             calculations[key] = {
-                totalOrderValue,
+                totalOrderValue : key === 'CARD' ? totalOrderValue : totalOrderValue + cashOrderValueService,
                 totalOrders: groupedData[key].length,
             };
+            if (key === 'CASH') {
+                calculations['CASH'].isServiceFeeIncluded = true
+            }
         }
         
     }
@@ -61,6 +72,20 @@ const calculateOrderValues = (orders, customer, type) => {
             totalOrders: orders.filter(order => order.serviceFee > 0).length,
             commissionRate: 0,
             amount: orderValue
+        }
+    }
+
+    //if service fee is not applicable, check if any cash payment is made for service fee, if so, calculate the total amount of cash payment for service fee column
+
+    if(!customer.serviceFee && type === 'orderType' && orders.some(order => order.paymentType === 'CASH' && order.serviceFee > 0)){
+        const totalCashOrdersWithServiceFee = orders.filter(order => order.paymentType === 'CASH' && order.serviceFee > 0)?.length 
+        const cashOrderValueService = orders.filter(order => order.paymentType === 'CASH' && order.serviceFee > 0).reduce((acc, order) => acc + order.serviceFee, 0) 
+        calculations['SERVICE_FEE'] = {
+            totalOrderValue: cashOrderValueService,
+            totalOrders: totalCashOrdersWithServiceFee,
+            commissionRate: 0,
+            amount: cashOrderValueService,
+            isCashOrders : true
         }
     }
 
@@ -147,6 +172,25 @@ const getWeekBoundaries = (startDateStr, endDateStr) => {
       endOfWeek: formatDate(sunday),
     };
   };
+
+  const validateHeaders = (fileHeaders) => {
+    const missingRequiredHeaders = requiredHeaders.filter(
+        (header) => !fileHeaders.includes(header)
+    );
+
+    const unexpectedHeaders = fileHeaders.filter(
+        (header) =>
+            !requiredHeaders.includes(header) && !optionalHeaders.includes(header)
+    );
+
+    const isValid = missingRequiredHeaders.length === 0 && unexpectedHeaders.length === 0;
+
+    return {
+        isValid,
+        missingRequiredHeaders,
+        unexpectedHeaders,
+    };
+};
   
 
-module.exports = {calculateOrderValues, generateInvoiceId, getWeekBoundaries};
+module.exports = {calculateOrderValues, generateInvoiceId, getWeekBoundaries, validateHeaders};
