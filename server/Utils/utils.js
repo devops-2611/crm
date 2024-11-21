@@ -24,7 +24,6 @@ const calculateOrderValues = (orders, customer, type) => {
             const totalForRow = order.subTotal
                 - order.orderDiscount
                 - order.promoDiscount;
-
             totalOrderValue += totalForRow;
         });
 
@@ -34,6 +33,7 @@ const calculateOrderValues = (orders, customer, type) => {
         } else if (key.toLowerCase() === 'collection') {
             commissionRate = customer?.collectionOrdersComission;
         }
+
 
         const commissionAmount = (commissionRate * totalOrderValue) / 100;
 

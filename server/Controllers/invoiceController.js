@@ -187,7 +187,7 @@ const uploadAndParseCSV = async (req, res) => {
 
         let totalSubTotal = 0;
         let totalSalesValue = 0;
-        let serviceFeeCash = 0;
+        let serviceFeeCharge = 0;
         let totalFoodValue = 0;
 
         for (const orderType in calculationsByOrderType) {
@@ -197,10 +197,10 @@ const uploadAndParseCSV = async (req, res) => {
             }
         }
         if(calculationsByOrderType['SERVICE_FEE'] && calculationsByOrderType['SERVICE_FEE'].isCashOrders){
-            serviceFeeCash = calculationsByOrderType['SERVICE_FEE'].amount;           
+            serviceFeeCharge = calculationsByOrderType['SERVICE_FEE'].amount;           
         }
 
-        totalSalesValue = totalFoodValue + serviceFeeCash;
+        totalSalesValue = totalFoodValue + serviceFeeCharge;
 
         const tax_amount = (taxRate * totalSubTotal) / 100;
         const totalWithTax = totalSubTotal + tax_amount;
@@ -304,7 +304,7 @@ const uploadManualData = async (req, res) => {
 
         let totalSubTotal = 0;
         let totalSalesValue = 0;
-        let serviceFeeCash = 0;
+        let serviceFeeCharge = 0;
         let totalFoodValue = 0;
 
         for (const orderType in calculationsByOrderType) {
@@ -314,10 +314,10 @@ const uploadManualData = async (req, res) => {
             }
         }
         if(calculationsByOrderType['SERVICE_FEE'] && calculationsByOrderType['SERVICE_FEE'].isCashOrders){
-            serviceFeeCash = calculationsByOrderType['SERVICE_FEE'].amount;           
+            serviceFeeCharge = calculationsByOrderType['SERVICE_FEE'].amount;           
         }
 
-        totalSalesValue = totalFoodValue + serviceFeeCash;
+        totalSalesValue = totalFoodValue + serviceFeeCharge;
 
         const tax_amount = (taxRate * totalSubTotal) / 100;
         const totalWithTax = totalSubTotal + tax_amount;

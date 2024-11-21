@@ -17,9 +17,9 @@ interface Customer {
   serviceFee: boolean
   driverTip: boolean
   deliveryCharge: boolean
-    deliveryOrdersComission: number
-    collectionOrdersComission: number
-    eatInComission: number
+  deliveryOrdersComission: number
+  collectionOrdersComission: number
+  eatInComission: number
 }
 
 export default function CustomerManagement() {
@@ -38,9 +38,9 @@ export default function CustomerManagement() {
       serviceFee: true,
       driverTip: false,
       deliveryCharge: false,
-        deliveryOrdersComission: 0,
-        collectionOrdersComission: 0,
-        eatInComission: 0,
+      deliveryOrdersComission: 0,
+      collectionOrdersComission: 0,
+      eatInComission: 0,
     },
   })
 
@@ -55,9 +55,9 @@ export default function CustomerManagement() {
       serviceFee: true,
       driverTip: false,
       deliveryCharge: false,
-        deliveryOrdersComission: 0,
-        collectionOrdersComission: 0,
-        eatInComission: 0,
+      deliveryOrdersComission: 0,
+      collectionOrdersComission: 0,
+      eatInComission: 0,
     },
   })
 
@@ -92,9 +92,9 @@ export default function CustomerManagement() {
       serviceFee: values.serviceFee,
       driverTip: values.driverTip,
       deliveryCharge: values.deliveryCharge,
-        deliveryOrdersComission: values.deliveryOrdersComission,
-        collectionOrdersComission: values.collectionOrdersComission,
-        eatInComission: values.eatInComission
+      deliveryOrdersComission: values.deliveryOrdersComission,
+      collectionOrdersComission: values.collectionOrdersComission,
+      eatInComission: values.eatInComission
     }
     try {
       const response = await ApiHelpers.POST('/api/customer/add-customer', obj)
@@ -118,7 +118,20 @@ export default function CustomerManagement() {
 
   const handleEdit = (customer: Customer) => {
     setEditingCustomer(customer)
-    formEdit.setValues(customer)
+    formEdit.setValues({
+      customerName: customer.customerName || '',
+      customerAddress: customer.customerAddress || '',
+      customerArea: customer.customerArea || '',
+      customerPost: customer.customerPost || null,
+      customerEmail: customer.customerEmail || '',
+      customerMobile: customer.customerMobile || '',
+      serviceFee: customer.serviceFee || false,
+      driverTip: customer.driverTip || false,
+      deliveryCharge: customer.deliveryCharge || false,
+      deliveryOrdersComission: customer.deliveryOrdersComission || 0,
+      collectionOrdersComission: customer.collectionOrdersComission || 0,
+      eatInComission: customer.eatInComission || 0,
+    })
     setIsModalOpen(true)
   }
 
@@ -220,26 +233,26 @@ export default function CustomerManagement() {
           {...form.getInputProps('customerMobile')}
         />
         <TextInput
-  label="Delivery Orders Commission"
-  placeholder="Enter delivery orders commission"
-  type="number"
-  required
-  {...form.getInputProps('commissionRate.deliveryOrdersComission')}
-/>
-<TextInput
-  label="Collection Orders Commission"
-  placeholder="Enter collection orders commission"
-  type="number"
-  required
-  {...form.getInputProps('commissionRate.collectionOrdersComission')}
-/>
-<TextInput
-  label="Eat-In Commission"
-  placeholder="Enter eat-in commission"
-  type="number"
-  required
-  {...form.getInputProps('commissionRate.eatInComission')}
-/>
+          label="Delivery Orders Commission"
+          placeholder="Enter delivery orders commission"
+          type="number"
+          required
+          {...form.getInputProps('deliveryOrdersComission')}
+        />
+        <TextInput
+          label="Collection Orders Commission"
+          placeholder="Enter collection orders commission"
+          type="number"
+          required
+          {...form.getInputProps('collectionOrdersComission')}
+        />
+        <TextInput
+          label="Eat-In Commission"
+          placeholder="Enter eat-in commission"
+          type="number"
+          required
+          {...form.getInputProps('eatInComission')}
+        />
 
         <Radio.Group
           label="Service Fee Applicable"
@@ -339,13 +352,13 @@ export default function CustomerManagement() {
             label="Customer Area"
             placeholder="Enter customer area"
             required
-            {...form.getInputProps('customerArea')}
+            {...formEdit.getInputProps('customerArea')}
           />
           <TextInput
             label="Customer Post Code"
             placeholder="Enter customer post code"
             required
-            {...form.getInputProps('customerPost')}
+            {...formEdit.getInputProps('customerPost')}
           />
           <TextInput
             label="Customer Email"
@@ -360,26 +373,26 @@ export default function CustomerManagement() {
             {...formEdit.getInputProps('customerMobile')}
           />
           <TextInput
-  label="Delivery Orders Commission"
-  placeholder="Enter delivery orders commission"
-  type="number"
-  required
-  {...formEdit.getInputProps('commissionRate.deliveryOrdersComission')}
-/>
-<TextInput
-  label="Collection Orders Commission"
-  placeholder="Enter collection orders commission"
-  type="number"
-  required
-  {...formEdit.getInputProps('commissionRate.collectionOrdersComission')}
-/>
-<TextInput
-  label="Eat-In Commission"
-  placeholder="Enter eat-in commission"
-  type="number"
-  required
-  {...formEdit.getInputProps('commissionRate.eatInComission')}
-/>
+            label="Delivery Orders Commission"
+            placeholder="Enter delivery orders commission"
+            type="number"
+            required
+            {...formEdit.getInputProps('deliveryOrdersComission')}
+          />
+          <TextInput
+            label="Collection Orders Commission"
+            placeholder="Enter collection orders commission"
+            type="number"
+            required
+            {...formEdit.getInputProps('collectionOrdersComission')}
+          />
+          <TextInput
+            label="Eat-In Commission"
+            placeholder="Enter eat-in commission"
+            type="number"
+            required
+            {...formEdit.getInputProps('eatInComission')}
+          />
 
           <Radio.Group
             label="Service Fee Applicable"
