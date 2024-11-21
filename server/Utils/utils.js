@@ -30,9 +30,9 @@ const calculateOrderValues = (orders, customer, type) => {
 
         let commissionRate = 0;
         if (key.toLowerCase() === 'delivery') {
-            commissionRate = AppConstants.DELIVERY_COMMISSION;
+            commissionRate = customer?.deliveryOrdersComission;
         } else if (key.toLowerCase() === 'collection') {
-            commissionRate = AppConstants.COLLECTION_COMMISSION;
+            commissionRate = customer?.collectionOrdersComission;
         }
 
         const commissionAmount = (commissionRate * totalOrderValue) / 100;
