@@ -1,11 +1,11 @@
 import ApiHelpers from "../api/ApiHelpers";
 import ApiConstants from "../api/ApiConstants";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
 import { AxiosError, AxiosResponse } from "axios";
 import useAppBasedContext from "./useAppBasedContext";
-
+import { isEqual } from "lodash";
 interface ValidationErrorDetail {
   fileName: string;
   issues: Issue[];
@@ -41,9 +41,14 @@ export interface CalculationsByOrderType {
   DELIVERY_CHARGE?: CalculationDetails;
   DRIVER_TIP?: CalculationDetails;
 }
-
+interface AmountToReceive {
+  total: number;
+  cashPayment: number;
+  bankPayment: number;
+}
 interface CalculationsByPaymentType {
-  CARD: PaymentTypeDetails;
+  CARD?: PaymentTypeDetails;
+  CASH?: PaymentTypeDetails;
 }
 
 export interface ParsedData {
@@ -54,10 +59,12 @@ export interface ParsedData {
   tax_amount: number;
   totalWithTax: number;
   totalSalesValue: number;
-  amountToRecieve: number;
+  amountToRecieve: AmountToReceive;
   startDate: string;
   endDate: string;
   storeName: string;
+  taxRate: number;
+  totalFoodValue: number;
 }
 
 const uploadFiles = async (
@@ -83,9 +90,36 @@ const uploadFiles = async (
 };
 
 export const useUploadandGetCsvData = () => {
+  const queryClient = useQueryClient();
   const { setParsedData, setTrackOldFormData } = useAppBasedContext();
-  return useMutation<AxiosResponse<ParsedData>, AxiosError<ValidationErrorResponse>, FormValueTypes>({
-    mutationFn: (data: FormValueTypes) => uploadFiles(data),
+  return useMutation<
+    AxiosResponse<ParsedData>,
+    AxiosError<ValidationErrorResponse>,
+    FormValueTypes
+  >({
+    mutationFn: async (newData: FormValueTypes) => {
+      // Retrieve the previously posted data
+      const cachedOldFormData = queryClient.getQueryData<FormValueTypes>([
+        "oldFormData",
+      ]);
+
+      // Compare new data with cached data
+      if (isEqual(cachedOldFormData, newData)) {
+        // Return the cached parsed data if the form data hasn't changed
+        const cachedParsedData = queryClient.getQueryData<ParsedData>([
+          "parsedData",
+        ]);
+        return { data: cachedParsedData } as AxiosResponse<ParsedData>;
+      }
+
+      // Perform the network call if data has changed
+      const response = await uploadFiles(newData);
+
+      // Update cached form data after successful network call
+      queryClient.setQueryData(["oldFormData"], newData);
+
+      return response;
+    },
     retry: 0,
     onSuccess: (data, postedData) => {
       notifications.show({
@@ -96,12 +130,14 @@ export const useUploadandGetCsvData = () => {
       });
       setParsedData(data?.data);
       setTrackOldFormData({ step1: postedData });
+      // Cache the parsed data for future use
+      queryClient.setQueryData(["parsedData"], data?.data);
     },
     onError: (data) => {
       if (data instanceof AxiosError) {
         notifications.show({
           title: data?.response?.data?.error ?? "Request Failed",
-          message: 'TODO',
+          message: "TODO",
           color: "red",
           autoClose: 5000,
         });
