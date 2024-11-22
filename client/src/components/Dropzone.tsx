@@ -1,5 +1,20 @@
-import { ActionIcon, Box, Group, List, Text, ThemeIcon, rem, useMantineTheme } from "@mantine/core";
-import { IconUpload, IconPhoto, IconX, IconTrash, IconCircleCheck } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Box,
+  Group,
+  List,
+  Text,
+  ThemeIcon,
+  rem,
+  useMantineTheme,
+} from "@mantine/core";
+import {
+  IconUpload,
+  IconPhoto,
+  IconX,
+  IconTrash,
+  IconCircleCheck,
+} from "@tabler/icons-react";
 import {
   Dropzone,
   MIME_TYPES,
@@ -13,13 +28,9 @@ import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
 import React from "react";
 function findCommonStrings(array1: string[], array2: string[]) {
   const set1 = new Set(array1);
-
   const commonStrings = array2.filter((item) => set1.has(item));
-
   return commonStrings;
 }
-
-
 
 function findDuplicates(arr: string[]) {
   const duplicates = [];
@@ -42,13 +53,13 @@ function findDuplicates(arr: string[]) {
 export function FileUpload() {
   const { values, setFieldValue, errors } = useFormikContext<FormValueTypes>();
   const theme = useMantineTheme();
-console.log(errors?.csvfile,"checknowwwwww")
+  console.log(errors?.csvfile, "checknowwwwww");
   const handleReject = useCallback(
     (fileRejections: FileRejection[]) => {
       if (fileRejections[0].errors[0].code === "file-invalid-type") {
         notifications.show({
           title: "Invalid File type",
-          message: "Only CSV file format is allowed",
+          message: "Only Excel file format is allowed",
           color: theme.colors.red[6],
           autoClose: 5000,
         });
@@ -102,19 +113,14 @@ console.log(errors?.csvfile,"checknowwwwww")
     }
     setFieldValue("csvfile", updatedFiles);
   };
-  // const displayErrors =(e,fileName:string)=>{
-  //   e.stopPropagation();
-  //   console.log(errors?.csvfile.details)
-  //   const check = errors?.csvfile.details?.find((file)=>file.fileName ===fileName)
-  //   console.log(check)
-  // }
+
   return (
     <Dropzone
       onDrop={handleDrop}
       onReject={handleReject}
       maxSize={5 * 1024 ** 2}
       maxFiles={10}
-      accept={[MIME_TYPES.csv,MIME_TYPES.xlsx, MIME_TYPES.xls]}
+      accept={[MIME_TYPES.csv, MIME_TYPES.xlsx, MIME_TYPES.xls]}
       name={"csvfile"}
       style={{
         display: "flex",
@@ -176,9 +182,7 @@ console.log(errors?.csvfile,"checknowwwwww")
                     <IconCircleCheck
                       style={{ width: rem(16), height: rem(16) }}
                     />
-                    
                   </ThemeIcon>
-                  
                 }
               >
                 Uploaded file:{" "}
@@ -195,7 +199,6 @@ console.log(errors?.csvfile,"checknowwwwww")
                       >
                         <IconTrash />
                       </ActionIcon>
-                      {/* <ActionIcon  style={{ pointerEvents: "all" }} onClick={(e)=>displayErrors(e,file.name)}    key={file.name}><IconCircleX style={{ width: rem(20), height: rem(20) }} /></ActionIcon> */}
                     </Group>
                   </List.Item>
                 ))}

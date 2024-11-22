@@ -86,7 +86,7 @@ const EditableTable = ({
               </td>
               <td>
                 <NumberInput
-                  value={calculation.totalOrderValue?.toFixed(2)}
+                  value={calculation.totalOrderValue}
                   onChange={(val) =>
                     formik.setFieldValue(
                       `${tableKey}.${key}.totalOrderValue`,
@@ -125,7 +125,7 @@ const EditableTable = ({
                   </td>
                   <td>
                     <NumberInput
-                      value={calculation.amount?.toFixed(2)}
+                      value={calculation.amount}
                       onChange={(val) =>
                         formik.setFieldValue(`${tableKey}.${key}.amount`, val)
                       }
@@ -160,8 +160,7 @@ console.log(CalculatedData,"CalculatedData")
           title: "Please confirm your action",
           children: (
             <Text size="sm">
-              This action is so important that you are required to confirm it
-              with a modal. Please click one of these buttons to proceed.
+              I have checked all the calculation part, and all the amount diaplayed or edited are correct.
             </Text>
           ),
           labels: { confirm: "Confirm", cancel: "Cancel" },

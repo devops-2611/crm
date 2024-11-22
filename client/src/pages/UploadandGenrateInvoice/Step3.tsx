@@ -9,6 +9,24 @@ import {
 } from "@react-pdf/renderer";
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
+import { useRef } from "react";
+interface DocumentMetadata {
+  title: string;
+  author: string;
+  subject: string;
+  keywords: string;
+  creator: string;
+  producer: string;
+}
+
+const metaDataProps: DocumentMetadata = {
+  title: "Sample Document Title",
+  author: "John Doe",
+  subject: "Sample Document Subject",
+  keywords: "sample, document, metaData, pdf",
+  creator: "react-pdf",
+  producer: "react-pdf"
+};
 // Registering the font (optional)
 // Font.register({
 //   family: 'Roboto',
@@ -240,8 +258,8 @@ const InvoicePDF = () => {
     Total_INC_VAT: FinalData?.totalWithTax?.toFixed(2),
   };
   console.log(FinalData, "FinalData");
-  return (
-    <PDFViewer style={{ width: "100%", height: "100vh", marginTop: "20px" }}>
+    return (
+    <PDFViewer style={{ width: "100%", height: "100vh", marginTop: "20px" }} {...metaDataProps} >
       <Document>
         {/* Page 1 */}
         <Page size="A4" style={styles.page}>

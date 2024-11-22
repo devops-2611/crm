@@ -6,7 +6,7 @@ import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
 import { AxiosError, AxiosResponse } from "axios";
 import useAppBasedContext from "./useAppBasedContext";
 import { isEqual } from "lodash";
-interface ValidationErrorDetail {
+export interface ValidationErrorDetail {
   fileName: string;
   issues: Issue[];
 }
@@ -28,6 +28,9 @@ interface CalculationDetails {
   commissionRate: number;
   amount: number;
 }
+interface SERVICE_FEE_MORE_Keys extends CalculationDetails {
+  isCashOrders?: boolean;
+}
 
 interface PaymentTypeDetails {
   totalOrderValue: number;
@@ -37,7 +40,7 @@ interface PaymentTypeDetails {
 export interface CalculationsByOrderType {
   DELIVERY: CalculationDetails;
   COLLECTION: CalculationDetails;
-  SERVICE_FEE?: CalculationDetails;
+  SERVICE_FEE?: SERVICE_FEE_MORE_Keys;
   DELIVERY_CHARGE?: CalculationDetails;
   DRIVER_TIP?: CalculationDetails;
 }
@@ -137,7 +140,7 @@ export const useUploadandGetCsvData = () => {
       if (data instanceof AxiosError) {
         notifications.show({
           title: data?.response?.data?.error ?? "Request Failed",
-          message: "TODO",
+          message: "Request Failed",
           color: "red",
           autoClose: 5000,
         });
