@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { TextInput, Radio, Button, Table, Group, Modal } from '@mantine/core'
+import { useState, useEffect, useRef } from 'react'
+import { TextInput, Radio, Button, Table, Group, Modal, FileInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
@@ -20,12 +20,16 @@ interface Customer {
   deliveryOrdersComission: number
   collectionOrdersComission: number
   eatInComission: number
+  logoImg: string
 }
 
 export default function CustomerManagement() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [logoImg, setLogoImg] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm({
     initialValues: {
@@ -81,6 +85,17 @@ export default function CustomerManagement() {
     }
   }
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setLogoImg(reader.result as string); // Store Base64 string
+    };
+  };
+
   const handleSubmit = async (values: typeof form.values) => {
     const obj: any = {
       customerName: values.customerName,
@@ -94,14 +109,18 @@ export default function CustomerManagement() {
       deliveryCharge: values.deliveryCharge,
       deliveryOrdersComission: values.deliveryOrdersComission,
       collectionOrdersComission: values.collectionOrdersComission,
-      eatInComission: values.eatInComission
+      eatInComission: values.eatInComission,
+      img: logoImg
     }
+
+
     try {
       const response = await ApiHelpers.POST('/api/customer/add-customer', obj)
       if (response.status !== 200) throw new Error('Failed to add customer')
 
       await fetchCustomers()
       form.reset()
+      setLogoImg(null)
       notifications.show({
         title: 'Success',
         message: 'Customer added successfully',
@@ -152,12 +171,14 @@ export default function CustomerManagement() {
         deliveryCharge: values.deliveryCharge,
         deliveryOrdersComission: values.deliveryOrdersComission,
         collectionOrdersComission: values.collectionOrdersComission,
-        eatInComission: values.eatInComission
+        eatInComission: values.eatInComission,
+        img: logoImg
       }
       const response = await ApiHelpers.PUT(`/api/customer/edit-customer/${editingCustomer.customerId}`, obj)
       if (response.status !== 200) throw new Error('Failed to update customer')
       await fetchCustomers()
-      form.reset()
+      formEdit.reset()
+      setLogoImg(null)
       setIsModalOpen(false)
       setEditingCustomer(null)
       notifications.show({
@@ -254,6 +275,15 @@ export default function CustomerManagement() {
           {...form.getInputProps('eatInComission')}
         />
 
+          <div>
+          <label>Upload Logo</label>
+          <input
+            type="file"
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+          />
+        </div>
+
         <Radio.Group
           label="Service Fee Applicable"
           {...form.getInputProps('serviceFee')}
@@ -294,6 +324,7 @@ export default function CustomerManagement() {
             <th>Post Code</th>
             <th>Email</th>
             <th>Mobile</th>
+            <th>Logo</th>
             <th>Delivery Orders Commission</th>
             <th>Collection Orders Commission</th>
             <th>Eat-In Commission</th>
@@ -313,6 +344,7 @@ export default function CustomerManagement() {
               <td>{customer.customerPost}</td>
               <td>{customer.customerEmail}</td>
               <td>{customer.customerMobile}</td>
+              <td>{customer?.logoImg && <img src={`${import.meta.env.VITE_API_BASE_URL}${customer?.logoImg}`} alt="Logo" width="50" />}</td>
               <td>{customer.deliveryOrdersComission}</td>
               <td>{customer.collectionOrdersComission}</td>
               <td>{customer.eatInComission}</td>
@@ -393,6 +425,15 @@ export default function CustomerManagement() {
             required
             {...formEdit.getInputProps('eatInComission')}
           />
+
+        <div>
+          <label>Upload Logo</label>
+          <input
+            type="file"
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+          />
+        </div>
 
           <Radio.Group
             label="Service Fee Applicable"

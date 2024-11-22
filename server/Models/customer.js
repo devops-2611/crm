@@ -43,7 +43,9 @@ const CustomerSchema = new mongoose.Schema(
     deliveryOrdersComission: { type: Number },
     collectionOrdersComission: { type: Number },
     eatInComission: { type: Number },
+    logoImg: { type: String },
   },
+  
   { timestamps: true }
 );
 
