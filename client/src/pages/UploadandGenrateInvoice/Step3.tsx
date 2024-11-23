@@ -25,7 +25,7 @@ const metaDataProps: DocumentMetadata = {
   subject: "Sample Document Subject",
   keywords: "sample, document, metaData, pdf",
   creator: "react-pdf",
-  producer: "react-pdf"
+  producer: "react-pdf",
 };
 // Registering the font (optional)
 // Font.register({
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 60,
-    height: 60,
+    width: 200,
+    height: 200,
   },
   boldText: {
     fontWeight: "bold",
@@ -94,12 +94,11 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    borderBottom: "1px solid black",
+
   },
   tableCell: {
     flex: 3,
-    borderRight: "1px solid black",
-    borderLeft: "1px solid black",
+    
     padding: "5",
   },
   tableCellDate: {
@@ -109,7 +108,7 @@ const styles = StyleSheet.create({
   tableCellAmount: {
     flex: 1,
     textAlign: "right",
-    borderRight: "1px solid black",
+   
   },
   BasicInfo: {
     display: "flex",
@@ -119,6 +118,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 50,
   },
   PageNoText: {
     position: "absolute", // Fixes the footer position
@@ -151,7 +151,8 @@ const styles_page2 = StyleSheet.create({
     display: "flex",
     width: "auto",
     borderStyle: "solid",
-    borderWidth: 1,
+    borderRight: 1,
+    borderBottom: 1,
     marginTop: 20,
   },
   tableRow: {
@@ -159,7 +160,26 @@ const styles_page2 = StyleSheet.create({
   },
   tableCell: {
     borderStyle: "solid",
-    borderWidth: 1,
+    borderLeft: 1,
+    borderTop: 1,
+    padding: 5,
+    fontSize: 10,
+    flex: 1,
+    textAlign: "left",
+  },
+  secondlastRowCell: {
+    borderStyle: "solid",
+    borderTop: 1,
+    padding: 5,
+    fontSize: 10,
+    flex: 1,
+    textAlign: "left",
+  },
+  lastRowCell: {
+    borderStyle: "solid",
+    borderLeft: 1,
+    // borderTop: 1,
+
     padding: 5,
     fontSize: 10,
     flex: 1,
@@ -257,9 +277,16 @@ const InvoicePDF = () => {
     VAT: FinalData?.tax_amount?.toFixed(2),
     Total_INC_VAT: FinalData?.totalWithTax?.toFixed(2),
   };
-  console.log(FinalData, "FinalData");
-    return (
-    <PDFViewer style={{ width: "100%", height: "100vh", marginTop: "20px" }} {...metaDataProps} >
+
+  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
+    customerConfig?.logoImg
+  }`;
+
+  return (
+    <PDFViewer
+      style={{ width: "100%", height: "100vh", marginTop: "20px" }}
+      {...metaDataProps}
+    >
       <Document>
         {/* Page 1 */}
         <Page size="A4" style={styles.page}>
@@ -271,10 +298,8 @@ const InvoicePDF = () => {
               </Text>
               <Text>Invoice date: {Variables?.invoiceDate}</Text>
             </View>
-            <Image
-              src="https://i.imgur.com/6oyvQbQ.png" // Replace this with your logo URL
-              style={styles.logo}
-            />
+
+            <Image src={logoUrl} style={styles.logo} />
           </View>
 
           {/* Store and Swishr Details */}
@@ -455,6 +480,22 @@ const InvoicePDF = () => {
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>Total Sales</Text>
               <Text style={styles_page2.tableCell}>£157.37</Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={{ ...styles_page2.lastRowCell, borderTop: 1 }}>
+                Total To Be Paid This Week After All Deductions
+              </Text>
+              <Text
+                style={{ ...styles_page2.secondlastRowCell, borderLeft: 1 }}
+              >
+                £118.96 will be paid via Bank Transfer Payments
+              </Text>
+            </View>
+            <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.lastRowCell}>Total here</Text>
+              <Text style={{ ...styles_page2.lastRowCell, borderLeft: 1 }}>
+                £0.00 Paid via Cash Order
+              </Text>
             </View>
           </View>
           {/* Account Statement Section */}

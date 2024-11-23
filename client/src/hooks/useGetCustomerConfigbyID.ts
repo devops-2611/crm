@@ -18,20 +18,23 @@ interface ConfigDetails {
 }
 
 export interface CustomerData {
-  configDetails: ConfigDetails;
   _id: string;
   customerId: number;
   customerName: string;
   customerEmail: string;
   customerMobile: string;
   customerAddress: string;
-  createdAt: string;
-  updatedAt: string;
   customerArea: string;
-  customerPost: number;
+  customerPost: string;
   serviceFee: boolean;
   deliveryCharge: boolean;
   driverTip: boolean;
+  deliveryOrdersComission: number;
+  collectionOrdersComission: number;
+  eatInComission: number;
+  logoImg: string;
+  createdAt: string;
+  updatedAt: string;
   __v: number;
 }
 
