@@ -6,6 +6,7 @@ import {
   View,
   PDFViewer,
   Image,
+  Font,
 } from "@react-pdf/renderer";
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
@@ -29,10 +30,13 @@ const metaDataProps: DocumentMetadata = {
 };
 // Registering the font (optional)
 // Font.register({
-//   family: 'Roboto',
+//   family: "Roboto",
 //   fonts: [
-//     { src: 'https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu4mxP.ttf' }, // Regular
-//     { src: 'https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1Mu72xP.ttf', fontWeight: 'bold' }, // Bold
+//     { src: "https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu4mxP.ttf" }, // Regular
+//     {
+//       src: "https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1Mu72xP.ttf",
+//       fontWeight: "bold",
+//     }, // Bold
 //   ],
 // });
 
@@ -94,11 +98,10 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-
   },
   tableCell: {
     flex: 3,
-    
+
     padding: "5",
   },
   tableCellDate: {
@@ -108,31 +111,35 @@ const styles = StyleSheet.create({
   tableCellAmount: {
     flex: 1,
     textAlign: "right",
-   
   },
   BasicInfo: {
     display: "flex",
     justifyContent: "space-between",
   },
   FooterText: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 50,
-  },
-  PageNoText: {
     position: "absolute", // Fixes the footer position
     bottom: 10, // Distance from the bottom of the page
     left: 0,
     right: 0,
     textAlign: "center",
     fontSize: 10,
+    paddingLeft: 30,
+    paddingRight: 30,
+  },
+  PageNoText: {
+    left: 0,
+    right: 0,
+    fontSize: 10,
+    marginTop: 10,
   },
 });
 const styles_page2 = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
     padding: 20,
+  },
+  headerFlexBox: {
+    flexDirection: "row-reverse",
   },
   header: {
     textAlign: "center",
@@ -276,11 +283,46 @@ const InvoicePDF = () => {
     Subtotal: FinalData?.totalSubTotal?.toFixed(2),
     VAT: FinalData?.tax_amount?.toFixed(2),
     Total_INC_VAT: FinalData?.totalWithTax?.toFixed(2),
-  };
 
+    //Page 2 SUmmary Section
+    summaryTotalDeliveryOrders:
+      FinalData?.calculationsByOrderType?.DELIVERY?.totalOrders ?? 0,
+    summaryTotalCollectionOrders:
+      FinalData?.calculationsByOrderType?.COLLECTION?.totalOrders ?? 0,
+    sumarynoOfCardPayments:
+      FinalData?.calculationsByPaymentType?.CARD?.totalOrders ?? 0,
+    sumarynoOfCashPayments:
+      FinalData?.calculationsByPaymentType?.CASH?.totalOrders ?? 0,
+
+    summaryCardTotal:
+      FinalData?.calculationsByPaymentType?.CARD?.totalOrderValue?.toFixed(2) ?? 0,
+    summaryCashTotal:
+      FinalData?.calculationsByPaymentType?.CASH?.totalOrderValue?.toFixed(2) ?? 0,
+
+    summaryTotalSales: FinalData?.totalSalesValue?.toFixed(2) ?? 0,
+
+    summaryAmountTOBepadiAfterDeductions: FinalData?.amountToRecieve.total ?? 0,
+    summaryAmountTOBeviaBankTransfer:
+      FinalData?.amountToRecieve.bankPayment ?? 0,
+    summaryAmounttobePAidViaCashOrders:
+      FinalData?.amountToRecieve.cashPayment ?? 0,
+
+
+    //Page 2 Account Section
+    AccountBalanceAmount: 'TODO AccountBalanceAmount',
+
+  };
+  console.log(FinalData, "finalData");
   const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
     customerConfig?.logoImg
   }`;
+  const CustomerVairables = {
+    //first page header left side section
+    storeName: customerConfig.customerName,
+    addressLine1: customerConfig?.customerAddress,
+    addressArea: customerConfig?.customerArea,
+    postcode: customerConfig?.customerPost,
+  };
 
   return (
     <PDFViewer
@@ -305,10 +347,13 @@ const InvoicePDF = () => {
           {/* Store and Swishr Details */}
           <View style={styles.tableRow}>
             <View style={styles.section}>
-              <Text style={styles.boldText}>Store</Text>
-              <Text>Address</Text>
-              <Text>Chester</Text>
-              <Text>Post code</Text>
+              <Text style={styles.boldText}>
+                {CustomerVairables?.storeName}
+              </Text>
+              <Text>{CustomerVairables?.addressLine1}</Text>
+              <Text>{CustomerVairables?.addressArea}</Text>
+
+              <Text>{CustomerVairables?.postcode}</Text>
             </View>
             <View style={styles.section}>
               <Text style={styles.boldText}>{Variables?.storeName}</Text>
@@ -331,10 +376,22 @@ const InvoicePDF = () => {
           {/* Description Table */}
           <View>
             <View style={styles.tableHeader}>
-              <Text style={{ ...styles.tableCell, fontWeight: "bold" }}>
+              <Text
+                style={{
+                  ...styles.tableCell,
+                  fontWeight: "bold",
+                  fontSize: 12,
+                }}
+              >
                 Description
               </Text>
-              <Text style={{ ...styles.tableCellAmount, fontWeight: "bold" }}>
+              <Text
+                style={{
+                  ...styles.tableCellAmount,
+                  fontWeight: "bold",
+                  fontSize: 12,
+                }}
+              >
                 Amount
               </Text>
             </View>
@@ -429,21 +486,22 @@ const InvoicePDF = () => {
               You don’t need to do anything, this will automatically be deducted
               in your Swishr Account statement 128 City Road, London, EC1V 2NX
             </Text>
+            <Text style={styles.PageNoText}>Page 1 of 2</Text>
           </View>
-
-          <Text style={styles.PageNoText}>Page 1 of 2</Text>
         </Page>
 
         {/* Page 2 */}
         <Page size="A4" style={styles.page}>
           {/* Header */}
-          <View style={styles_page2.header}>
-            <Text style={styles_page2.logo}>SWISHR</Text>
-            <Text style={styles_page2.title}>
-              Period: 28th October 2024 - 3rd November 2024
-            </Text>
-            <Text>Restaurant ID: 0000</Text>
-            <Text>Account Ref: SWSH-0000-0000</Text>
+          <View style={styles_page2.headerFlexBox}>
+            <View>
+              <Image src={logoUrl} style={styles.logo} />
+              <Text>
+                {Variables.Period_startDate} - {Variables?.Period_EndDate}
+              </Text>
+              <Text>Restaurant ID: TODO</Text>
+              <Text>Account Ref: TODO</Text>
+            </View>
           </View>
 
           {/* Summary Section */}
@@ -453,33 +511,47 @@ const InvoicePDF = () => {
           <View style={styles_page2.table}>
             <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
               <Text style={styles_page2.tableCell}>Total Orders</Text>
-              <Text style={styles_page2.tableCell}>10</Text>
+              <Text style={styles_page2.tableCell}>
+                {Number(Variables?.summaryTotalDeliveryOrders) +
+                  Number(Variables?.summaryTotalCollectionOrders)}
+              </Text>
             </View>
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>Delivery Orders</Text>
-              <Text style={styles_page2.tableCell}>7</Text>
+              <Text style={styles_page2.tableCell}>
+                {Variables?.summaryTotalDeliveryOrders}
+              </Text>
             </View>
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>Collections Orders</Text>
-              <Text style={styles_page2.tableCell}>3</Text>
-            </View>
-            <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}>10 Card Payments</Text>
-              <Text style={styles_page2.tableCell}>£157.37</Text>
+              <Text style={styles_page2.tableCell}>
+                {Variables?.summaryTotalCollectionOrders}
+              </Text>
             </View>
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>
-                0 Cash Payments (Including Service Fee)
+                {Variables?.sumarynoOfCardPayments} Card Payments
               </Text>
-              <Text style={styles_page2.tableCell}>£0.00</Text>
+              <Text style={styles_page2.tableCell}>
+                £{Variables?.summaryCardTotal}
+              </Text>
             </View>
             <View style={styles_page2.tableRow}>
+              <Text style={styles_page2.tableCell}>
+                {Variables?.sumarynoOfCashPayments} Cash Payments (Including
+                Service Fee)
+              </Text>
+              <Text style={styles_page2.tableCell}>
+                £{Variables?.summaryCashTotal}
+              </Text>
+            </View>
+            {/* <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>Food & Drink Value</Text>
               <Text style={styles_page2.tableCell}>£157.37</Text>
-            </View>
+            </View> */}
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>Total Sales</Text>
-              <Text style={styles_page2.tableCell}>£157.37</Text>
+              <Text style={styles_page2.tableCell}>£{Variables?.summaryTotalSales}</Text>
             </View>
             <View style={styles_page2.tableRow}>
               <Text style={{ ...styles_page2.lastRowCell, borderTop: 1 }}>
@@ -488,13 +560,17 @@ const InvoicePDF = () => {
               <Text
                 style={{ ...styles_page2.secondlastRowCell, borderLeft: 1 }}
               >
-                £118.96 will be paid via Bank Transfer Payments
+                £{Variables?.summaryAmountTOBeviaBankTransfer} will be paid via
+                Bank Transfer Payments
               </Text>
             </View>
             <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.lastRowCell}>Total here</Text>
+              <Text style={styles_page2.lastRowCell}>
+                £{Variables?.summaryAmountTOBepadiAfterDeductions}
+              </Text>
               <Text style={{ ...styles_page2.lastRowCell, borderLeft: 1 }}>
-                £0.00 Paid via Cash Order
+                £{Variables?.summaryAmounttobePAidViaCashOrders} Paid via Cash
+                Order
               </Text>
             </View>
           </View>
@@ -507,7 +583,7 @@ const InvoicePDF = () => {
           <View style={styles_page2.table}>
             <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
               <Text style={styles_page2.tableCell}>Account Balance</Text>
-              <Text style={styles_page2.tableCell}>£0</Text>
+              <Text style={styles_page2.tableCell}>TODO £0</Text>
             </View>
           </View>
           <View style={styles_page2.table}>
@@ -517,28 +593,28 @@ const InvoicePDF = () => {
               <Text style={styles_page2.tableCell}>Amount</Text>
             </View>
             <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}>21st October 2024</Text>
+              <Text style={styles_page2.tableCell}> TODO 21st October 2024</Text>
               <Text style={styles_page2.tableCell}>Opening Balance</Text>
-              <Text style={styles_page2.tableCell}>£0</Text>
+              <Text style={styles_page2.tableCell}> TODO £0</Text>
             </View>
             <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}>27th October 2024</Text>
+              <Text style={styles_page2.tableCell}> TODO 27th October 2024</Text>
               <Text style={styles_page2.tableCell}>
                 Card Order Payments Received
               </Text>
-              <Text style={styles_page2.tableCell}>£157.37</Text>
+              <Text style={styles_page2.tableCell}> TODO £157.37</Text>
             </View>
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>27th October 2024</Text>
-              <Text style={styles_page2.tableCell}>Invoice 157 Due</Text>
-              <Text style={styles_page2.tableCell}>-£38.41</Text>
+              <Text style={styles_page2.tableCell}> TODO Invoice 157 Due TODO</Text>
+              <Text style={styles_page2.tableCell}> TODO £38.41</Text>
             </View>
             <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}>30th October 2024</Text>
+              <Text style={styles_page2.tableCell}>TODO 30th October 2024</Text>
               <Text style={styles_page2.tableCell}>
                 Remaining Balance Bank Transferred to Merchant
               </Text>
-              <Text style={styles_page2.tableCell}>-£118.96</Text>
+              <Text style={styles_page2.tableCell}>£ TODO</Text>
             </View>
           </View>
 
@@ -546,7 +622,7 @@ const InvoicePDF = () => {
           <View style={styles_page2.table}>
             <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
               <Text style={styles_page2.tableCell}>Closing Balance</Text>
-              <Text style={styles_page2.tableCell}>£0</Text>
+              <Text style={styles_page2.tableCell}>£ TODO</Text>
             </View>
           </View>
           {/* Footer Section */}

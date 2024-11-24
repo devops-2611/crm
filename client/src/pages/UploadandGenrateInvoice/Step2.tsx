@@ -176,7 +176,7 @@ console.log(CalculatedData,"CalculatedData")
       setActiveStep((prev) => prev + 1);
     }
   }, [isSuccessInUpdatingData, setActiveStep]);
-  const [accordianValue, setAccordianValue] = useState<string[]>([]);
+  const [accordianValue, setAccordianValue] = useState<string[]>(['Order Summary']);
   return (
     <Box mx="auto" mt="xl">
       <Accordion
@@ -188,7 +188,7 @@ console.log(CalculatedData,"CalculatedData")
       >
         {Object.keys(formik.values)?.length > 0 && (
           <form onSubmit={formik.handleSubmit}>
-            <Accordion.Item value="photos">
+            <Accordion.Item value="General Information">
               <Accordion.Control
                 icon={
                   <IconInfoSquareRounded
@@ -316,7 +316,6 @@ console.log(CalculatedData,"CalculatedData")
               </Accordion.Control>
               <Accordion.Panel>
                 <Stack>
-                  <Text>Some text</Text>
                   <Group mt="sm" wrap={"wrap"}>
                     <NumberInput
                       decimalScale={2}

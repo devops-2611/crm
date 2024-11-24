@@ -9,6 +9,11 @@ export interface EditAndSaveResponse {
   message: string;
   invoice: Invoice;
 }
+interface AmountToReceive {
+  total: number;
+  cashPayment: number;
+  bankPayment: number;
+}
 export interface Invoice {
   invoiceId: string;
   customerId: number;
@@ -22,13 +27,13 @@ export interface Invoice {
   };
   calculationsByPaymentType: {
     CARD?: PaymentTypeDetails;
-    [key: string]: PaymentTypeDetails | undefined; // For potential additional payment types
+    CASH?: PaymentTypeDetails;
   };
   totalSubTotal: number;
   tax_amount: number;
   totalWithTax: number;
   totalSalesValue: number;
-  amountToRecieve: number;
+  amountToRecieve: AmountToReceive;
   startDate: string;
   endDate: string;
   storeName: string;
