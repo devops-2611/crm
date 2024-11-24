@@ -160,7 +160,7 @@ console.log(CalculatedData,"CalculatedData")
           title: "Please confirm your action",
           children: (
             <Text size="sm">
-              I have checked all the calculation part, and all the amount diaplayed or edited are correct.
+              I have checked all the calculations, and I am ready to generate Invoice.
             </Text>
           ),
           labels: { confirm: "Confirm", cancel: "Cancel" },

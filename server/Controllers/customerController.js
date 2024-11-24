@@ -19,7 +19,7 @@ exports.addCustomer = async (req, res) => {
     const imageType = matches[2]; // e.g., 'png', 'jpeg'
     const imgBuffer = Buffer.from(matches[3], 'base64'); // Decode Base64 string
 
-    const imgName = `${Date.now()}-${customerName?.split(' ').join('-')}.${imageType}`;
+    const imgName = `${Date.now()}-${customerName?.split(' ')[0]?.toString()}.${imageType}`;
     const uploadDir = path.join(__dirname, '../Uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -117,7 +117,7 @@ exports.getAllCustomerList = async (req, res) => {
         }
   
         // Save the new image
-        const imgName = `${Date.now()}-${name}.${imageType}`;
+        const imgName = `${Date.now()}-${customerName?.split(' ')[0]?.toString()}.${imageType}`;
         const imgPath = path.join(__dirname, '../Uploads', imgName);
         fs.writeFileSync(imgPath, imgBuffer);
   
