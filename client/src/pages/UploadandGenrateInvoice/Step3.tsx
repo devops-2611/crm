@@ -11,6 +11,7 @@ import {
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
 import { useRef } from "react";
+import { Button, Group } from "@mantine/core";
 interface DocumentMetadata {
   title: string;
   author: string;
@@ -54,11 +55,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 200,
+    width: 300,
     height: 200,
   },
   boldText: {
-    fontWeight: "bold",
+    fontFamily:'Helvetica-Bold'
   },
   centerText: {
     textAlign: "center",
@@ -66,6 +67,8 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 10,
+    fontFamily:'Helvetica-Bold'
+
   },
   summarySection: {
     marginVertical: 10,
@@ -206,7 +209,7 @@ const styles_page2 = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: 10,
+    marginTop: 20,
   },
 
   footer: {
@@ -295,9 +298,11 @@ const InvoicePDF = () => {
       FinalData?.calculationsByPaymentType?.CASH?.totalOrders ?? 0,
 
     summaryCardTotal:
-      FinalData?.calculationsByPaymentType?.CARD?.totalOrderValue?.toFixed(2) ?? 0,
+      FinalData?.calculationsByPaymentType?.CARD?.totalOrderValue?.toFixed(2) ??
+      0,
     summaryCashTotal:
-      FinalData?.calculationsByPaymentType?.CASH?.totalOrderValue?.toFixed(2) ?? 0,
+      FinalData?.calculationsByPaymentType?.CASH?.totalOrderValue?.toFixed(2) ??
+      0,
 
     summaryTotalSales: FinalData?.totalSalesValue?.toFixed(2) ?? 0,
 
@@ -307,10 +312,8 @@ const InvoicePDF = () => {
     summaryAmounttobePAidViaCashOrders:
       FinalData?.amountToRecieve.cashPayment ?? 0,
 
-
     //Page 2 Account Section
-    AccountBalanceAmount: 'TODO AccountBalanceAmount',
-
+    AccountBalanceAmount: "TODO AccountBalanceAmount",
   };
   console.log(FinalData, "finalData");
   const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
@@ -325,10 +328,10 @@ const InvoicePDF = () => {
   };
 
   return (
-    <PDFViewer
-      style={{ width: "100%", height: "100vh", marginTop: "20px" }}
-      {...metaDataProps}
-    >
+    // <PDFViewer
+    //   style={{ width: "100%", height: "100vh", marginTop: "20px" }}
+    //   {...metaDataProps}
+    // >
       <Document>
         {/* Page 1 */}
         <Page size="A4" style={styles.page}>
@@ -338,7 +341,7 @@ const InvoicePDF = () => {
               <Text style={styles.boldText}>
                 Invoice no. {Variables?.invoiceId}
               </Text>
-              <Text>Invoice date: {Variables?.invoiceDate}</Text>
+              <Text style={styles.boldText}>Invoice date: {Variables?.invoiceDate}</Text>
             </View>
 
             <Image src={logoUrl} style={styles.logo} />
@@ -347,7 +350,7 @@ const InvoicePDF = () => {
           {/* Store and Swishr Details */}
           <View style={styles.tableRow}>
             <View style={styles.section}>
-              <Text style={styles.boldText}>
+              <Text>
                 {CustomerVairables?.storeName}
               </Text>
               <Text>{CustomerVairables?.addressLine1}</Text>
@@ -356,7 +359,7 @@ const InvoicePDF = () => {
               <Text>{CustomerVairables?.postcode}</Text>
             </View>
             <View style={styles.section}>
-              <Text style={styles.boldText}>{Variables?.storeName}</Text>
+              <Text >{Variables?.storeName}</Text>
               <Text>128 City Road</Text>
               <Text>London</Text>
               <Text>EC1V 2NX</Text>
@@ -379,8 +382,8 @@ const InvoicePDF = () => {
               <Text
                 style={{
                   ...styles.tableCell,
-                  fontWeight: "bold",
-                  fontSize: 12,
+                  ...styles.boldText,
+                  fontSize: 13,
                 }}
               >
                 Description
@@ -388,8 +391,8 @@ const InvoicePDF = () => {
               <Text
                 style={{
                   ...styles.tableCellAmount,
-                  fontWeight: "bold",
-                  fontSize: 12,
+                  ...styles.boldText,
+                  fontSize: 13,
                 }}
               >
                 Amount
@@ -473,8 +476,8 @@ const InvoicePDF = () => {
               <Text style={styles.boldText}>£{Variables?.Subtotal}</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text>VAT:</Text>
-              <Text>£{Variables?.VAT}</Text>
+              <Text style={{ ...styles.boldText}}>VAT:</Text>
+              <Text style={styles.boldText}>£{Variables?.VAT}</Text>
             </View>
             <View style={styles.summaryRow}>
               <Text style={styles.boldText}>Total Inc. VAT:</Text>
@@ -505,12 +508,12 @@ const InvoicePDF = () => {
           </View>
 
           {/* Summary Section */}
-          <Text style={styles_page2.summaryTitle}>Summary</Text>
+          <Text style={{...styles_page2.summaryTitle, ...styles.boldText}}>Summary</Text>
 
           {/* Table */}
           <View style={styles_page2.table}>
             <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
-              <Text style={styles_page2.tableCell}>Total Orders</Text>
+              <Text style={{...styles_page2.tableCell, ...styles.boldText}}>Total Orders</Text>
               <Text style={styles_page2.tableCell}>
                 {Number(Variables?.summaryTotalDeliveryOrders) +
                   Number(Variables?.summaryTotalCollectionOrders)}
@@ -551,7 +554,9 @@ const InvoicePDF = () => {
             </View> */}
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>Total Sales</Text>
-              <Text style={styles_page2.tableCell}>£{Variables?.summaryTotalSales}</Text>
+              <Text style={styles_page2.tableCell}>
+                £{Variables?.summaryTotalSales}
+              </Text>
             </View>
             <View style={styles_page2.tableRow}>
               <Text style={{ ...styles_page2.lastRowCell, borderTop: 1 }}>
@@ -575,30 +580,36 @@ const InvoicePDF = () => {
             </View>
           </View>
           {/* Account Statement Section */}
-          <Text style={styles_page2.accountStateMentTitle}>
+          <Text style={{...styles_page2.accountStateMentTitle, ...styles.boldText}}>
             Account Statement
           </Text>
           {/* Account Balance */}
 
           <View style={styles_page2.table}>
             <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
-              <Text style={styles_page2.tableCell}>Account Balance</Text>
+              <Text style={{...styles_page2.tableCell, ...styles.boldText}}>Account Balance</Text>
               <Text style={styles_page2.tableCell}>TODO £0</Text>
             </View>
           </View>
           <View style={styles_page2.table}>
             <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
-              <Text style={styles_page2.tableCell}>Date</Text>
-              <Text style={styles_page2.tableCell}>Description</Text>
-              <Text style={styles_page2.tableCell}>Amount</Text>
+              <Text style={{...styles_page2.tableCell, ...styles.boldText}}>Date</Text>
+              <Text style={{...styles_page2.tableCell, ...styles.boldText}}>Description</Text>
+              <Text style={{...styles_page2.tableCell, ...styles.boldText}}>Amount</Text>
             </View>
             <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}> TODO 21st October 2024</Text>
+              <Text style={styles_page2.tableCell}>
+                {" "}
+                TODO 21st October 2024
+              </Text>
               <Text style={styles_page2.tableCell}>Opening Balance</Text>
               <Text style={styles_page2.tableCell}> TODO £0</Text>
             </View>
             <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}> TODO 27th October 2024</Text>
+              <Text style={styles_page2.tableCell}>
+                {" "}
+                TODO 27th October 2024
+              </Text>
               <Text style={styles_page2.tableCell}>
                 Card Order Payments Received
               </Text>
@@ -606,7 +617,10 @@ const InvoicePDF = () => {
             </View>
             <View style={styles_page2.tableRow}>
               <Text style={styles_page2.tableCell}>27th October 2024</Text>
-              <Text style={styles_page2.tableCell}> TODO Invoice 157 Due TODO</Text>
+              <Text style={styles_page2.tableCell}>
+                {" "}
+                TODO Invoice 157 Due TODO
+              </Text>
               <Text style={styles_page2.tableCell}> TODO £38.41</Text>
             </View>
             <View style={styles_page2.tableRow}>
@@ -621,7 +635,7 @@ const InvoicePDF = () => {
           {/* Closing Balance */}
           <View style={styles_page2.table}>
             <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
-              <Text style={styles_page2.tableCell}>Closing Balance</Text>
+              <Text style={{...styles_page2.tableCell, ...styles.boldText}}>Closing Balance</Text>
               <Text style={styles_page2.tableCell}>£ TODO</Text>
             </View>
           </View>
@@ -629,8 +643,10 @@ const InvoicePDF = () => {
           <Text style={styles_page2.PageNoText}>Page No 2</Text>
         </Page>
       </Document>
-    </PDFViewer>
+    // </PDFViewer>
   );
 };
+
+
 
 export default InvoicePDF;
