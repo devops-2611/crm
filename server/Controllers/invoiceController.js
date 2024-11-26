@@ -1,5 +1,4 @@
 
-const multer = require('multer');
 const csv = require('csv-parser');
 const xlsx = require('xlsx');
 const stream = require('stream');
@@ -8,9 +7,6 @@ const CustomerModel = require('../Models/customer');
 const InvoiceModal = require('../Models/invoice');
 const { calculateOrderValues, generateInvoiceId, getWeekBoundaries } = require('../Utils/utils');
 
-
-// Configure Multer to store files in memory
-const upload = multer({ storage: multer.memoryStorage() });
 
 const expectedHeaders = [
     "Order ID",
@@ -368,4 +364,4 @@ const getInvoiceByCustomerId = async (req, res) => {
     }
 };
 
-module.exports = { upload, uploadAndParseCSV, saveInvoiceData, getInvoiceByCustomerId, uploadManualData };
+module.exports = { uploadAndParseCSV, saveInvoiceData, getInvoiceByCustomerId, uploadManualData };
