@@ -127,12 +127,13 @@ export const useUploadandGetCsvData = () => {
     onSuccess: (data, postedData) => {
       notifications.show({
         title: "File Uploaded successfully",
-        message: "Some more text here",
+        message: "Success",
         color: "green",
         autoClose: 2000,
       });
       setParsedData(data?.data);
-      setTrackOldFormData({ step1: postedData });
+      setTrackOldFormData({ step1: postedData, step2:undefined });
+
       // Cache the parsed data for future use
       queryClient.setQueryData(["parsedData"], data?.data);
     },

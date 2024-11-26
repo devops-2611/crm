@@ -13,7 +13,7 @@ import {
   Divider,
 } from "@mantine/core";
 import { useSaveSubmittedData } from "../../hooks/useSaveSubmittedData";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   IconChevronRight,
   IconChevronLeft,
@@ -233,7 +233,8 @@ const EditableTable = ({
   isPayMentType?: boolean;
 }) => {
   return (
-    <Table striped highlightOnHover withColumnBorders>
+    <Table.ScrollContainer minWidth={'300px'} type="native">
+    <Table striped highlightOnHover withColumnBorders >
       <thead>
         <tr>
           {columnsHeaders.map((header) => (
@@ -304,6 +305,8 @@ const EditableTable = ({
         })}
       </tbody>
     </Table>
+</Table.ScrollContainer>
+
   );
 };
 
@@ -316,7 +319,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
   const { trackOldFormData, parsedData: CalculatedData } = useAppBasedContext();
 
   const formik = useFormik<ParsedData>({
-    initialValues: CalculatedData ?? {},
+    initialValues: trackOldFormData?.step2  ?? CalculatedData,
     onSubmit: (values) => {
       modals.openConfirmModal({
         title: "Please confirm your action",
@@ -335,7 +338,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
 
   useEffect(() => {
     if (isSuccessInUpdatingData) {
-      setActiveStep((prev) => prev + 1);
+      setActiveStep((prev:number) => prev + 1);
     }
   }, [isSuccessInUpdatingData, setActiveStep]);
 

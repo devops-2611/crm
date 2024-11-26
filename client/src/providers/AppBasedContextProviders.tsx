@@ -9,13 +9,15 @@ interface AppBAsedProvidersProps {
 }
 interface completeFormData {
   step1?: FormValueTypes;
-  step2?: EditAndSaveResponse;
+  step2?: ParsedData;
 }
 export interface AppBasedContextVariables {
   customerConfig: CustomerData;
   setCustomerConfig: (customerConfig: CustomerData) => void;
   parsedData: ParsedData;
   setParsedData: (parsedDataData: ParsedData) => void;
+  InvoiceData: EditAndSaveResponse;
+  setInvoiceData: (invoiceData: EditAndSaveResponse) => void;
   setTrackOldFormData: (data: completeFormData) => void;
   trackOldFormData: completeFormData;
 }
@@ -40,11 +42,15 @@ const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
           ...prev,
           trackOldFormData: { ...prev?.trackOldFormData, ...data },
         })),
+      InvoiceData: contextValue?.InvoiceData ?? {},
+      setInvoiceData: (data: EditAndSaveResponse) =>
+        setContextValue((prev) => ({ ...prev, InvoiceData: data })),
     }),
     [
       contextValue?.customerConfig,
       contextValue?.parsedData,
       contextValue?.trackOldFormData,
+      contextValue?.InvoiceData,
     ]
   );
   return (
