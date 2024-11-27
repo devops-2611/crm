@@ -1,0 +1,126 @@
+trigger:
+- main
+
+variables:
+  ACR_NAME: 'crmreg'
+  ACR_LOGIN_SERVER: 'crmreg.azurecr.io'
+  FRONTEND_IMAGE_NAME: 'crm-frontend'
+  BACKEND_IMAGE_NAME: 'crm-backend'
+  RESOURCE_GROUP: 'aks-rg'
+  CLUSTER_NAME: 'aks_dodo'
+  AKS_NAMESPACE: 'ingress-nginx'
+  IMAGE_TAG: 'latest'  # Use 'latest' for the image tag
+
+stages:
+- stage: BuildAndPush
+  displayName: Build and Push Docker Images
+  jobs:
+  - job: BuildAndPushImages
+    displayName: Build and Push Images to ACR
+    pool: 
+      name: crm-pool
+      demands:
+        - agent.name -equals crm-agent1
+    steps:
+    # Step 1: Install Docker if not present
+    - script: |
+        if ! command -v docker &> /dev/null
+        then
+          echo "Docker not found. Installing Docker..."
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+        else
+          echo "Docker is already installed."
+        fi
+      displayName: 'Install Docker if not installed'
+
+    # Step 2: Ensure Docker is Running
+    - script: |
+        sudo systemctl start docker
+        sudo systemctl enable docker
+      displayName: 'Ensure Docker is Running'
+
+    # Step 3: Grant Docker Permissions to User
+    - script: |
+        sudo usermod -aG docker $(whoami)
+        sudo chown $(whoami):docker /var/run/docker.sock
+      displayName: 'Grant Docker Permissions to User'
+
+    # Step 4: Restart Docker Service
+    - script: |
+        sudo systemctl restart docker
+      displayName: 'Restart Docker Service'
+
+    # Step 5: Log in to Azure Container Registry (ACR)
+    - script: |
+        az acr login --name $(ACR_NAME)
+      displayName: 'Login to Azure Container Registry'
+
+    # Step 6: Build and Push Frontend Docker Image
+    - task: Docker@2
+      displayName: Build and Push Frontend Docker Image
+      inputs:
+        command: buildAndPush
+        repository: $(FRONTEND_IMAGE_NAME)  # Only the image name, not the full ACR address
+        dockerfile: client/Dockerfile
+        containerRegistry: crmreg-connection
+        tags: $(IMAGE_TAG)  # Always push with 'latest' tag
+
+    # Step 7: Build and Push Backend Docker Image
+    - task: Docker@2
+      displayName: Build and Push Backend Docker Image
+      inputs:
+        command: buildAndPush
+        repository: $(BACKEND_IMAGE_NAME)  # Only the image name, not the full ACR address
+        dockerfile: server/Dockerfile
+        containerRegistry: crmreg-connection
+        tags: $(IMAGE_TAG)  # Always push with 'latest' tag
+
+- stage: Deploy
+  displayName: Deploy to AKS
+  dependsOn: BuildAndPush
+  jobs:
+  - job: DeployToKubernetes
+    displayName: Deploy to AKS
+    pool: 
+      name: crm-pool
+      demands:
+        - agent.name -equals crm-agent1
+    steps:
+    # Step 8: Set AKS Context
+    - task: AzureCLI@2
+      displayName: 'Set AKS Context'
+      inputs:
+        azureSubscription: 'dodocon'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(CLUSTER_NAME)
+
+    # Step 9: Deploy Frontend to AKS
+    - task: Kubernetes@1
+      displayName: Deploy Frontend
+      inputs:
+        connectionType: Azure Resource Manager
+        azureSubscriptionEndpoint: 'dodocon'
+        azureResourceGroup: $(RESOURCE_GROUP)
+        kubernetesCluster: $(CLUSTER_NAME)
+        namespace: $(AKS_NAMESPACE)
+        command: apply
+        useConfigurationFile: true
+        configuration: fe.yml
+
+    # Step 10: Deploy Backend to AKS
+    - task: Kubernetes@1
+      displayName: Deploy Backend
+      inputs:
+        connectionType: Azure Resource Manager
+        azureSubscriptionEndpoint: 'dodocon'
+        azureResourceGroup: $(RESOURCE_GROUP)
+        kubernetesCluster: $(CLUSTER_NAME)
+        namespace: $(AKS_NAMESPACE)
+        command: apply
+        useConfigurationFile: true
+        configuration: be.yml
