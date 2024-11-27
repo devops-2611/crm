@@ -1,5 +1,5 @@
 import { FileUpload } from "../../components/Dropzone";
-import { Button, Container, NumberInput } from "@mantine/core";
+import { Button, Container, LoadingOverlay, NumberInput } from "@mantine/core";
 import { Select, Stack } from "@mantine/core";
 import { useGetAllCustomerList } from "../../hooks/useGetAllCustomerList";
 import { useEffect, useMemo, useRef } from "react";
@@ -70,7 +70,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
     }
   };
   return (
-    <Container p={20}>
+    <Container p={20} pos={'relative'}>
       <Formik
         initialValues={trackOldFormData?.step1 ?? initalValues}
         onSubmit={(values) => {
@@ -138,6 +138,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
              <ErrorDetails errorData={ErrorOnUploadingFiles?.response?.data} />
       </>)}
       </Formik>
+      <LoadingOverlay visible={isPending} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
     </Container>
   );
 }

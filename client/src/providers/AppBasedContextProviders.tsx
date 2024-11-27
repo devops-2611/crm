@@ -12,14 +12,14 @@ interface completeFormData {
   step2?: ParsedData;
 }
 export interface AppBasedContextVariables {
-  customerConfig: CustomerData;
-  setCustomerConfig: (customerConfig: CustomerData) => void;
-  parsedData: ParsedData;
-  setParsedData: (parsedDataData: ParsedData) => void;
-  InvoiceData: EditAndSaveResponse;
-  setInvoiceData: (invoiceData: EditAndSaveResponse) => void;
-  setTrackOldFormData: (data: completeFormData) => void;
-  trackOldFormData: completeFormData;
+  customerConfig?: CustomerData;
+  setCustomerConfig?: (customerConfig: CustomerData) => void |undefined;
+  parsedData?: ParsedData;
+  setParsedData?: (parsedDataData: ParsedData) => void | undefined;
+  InvoiceData?: EditAndSaveResponse;
+  setInvoiceData?: (invoiceData: EditAndSaveResponse) => void | undefined;
+  setTrackOldFormData?: (data: completeFormData) => void| undefined;
+  trackOldFormData?: completeFormData;
 }
 
 const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
@@ -27,7 +27,7 @@ const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
     useState<AppBasedContextVariables | null>(null);
   const value = useMemo(
     () => ({
-      customerConfig: contextValue?.customerConfig ?? {},
+      customerConfig: contextValue?.customerConfig,
       setCustomerConfig: (customerConfig: CustomerData) =>
         setContextValue((prev) => ({
           ...prev,
@@ -36,13 +36,13 @@ const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
       parsedData: contextValue?.parsedData,
       setParsedData: (parsedDataData: ParsedData) =>
         setContextValue((prev) => ({ ...prev, parsedData: parsedDataData })),
-      trackOldFormData: contextValue?.trackOldFormData ?? {},
+      trackOldFormData: contextValue?.trackOldFormData,
       setTrackOldFormData: (data: Partial<completeFormData>) =>
         setContextValue((prev) => ({
           ...prev,
           trackOldFormData: { ...prev?.trackOldFormData, ...data },
         })),
-      InvoiceData: contextValue?.InvoiceData ?? {},
+      InvoiceData: contextValue?.InvoiceData,
       setInvoiceData: (data: EditAndSaveResponse) =>
         setContextValue((prev) => ({ ...prev, InvoiceData: data })),
     }),

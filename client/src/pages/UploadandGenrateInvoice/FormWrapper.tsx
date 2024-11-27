@@ -14,7 +14,7 @@ const FormWrapper = () => {
       <InvoiceStepper active={activeStep} setActiveStep={setActiveStep} />
       {activeStep === 1 && <Step1 setActiveStep={setActiveStep} />}
       {activeStep === 2 && <Step2 setActiveStep={setActiveStep} />}
-      {activeStep === 3 && <DonwloadButton setActiveStep={setActiveStep} />}
+      {activeStep === 3 && <Step3 setActiveStep={setActiveStep} />}
     </Container>
   );
 };

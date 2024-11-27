@@ -85,7 +85,6 @@ const uploadFiles = async (
   formData.append("customerId", formValues.customerid);
   formData.append("taxRate", formValues.taxrate.toString());
 
-  console.log(formData, "formdata");
   return await ApiHelpers.POST(
     ApiConstants.UPLOAD_AND_GET_INVOICE_DATA(),
     formData

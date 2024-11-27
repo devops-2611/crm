@@ -11,6 +11,7 @@ import {
   Text,
   Stack,
   Divider,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useSaveSubmittedData } from "../../hooks/useSaveSubmittedData";
 import { useEffect, useState } from "react";
@@ -51,6 +52,10 @@ const Labels: Record<CalculationsByOrderTypeKeys, string> = {
   SERVICE_FEE: "Service Fee (Applicable)",
   DRIVER_TIP: "Driver Tip (Applicable)",
 };
+export interface InvoicePreviewProps {
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+}
+
 
 const AccordionConfig = [
   {
@@ -319,7 +324,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
   const { trackOldFormData, parsedData: CalculatedData } = useAppBasedContext();
 
   const formik = useFormik<ParsedData>({
-    initialValues: trackOldFormData?.step2  ?? CalculatedData,
+    initialValues: trackOldFormData?.step2  ?? CalculatedData ?? {},
     onSubmit: (values) => {
       modals.openConfirmModal({
         title: "Please confirm your action",
@@ -347,7 +352,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
   ]);
 
   return (
-    <Box mx="auto" mt="xl">
+    <Box mx="auto" mt="xl" pos={'relative'}>
       <Accordion
         variant="contained"
         multiple
@@ -385,6 +390,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
           </form>
         )}
       </Accordion>
+      <LoadingOverlay visible={isPending} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
     </Box>
   );
 };
