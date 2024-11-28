@@ -5,17 +5,22 @@ import {
   StyleSheet,
   View,
   Image,
-  PDFViewer,
   pdf,
 } from "@react-pdf/renderer";
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
-import { Button, Group, Stack } from "@mantine/core";
-import { IconChevronLeft, IconDownload , IconEye, IconRestore } from "@tabler/icons-react";
+import { Button, Group, Stack, Text as MantineText } from "@mantine/core";
+import {
+  IconChevronLeft,
+  IconDownload,
+  IconEye,
+  IconRestore,
+} from "@tabler/icons-react";
 import { InvoicePreviewProps } from "./Step2";
 import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDisclosure } from "@mantine/hooks";
+import { modals } from "@mantine/modals";
 
 interface DocumentMetadata {
   title: string;
@@ -223,10 +228,16 @@ const styles_page2 = StyleSheet.create({
   },
 });
 const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
-  const { InvoiceData, customerConfig, setTrackOldFormData , setParsedData, setInvoiceData} = useAppBasedContext();
+  const {
+    InvoiceData,
+    customerConfig,
+    setTrackOldFormData,
+    setParsedData,
+    setInvoiceData,
+  } = useAppBasedContext();
   const [opened, { toggle }] = useDisclosure();
 
-const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
+  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
     customerConfig?.logoImg
   }`;
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -234,7 +245,7 @@ const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
 
   const Variables = {
     invoiceId: FinalData?.invoiceId ?? "NA",
-    storeName: FinalData?.storeName ?? "NA",
+    storeName: customerConfig?.customerName ?? "NA",
     address: customerConfig?.customerAddress ?? "NA",
     chester: "Dont know mapping key",
     postcode: customerConfig?.customerPost ?? "NA",
@@ -329,11 +340,7 @@ const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
       const generatePDF = async () => {
         // Create the PDF document using @react-pdf/renderer
         const doc = (
-          <Document
-            // {...metaDataProps}
-            onRender={(props) => console.log(props?.blob?.size, "on rendner")}
-            key={Variables?.invoiceId}
-          >
+          <Document {...metaDataProps} key={Variables?.invoiceId}>
             {/* Page 1 */}
             <Page size="A4" style={styles.page}>
               {/* Header Section */}
@@ -726,22 +733,33 @@ const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
   };
   const queryClient = useQueryClient();
 
-const clearCache = useCallback(() => {
-  // This will remove the cache for the `parsedData` query
-  queryClient.removeQueries({
-    queryKey: ["parsedData", "oldFormData", "oldpreviewPDFData","editedAndSavedData"], // Use query key
-    exact: true,               // Exact match of the query key
-  });
-},[queryClient]);
-  const handleReset =()=>{
-    if(setTrackOldFormData && setParsedData && setInvoiceData){
-      setActiveStep(1)
-      setTrackOldFormData({step1:undefined, step2:undefined})
-      setParsedData(undefined)
-      setInvoiceData(undefined)
-      clearCache()
-    }
-  }
+  const clearCache = useCallback(() => {
+    // This will remove the cache for the `parsedData` query
+    queryClient.removeQueries({
+      queryKey: [
+        "parsedData",
+        "oldFormData",
+        "oldpreviewPDFData",
+        "editedAndSavedData",
+      ], // Use query key
+      exact: true, // Exact match of the query key
+    });
+  }, [queryClient]);
+  const handleReset = () => {
+    modals.openConfirmModal({
+      title: "Please confirm your action",
+      children: <MantineText size="sm">Are you sure?</MantineText>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        setActiveStep(1);
+        setTrackOldFormData({ step1: undefined, step2: undefined });
+        setParsedData(undefined);
+        setInvoiceData(undefined);
+        clearCache();
+      },
+    });
+  };
   try {
     return (
       <Stack gap={30} mt={30}>
@@ -768,7 +786,7 @@ const clearCache = useCallback(() => {
           >
             Go Back
           </Button>
-         
+
           <Button
             type="button"
             onClick={handleReset}
@@ -778,14 +796,16 @@ const clearCache = useCallback(() => {
           </Button>
         </Group>
 
-        {pdfUrl ? opened && (
-          // Embed the Blob URL in the iframe's src
-          <iframe
-            style={{ width: "100%", height: "100vh", overflow:'scroll' }}
-            src={pdfUrl}
-            {...metaDataProps}
-            title="some"
-          />
+        {pdfUrl ? (
+          opened && (
+            // Embed the Blob URL in the iframe's src
+            <iframe
+              style={{ width: "100%", height: "100vh", overflow: "scroll" }}
+              src={pdfUrl}
+              {...metaDataProps}
+              title="some"
+            />
+          )
         ) : (
           <div>Loading PDF...</div>
         )}

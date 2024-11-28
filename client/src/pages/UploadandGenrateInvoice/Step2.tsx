@@ -1,4 +1,4 @@
-import { useFormik } from "formik";
+import { FormikProps, useFormik } from "formik";
 import {
   TextInput,
   Group,
@@ -57,170 +57,7 @@ export interface InvoicePreviewProps {
 }
 
 
-const AccordionConfig = [
-  {
-    label: "General Information",
-    icon: (
-      <IconInfoSquareRounded
-        style={{
-          color: "blue",
-          width: rem(20),
-          height: rem(20),
-        }}
-      />
-    ),
-    content: (formik) => (
-      <>
-        <TextInput
-          label="Customer ID"
-          {...formik.getFieldProps("customerId")}
-          type="number"
-          mt="md"
-          disabled
-        />
-        <TextInput
-          label="Store Name"
-          {...formik.getFieldProps("storeName")}
-          mt="md"
-        />
-        <DateTimePicker
-          label="Start Date"
-          value={new Date(formik.values.startDate)}
-          onChange={(value) =>
-            formik.setFieldValue("startDate", convertDate(value))
-          }
-        />
-        <DateTimePicker
-          label="End Date"
-          value={new Date(formik.values.endDate)}
-          onChange={(value) =>
-            formik.setFieldValue("endDate", convertDate(value))
-          }
-        />
-      </>
-    ),
-  },
-  {
-    label: "Calculations by Order Type",
-    icon: (
-      <IconTruckDelivery
-        style={{
-          color: "#9b59b6",
-          width: rem(20),
-          height: rem(20),
-        }}
-      />
-    ),
-    content: (formik) => (
-      <EditableTable
-        data={formik.values?.calculationsByOrderType}
-        formik={formik}
-        tableKey="calculationsByOrderType"
-        labels={Labels}
-        columnsHeaders={[
-          "Order Type",
-          "Total Sales Value",
-          "Total Orders",
-          "Commission Rate",
-          "Amount",
-        ]}
-      />
-    ),
-  },
-  {
-    label: "Calculations by Payment Type",
-    icon: (
-      <IconCreditCardPay
-        style={{
-          color: "#1abc9c",
-          width: rem(20),
-          height: rem(20),
-        }}
-      />
-    ),
-    content: (formik) => (
-      <EditableTable
-        data={formik.values?.calculationsByPaymentType}
-        formik={formik}
-        tableKey="calculationsByPaymentType"
-        labels={Labels}
-        columnsHeaders={["Type", "Total Sales Value", "Total Orders"]}
-        isPayMentType
-      />
-    ),
-  },
-  {
-    label: "Order Summary",
-    icon: (
-      <IconCoinPound
-        style={{
-          color: "#34495e",
-          width: rem(20),
-          height: rem(20),
-        }}
-      />
-    ),
-    content: (formik) => (
-      <Stack>
-        <Group mt="sm" wrap={"wrap"}>
-          <NumberInput
-            label="Sub-Total"
-            value={formik.values.totalSubTotal}
-            onChange={(value) =>
-              formik.setFieldValue("totalSubTotal", Number(value))
-            }
-          />
-          <NumberInput
-            label="VAT (Amount)"
-            value={formik.values.tax_amount}
-            onChange={(value) =>
-              formik.setFieldValue("tax_amount", Number(value))
-            }
-          />
-          <NumberInput
-            label="Total with Tax"
-            value={formik.values.totalWithTax}
-            onChange={(value) =>
-              formik.setFieldValue("totalWithTax", Number(value))
-            }
-          />
-          <NumberInput
-            label="Total Sales Value"
-            value={formik.values?.totalSalesValue}
-            onChange={(value) =>
-              formik.setFieldValue("totalSalesValue", Number(value))
-            }
-          />
-        </Group>
-        <Divider />
-        <Text>Amount to Receive</Text>
-        <Group mt="sm" wrap={"wrap"}>
-          <NumberInput
-            label="Cash Payment"
-            value={formik.values?.amountToRecieve?.cashPayment}
-            onChange={(value) =>
-              formik.setFieldValue("amountToRecieve.cashPayment", Number(value))
-            }
-          />
-          <NumberInput
-            label="Bank Payment"
-            value={formik.values?.amountToRecieve?.bankPayment}
-            onChange={(value) =>
-              formik.setFieldValue("amountToRecieve.bankPayment", Number(value))
-            }
-          />
-          <NumberInput
-            label="Total"
-            value={formik.values?.amountToRecieve?.total}
-            onChange={(value) =>
-              formik.setFieldValue("amountToRecieve.total", Number(value))
-            }
-          />
-        </Group>
-      </Stack>
-    ),
-  },
-];
+
 
 const EditableTable = ({
   data,
@@ -321,8 +158,174 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
     isSuccess: isSuccessInUpdatingData,
     isPending,
   } = useSaveSubmittedData();
-  const { trackOldFormData, parsedData: CalculatedData } = useAppBasedContext();
-
+  const { trackOldFormData, parsedData: CalculatedData, customerConfig } = useAppBasedContext();
+  const AccordionConfig = [
+    {
+      label: "General Information",
+      icon: (
+        <IconInfoSquareRounded
+          style={{
+            color: "blue",
+            width: rem(20),
+            height: rem(20),
+          }}
+        />
+      ),
+      content: (formik:FormikProps<ParsedData>)=> (
+        <>
+          <TextInput
+            label="Customer ID"
+            {...formik.getFieldProps("customerId")}
+            type="number"
+            mt="md"
+            disabled
+          />
+          <TextInput
+            label="Store Name"
+            // {...formik.getFieldProps("storeName")}
+            mt="md"
+            value={customerConfig?.customerName ?? ''}
+            disabled={true}
+          />
+          <DateTimePicker
+            label="Start Date"
+            value={new Date(formik.values.startDate)}
+            onChange={(value) =>
+              formik.setFieldValue("startDate", convertDate(value))
+            }
+          />
+          <DateTimePicker
+            label="End Date"
+            value={new Date(formik.values.endDate)}
+            onChange={(value) =>
+              formik.setFieldValue("endDate", convertDate(value))
+            }
+          />
+        </>
+      ),
+    },
+    {
+      label: "Calculations by Order Type",
+      icon: (
+        <IconTruckDelivery
+          style={{
+            color: "#9b59b6",
+            width: rem(20),
+            height: rem(20),
+          }}
+        />
+      ),
+      content: (formik:FormikProps<ParsedData>)=> (
+        <EditableTable
+          data={formik.values?.calculationsByOrderType}
+          formik={formik}
+          tableKey="calculationsByOrderType"
+          labels={Labels}
+          columnsHeaders={[
+            "Order Type",
+            "Total Sales Value",
+            "Total Orders",
+            "Commission Rate",
+            "Amount",
+          ]}
+        />
+      ),
+    },
+    {
+      label: "Calculations by Payment Type",
+      icon: (
+        <IconCreditCardPay
+          style={{
+            color: "#1abc9c",
+            width: rem(20),
+            height: rem(20),
+          }}
+        />
+      ),
+      content: (formik:FormikProps<ParsedData>)=> (
+        <EditableTable
+          data={formik.values?.calculationsByPaymentType}
+          formik={formik}
+          tableKey="calculationsByPaymentType"
+          labels={Labels}
+          columnsHeaders={["Type", "Total Sales Value", "Total Orders"]}
+          isPayMentType
+        />
+      ),
+    },
+    {
+      label: "Order Summary",
+      icon: (
+        <IconCoinPound
+          style={{
+            color: "#34495e",
+            width: rem(20),
+            height: rem(20),
+          }}
+        />
+      ),
+      content: (formik:FormikProps<ParsedData>)=> (
+        <Stack>
+          <Group mt="sm" wrap={"wrap"}>
+            <NumberInput
+              label="Sub-Total"
+              value={formik.values.totalSubTotal}
+              onChange={(value) =>
+                formik.setFieldValue("totalSubTotal", Number(value))
+              }
+            />
+            <NumberInput
+              label="VAT (Amount)"
+              value={formik.values.tax_amount}
+              onChange={(value) =>
+                formik.setFieldValue("tax_amount", Number(value))
+              }
+            />
+            <NumberInput
+              label="Total with Tax"
+              value={formik.values.totalWithTax}
+              onChange={(value) =>
+                formik.setFieldValue("totalWithTax", Number(value))
+              }
+            />
+            <NumberInput
+              label="Total Sales Value"
+              value={formik.values?.totalSalesValue}
+              onChange={(value) =>
+                formik.setFieldValue("totalSalesValue", Number(value))
+              }
+            />
+          </Group>
+          <Divider />
+          <Text>Amount to Receive</Text>
+          <Group mt="sm" wrap={"wrap"}>
+            <NumberInput
+              label="Cash Payment"
+              value={formik.values?.amountToRecieve?.cashPayment}
+              onChange={(value) =>
+                formik.setFieldValue("amountToRecieve.cashPayment", Number(value))
+              }
+            />
+            <NumberInput
+              label="Bank Payment"
+              value={formik.values?.amountToRecieve?.bankPayment}
+              onChange={(value) =>
+                formik.setFieldValue("amountToRecieve.bankPayment", Number(value))
+              }
+            />
+            <NumberInput
+              label="Total"
+              value={formik.values?.amountToRecieve?.total}
+              onChange={(value) =>
+                formik.setFieldValue("amountToRecieve.total", Number(value))
+              }
+            />
+          </Group>
+        </Stack>
+      ),
+    },
+  ];
+// const initialValues = {...trackOldFormData?.step2, }
   const formik = useFormik<ParsedData>({
     initialValues: trackOldFormData?.step2  ?? CalculatedData ?? {},
     onSubmit: (values) => {
