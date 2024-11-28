@@ -4,7 +4,7 @@ interface InvoiceStepperTypes{
     setActiveStep:(step:number)=>void
 }
 const InvoiceStepper = (props:InvoiceStepperTypes) => {
-    const {active, setActiveStep}=props
+    const {active}=props
   return (
     <Stepper active={active} iconPosition="left">
       <Stepper.Step label="Step 1" description="Upload CSV file" />

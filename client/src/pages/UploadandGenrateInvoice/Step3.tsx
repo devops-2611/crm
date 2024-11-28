@@ -6,12 +6,15 @@ import {
   View,
   Image,
   PDFViewer,
+  pdf,
 } from "@react-pdf/renderer";
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
-import { Button } from "@mantine/core";
-import { IconChevronLeft } from "@tabler/icons-react";
+import { Button, Group, Stack } from "@mantine/core";
+import { IconChevronLeft, IconDownload , IconRestore } from "@tabler/icons-react";
 import { InvoicePreviewProps } from "./Step2";
+import { useEffect, useState } from "react";
+
 interface DocumentMetadata {
   title: string;
   author: string;
@@ -48,7 +51,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 100,
-    marginRight: 30
+    marginRight: 30,
   },
   boldText: {
     fontFamily: "Helvetica-Bold",
@@ -218,12 +221,11 @@ const styles_page2 = StyleSheet.create({
   },
 });
 const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
-  const { InvoiceData, customerConfig } = useAppBasedContext();
-  console.log(InvoiceData);
-
-  if (!InvoiceData?.invoice || !customerConfig) {
-    return <div>Data not available</div>;
-  }
+  const { InvoiceData, customerConfig, } = useAppBasedContext();
+  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
+    customerConfig?.logoImg
+  }`;
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const FinalData = InvoiceData?.invoice;
 
   const Variables = {
@@ -317,44 +319,14 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
     //Page 2 Account Section
     AccountBalanceAmount: "TODO AccountBalanceAmount",
   };
-  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
-    customerConfig?.logoImg
-  }`;
 
-  if (!logoUrl) {
-    return <div>"No logo URL found"</div>;
-  }
-  console.log(FinalData, "finalData");
-
-  const CustomerVairables = {
-    //first page header left side section
-    storeName: customerConfig.customerName ?? "NA",
-    addressLine1: customerConfig?.customerAddress ?? "NA",
-    addressArea: customerConfig?.customerArea ?? "NA",
-    postcode: customerConfig?.customerPost ?? "NA",
-  };
-  const metaDataProps: DocumentMetadata = {
-    title: `${Variables?.storeName}_${Variables?.Period_startDate}_ to_${Variables?.Period_EndDate}`,
-    author: "John Doe",
-    subject: "Sample Document Subject",
-    keywords: "sample, document, metaData, pdf",
-    creator: "react-pdf",
-    producer: "react-pdf",
-  };
-  try {
-    return (
-      <>
-        <PDFViewer
-          style={{
-            width: "100%",
-            height: "100vh",
-            marginTop: "20px",
-            overflow: "hidden",
-          }}
-          {...metaDataProps}
-        >
+  useEffect(() => {
+    if (InvoiceData && InvoiceData?.invoice && customerConfig && logoUrl) {
+      const generatePDF = async () => {
+        // Create the PDF document using @react-pdf/renderer
+        const doc = (
           <Document
-            {...metaDataProps}
+            // {...metaDataProps}
             onRender={(props) => console.log(props?.blob?.size, "on rendner")}
             key={Variables?.invoiceId}
           >
@@ -462,8 +434,9 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
                       ?.isCashOrders ? (
                       <Text style={styles.tableCell}>
                         Service Fee Paid By Cash Orders (
-                        {Variables?.Description_ServiceFees_TotalOrders} (VAT @{" "}
-                        {Variables?.Description_Delivery_Commission_VAT}%)
+                        {Variables?.Description_ServiceFees_TotalOrders} Orders)
+                        (VAT @ {Variables?.Description_Delivery_Commission_VAT}
+                        %)
                       </Text>
                     ) : (
                       <Text style={styles.tableCell}>
@@ -544,7 +517,7 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
                     {Variables.Period_startDate} - {Variables?.Period_EndDate}
                   </Text>
                   {/* <Text>Restaurant ID: TODO</Text>
-              <Text>Account Ref: TODO</Text> */}
+          <Text>Account Ref: TODO</Text> */}
                 </View>
               </View>
 
@@ -598,9 +571,9 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
                   </Text>
                 </View>
                 {/* <View style={styles_page2.tableRow}>
-                <Text style={styles_page2.tableCell}>Food & Drink Value</Text>
-                <Text style={styles_page2.tableCell}>£157.37</Text>
-              </View> */}
+            <Text style={styles_page2.tableCell}>Food & Drink Value</Text>
+            <Text style={styles_page2.tableCell}>£157.37</Text>
+          </View> */}
                 <View style={styles_page2.tableRow}>
                   <Text style={styles_page2.tableCell}>Total Sales</Text>
                   <Text style={styles_page2.tableCell}>
@@ -630,83 +603,165 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
               </View>
               {/* Account Statement Section */}
               {/* <Text
-            style={{ ...styles_page2.accountStateMentTitle, ...styles.boldText }}
-          >
-            Account Statement
-          </Text> */}
+        style={{ ...styles_page2.accountStateMentTitle, ...styles.boldText }}
+      >
+        Account Statement
+      </Text> */}
               {/* Account Balance */}
 
               {/* <View style={styles_page2.table}>
-            <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
-              <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
-                Account Balance
-              </Text>
-              <Text style={styles_page2.tableCell}>TODO £0</Text>
-            </View>
-          </View>
-          <View style={styles_page2.table}>
-            <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
-              <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
-                Date
-              </Text>
-              <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
-                Description
-              </Text>
-              <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
-                Amount
-              </Text>
-            </View>
-            <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}> TODO 21st October 2024</Text>
-              <Text style={styles_page2.tableCell}>Opening Balance</Text>
-              <Text style={styles_page2.tableCell}> TODO £0</Text>
-            </View>
-            <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}> TODO 27th October 2024</Text>
-              <Text style={styles_page2.tableCell}>
-                Card Order Payments Received
-              </Text>
-              <Text style={styles_page2.tableCell}> TODO £157.37</Text>
-            </View>
-            <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}>27th October 2024</Text>
-              <Text style={styles_page2.tableCell}>
-                {" "}
-                TODO Invoice 157 Due TODO
-              </Text>
-              <Text style={styles_page2.tableCell}> TODO £38.41</Text>
-            </View>
-            <View style={styles_page2.tableRow}>
-              <Text style={styles_page2.tableCell}>TODO 30th October 2024</Text>
-              <Text style={styles_page2.tableCell}>
-                Remaining Balance Bank Transferred to Merchant
-              </Text>
-              <Text style={styles_page2.tableCell}>£ TODO</Text>
-            </View>
-          </View> */}
+        <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
+          <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
+            Account Balance
+          </Text>
+          <Text style={styles_page2.tableCell}>TODO £0</Text>
+        </View>
+      </View>
+      <View style={styles_page2.table}>
+        <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
+          <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
+            Date
+          </Text>
+          <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
+            Description
+          </Text>
+          <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
+            Amount
+          </Text>
+        </View>
+        <View style={styles_page2.tableRow}>
+          <Text style={styles_page2.tableCell}> TODO 21st October 2024</Text>
+          <Text style={styles_page2.tableCell}>Opening Balance</Text>
+          <Text style={styles_page2.tableCell}> TODO £0</Text>
+        </View>
+        <View style={styles_page2.tableRow}>
+          <Text style={styles_page2.tableCell}> TODO 27th October 2024</Text>
+          <Text style={styles_page2.tableCell}>
+            Card Order Payments Received
+          </Text>
+          <Text style={styles_page2.tableCell}> TODO £157.37</Text>
+        </View>
+        <View style={styles_page2.tableRow}>
+          <Text style={styles_page2.tableCell}>27th October 2024</Text>
+          <Text style={styles_page2.tableCell}>
+            {" "}
+            TODO Invoice 157 Due TODO
+          </Text>
+          <Text style={styles_page2.tableCell}> TODO £38.41</Text>
+        </View>
+        <View style={styles_page2.tableRow}>
+          <Text style={styles_page2.tableCell}>TODO 30th October 2024</Text>
+          <Text style={styles_page2.tableCell}>
+            Remaining Balance Bank Transferred to Merchant
+          </Text>
+          <Text style={styles_page2.tableCell}>£ TODO</Text>
+        </View>
+      </View> */}
 
               {/* Closing Balance */}
               {/* <View style={styles_page2.table}>
-            <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
-              <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
-                Closing Balance
-              </Text>
-              <Text style={styles_page2.tableCell}>£ TODO</Text>
-            </View>
-          </View> */}
+        <View style={[styles_page2.tableRow, styles_page2.tableHeader]}>
+          <Text style={{ ...styles_page2.tableCell, ...styles.boldText }}>
+            Closing Balance
+          </Text>
+          <Text style={styles_page2.tableCell}>£ TODO</Text>
+        </View>
+      </View> */}
               {/* Footer Section */}
               <Text style={styles_page2.PageNoText}>Page No 2 of 2</Text>
             </Page>
           </Document>
-        </PDFViewer>
-        <Button
-          variant="filled"
-          onClick={() => setActiveStep((prev) => prev - 1)}
-          leftSection={<IconChevronLeft />}
-        >
-          Go Back
-        </Button>
-      </>
+        );
+
+        // Generate the Blob from the document
+        const pdfBlob = await pdf(doc).toBlob();
+
+        // Ensure the Blob is of the correct MIME type (application/pdf)
+        const url = URL.createObjectURL(pdfBlob);
+
+        // Set the generated Blob URL
+        setPdfUrl(url);
+        console.log(url, "url");
+      };
+
+      generatePDF();
+    } // Generate the PDF on component mount
+  }, []);
+  if (!InvoiceData?.invoice || !customerConfig) {
+    return <div>Data not available</div>;
+  }
+
+  if (!logoUrl) {
+    return <div>"No logo URL found"</div>;
+  }
+  console.log(FinalData, "finalData");
+
+  const CustomerVairables = {
+    //first page header left side section
+    storeName: customerConfig.customerName ?? "NA",
+    addressLine1: customerConfig?.customerAddress ?? "NA",
+    addressArea: customerConfig?.customerArea ?? "NA",
+    postcode: customerConfig?.customerPost ?? "NA",
+  };
+  const metaDataProps: DocumentMetadata = {
+    title: `${Variables?.storeName}_${Variables?.Period_startDate}_ to_${Variables?.Period_EndDate}`,
+    author: "John Doe",
+    subject: "Sample Document Subject",
+    keywords: "sample, document, metaData, pdf",
+    creator: "react-pdf",
+    producer: "react-pdf",
+  };
+
+  const handleDownload = () => {
+    if (pdfUrl) {
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.download = `${Variables?.storeName}_${Variables?.Period_startDate}_ to_${Variables?.Period_EndDate}`; // Set the filename for the downloaded PDF
+      link.click();
+    }
+  };
+  // const handleReset =()=>{
+
+  // }
+  try {
+    return (
+      <Stack gap={30} mt={30}>
+        <Group justify="center">
+          <Button
+            onClick={handleDownload}
+            disabled={!pdfUrl}
+            leftSection={<IconDownload />}
+          >
+            Download Invoice
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setActiveStep((prev: number) => prev - 1)}
+            leftSection={<IconChevronLeft />}
+          >
+            Go Back
+          </Button>
+          {/* <Button
+            type="button"
+            onClick={handleReset}
+            leftSection={<IconRestore />}
+          >
+            Reset
+          </Button> */}
+        </Group>
+
+        {pdfUrl ? (
+          // Embed the Blob URL in the iframe's src
+          <iframe
+            style={{ width: "100%", height: "100vh", overflow:'scroll' }}
+            src={pdfUrl}
+            {...metaDataProps}
+            title="some"
+          />
+        ) : (
+          <div>Loading PDF...</div>
+        )}
+      </Stack>
     );
   } catch (error) {
     console.log(error);
