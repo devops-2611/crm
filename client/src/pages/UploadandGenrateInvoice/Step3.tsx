@@ -11,9 +11,11 @@ import {
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
 import { Button, Group, Stack } from "@mantine/core";
-import { IconChevronLeft, IconDownload , IconRestore } from "@tabler/icons-react";
+import { IconChevronLeft, IconDownload , IconEye, IconRestore } from "@tabler/icons-react";
 import { InvoicePreviewProps } from "./Step2";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDisclosure } from "@mantine/hooks";
 
 interface DocumentMetadata {
   title: string;
@@ -221,8 +223,10 @@ const styles_page2 = StyleSheet.create({
   },
 });
 const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
-  const { InvoiceData, customerConfig, } = useAppBasedContext();
-  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
+  const { InvoiceData, customerConfig, setTrackOldFormData , setParsedData, setInvoiceData} = useAppBasedContext();
+  const [opened, { toggle }] = useDisclosure();
+
+const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
     customerConfig?.logoImg
   }`;
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -720,13 +724,28 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
       link.click();
     }
   };
-  // const handleReset =()=>{
+  const queryClient = useQueryClient();
 
-  // }
+const clearCache = useCallback(() => {
+  // This will remove the cache for the `parsedData` query
+  queryClient.removeQueries({
+    queryKey: ["parsedData", "oldFormData", "oldpreviewPDFData","editedAndSavedData"], // Use query key
+    exact: true,               // Exact match of the query key
+  });
+},[queryClient]);
+  const handleReset =()=>{
+    if(setTrackOldFormData && setParsedData && setInvoiceData){
+      setActiveStep(1)
+      setTrackOldFormData({step1:undefined, step2:undefined})
+      setParsedData(undefined)
+      setInvoiceData(undefined)
+      clearCache()
+    }
+  }
   try {
     return (
       <Stack gap={30} mt={30}>
-        <Group justify="center">
+        <Group justify="center" wrap="wrap">
           <Button
             onClick={handleDownload}
             disabled={!pdfUrl}
@@ -736,21 +755,30 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
           </Button>
           <Button
             type="button"
+            onClick={() => toggle()}
+            leftSection={<IconEye />}
+            disabled={!pdfUrl}
+          >
+            Preview
+          </Button>
+          <Button
+            type="button"
             onClick={() => setActiveStep((prev: number) => prev - 1)}
             leftSection={<IconChevronLeft />}
           >
             Go Back
           </Button>
-          {/* <Button
+         
+          <Button
             type="button"
             onClick={handleReset}
             leftSection={<IconRestore />}
           >
             Reset
-          </Button> */}
+          </Button>
         </Group>
 
-        {pdfUrl ? (
+        {pdfUrl ? opened && (
           // Embed the Blob URL in the iframe's src
           <iframe
             style={{ width: "100%", height: "100vh", overflow:'scroll' }}

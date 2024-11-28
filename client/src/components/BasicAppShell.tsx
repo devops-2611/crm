@@ -5,6 +5,7 @@ import {
   Group,
   NavLink,
   Transition,
+  Image
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Link, useLocation } from "react-router-dom";
@@ -50,6 +51,9 @@ export function BasicAppShell() {
     console.log(label, "label");
     setExpandedMenu((prev) => (prev === label ? null : label));
   };
+  // const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
+  //   customerConfig?.logoImg
+  // }`;
   return (
     <AppShell
       header={{ height: 60 }}
@@ -63,7 +67,16 @@ export function BasicAppShell() {
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           {/* <MantineLogo size={30} />
            */}
-          <div>Some logo here</div>
+          <div>
+          {/* <Image
+      radius="md"
+      h={200}
+      w="auto"
+      fit="contain"
+      src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-9.png"
+    /> */}
+
+          </div>
         </Group>
       </AppShell.Header>
       <Transition
