@@ -1,17 +1,31 @@
-import { Container, Table, Text, Accordion, Badge } from "@mantine/core";
+import { Container, Table, Text, Accordion, Badge, Paper } from "@mantine/core";
 import { Stack } from "@mantine/core";
 import { useState } from "react";
 import { useFormikContext } from "formik";
 import { ValidationErrorResponse } from "../../hooks/useUplaodAndGetCsvData";
 import { FormValueTypes } from "./Step1";
+import { forwardRef, Ref } from 'react';
 
 interface ErrorDetailsProps {
-  errorData: ValidationErrorResponse | undefined;
+  errorData?: ValidationErrorResponse; // errorData can be undefined
 }
 
-const ErrorDetails = ({ errorData }: ErrorDetailsProps) => {
+interface Issue {
+  invalidField: string;
+  invalidValue: string;
+}
+
+interface FileError {
+  fileName: string;
+  issues: Issue[];
+}
+
+const ErrorDetails = forwardRef<HTMLDivElement, ErrorDetailsProps>(function ErrorDetails(
+  { errorData }, 
+  ref: Ref<HTMLDivElement> // Ensure ref is typed as HTMLDivElement
+) {
   const { values } = useFormikContext<FormValueTypes>();
-  const [accordionValue, setAccordionValue] = useState<string[]>(
+  const [accordionValue, setAccordionValue] = useState<string[]>( 
     errorData?.details?.map((file) => file.fileName) ?? []
   );
 
@@ -29,12 +43,14 @@ const ErrorDetails = ({ errorData }: ErrorDetailsProps) => {
   if (!finalErrors?.length) return null;
 
   return (
-    <Container p={20}>
+    <Paper p={20} ref={ref} shadow="sm" radius={'md'} mt={20}>
       <Stack bg="var(--mantine-color-body)" justify="center" gap="md">
         <Badge color="orange" variant="light">
           {errorData?.error}
         </Badge>
-        <Text>Below Files Need to be Corrected. Find Complete Details Here</Text>
+        <Text>
+          Below are the files that need to be corrected. Please try again after uploading the correct files. Find complete details here.
+        </Text>
         <Accordion
           variant="contained"
           multiple
@@ -42,7 +58,7 @@ const ErrorDetails = ({ errorData }: ErrorDetailsProps) => {
           onChange={setAccordionValue}
           transitionDuration={400}
         >
-          {finalErrors.map((fileData) => (
+          {finalErrors.map((fileData: FileError) => (
             <Accordion.Item
               key={fileData.fileName}
               variant="contained"
@@ -51,7 +67,7 @@ const ErrorDetails = ({ errorData }: ErrorDetailsProps) => {
               <Accordion.Control>{fileData.fileName}</Accordion.Control>
               <Accordion.Panel>
                 {fileData.issues.length > 0 && (
-                  <Table striped highlightOnHover cellSpacing="xs" bgcolor="red">
+                  <Table striped highlightOnHover>
                     <thead>
                       <tr>
                         <th>Invalid Field</th>
@@ -73,8 +89,8 @@ const ErrorDetails = ({ errorData }: ErrorDetailsProps) => {
           ))}
         </Accordion>
       </Stack>
-    </Container>
+    </Paper>
   );
-};
+});
 
 export default ErrorDetails;

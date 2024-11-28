@@ -12,7 +12,7 @@ import FetchandSaveCustomerConfig from "./FetchandSaveCustomerConfig";
 import { useIsFetching } from "@tanstack/react-query";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
 import ErrorDetails from "./UploadFIlesDataError";
-
+import { useScrollIntoView } from '@mantine/hooks'
 export interface FormValueTypes {
   customerid: string;
   taxrate: number;
@@ -55,7 +55,15 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
     isSuccess: isSuccesinUploadingData,
     isPending,
     error: ErrorOnUploadingFiles,
+  
   } = useUploadandGetCsvData();
+
+  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
+    offset: 60,
+  });
+  useEffect(()=>{
+    scrollIntoView()
+  },[ErrorOnUploadingFiles])
   useEffect(() => {
     if (isSuccesinUploadingData) {
       setActiveStep((prev) => prev + 1);
@@ -135,7 +143,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
               <FetchandSaveCustomerConfig />
             </Stack>
           </Form>
-             <ErrorDetails errorData={ErrorOnUploadingFiles?.response?.data} />
+             <ErrorDetails errorData={ErrorOnUploadingFiles?.response?.data} ref={targetRef} />
       </>)}
       </Formik>
       <LoadingOverlay visible={isPending} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
