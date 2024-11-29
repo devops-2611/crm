@@ -237,9 +237,8 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
   } = useAppBasedContext();
   const [opened, { toggle }] = useDisclosure();
 
-  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
-    customerConfig?.logoImg
-  }`;
+  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${customerConfig?.logoImg
+    }`;
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const FinalData = InvoiceData?.invoice;
 
@@ -725,12 +724,19 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
 
   const handleDownload = () => {
     if (pdfUrl) {
+      const storeName = Variables?.storeName?.split(" ")[0];
+      const startDate = Variables?.Period_startDate.replace(/\s\d{4}/, "");
+      const endDate = Variables?.Period_EndDate.replace(/\s\d{4}/, "");
+
+      const fileName = `${storeName}_${startDate} - ${endDate}`;
+
       const link = document.createElement("a");
       link.href = pdfUrl;
-      link.download = `${Variables?.storeName}_${Variables?.Period_startDate}_ to_${Variables?.Period_EndDate}`; // Set the filename for the downloaded PDF
+      link.download = fileName; // Set the filename for the downloaded PDF
       link.click();
     }
   };
+
   const queryClient = useQueryClient();
 
   const clearCache = useCallback(() => {
@@ -747,8 +753,8 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
   }, [queryClient]);
   const handleReset = () => {
     modals.openConfirmModal({
-      title: "Please confirm your action",
-      children: <MantineText size="sm">Are you sure?</MantineText>,
+      title: <MantineText size="md" style={{ fontWeight: "600"}}>Are you sure you want to proceed?</MantineText>,
+      children: <MantineText size="sm">This action will reset the form and redirect you to Step 1.</MantineText>,
       labels: { confirm: "Confirm", cancel: "Cancel" },
       onCancel: () => console.log("Cancel"),
       onConfirm: () => {
@@ -779,6 +785,23 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
           >
             Preview
           </Button>
+        </Group>
+
+        {pdfUrl ? (
+          opened && (
+            // Embed the Blob URL in the iframe's src
+            <iframe
+              style={{ width: "100%", height: "100vh", overflow: "scroll" }}
+              src={pdfUrl}
+              {...metaDataProps}
+              title="some"
+            />
+          )
+        ) : (
+          <div>Loading PDF...</div>
+        )}
+
+        <Group justify="center" wrap="wrap">
           <Button
             type="button"
             onClick={() => setActiveStep((prev: number) => prev - 1)}
@@ -795,20 +818,6 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
             Reset
           </Button>
         </Group>
-
-        {pdfUrl ? (
-          opened && (
-            // Embed the Blob URL in the iframe's src
-            <iframe
-              style={{ width: "100%", height: "100vh", overflow: "scroll" }}
-              src={pdfUrl}
-              {...metaDataProps}
-              title="some"
-            />
-          )
-        ) : (
-          <div>Loading PDF...</div>
-        )}
       </Stack>
     );
   } catch (error) {
