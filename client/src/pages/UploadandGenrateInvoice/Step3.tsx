@@ -9,7 +9,14 @@ import {
 } from "@react-pdf/renderer";
 import moment from "moment";
 import useAppBasedContext from "../../hooks/useAppBasedContext";
-import { Button, Group, Stack, Text as MantineText } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Stack,
+  Text as MantineText,
+  Paper,
+  Badge,
+} from "@mantine/core";
 import {
   IconChevronLeft,
   IconDownload,
@@ -237,8 +244,9 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
   } = useAppBasedContext();
   const [opened, { toggle }] = useDisclosure();
 
-  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${customerConfig?.logoImg
-    }`;
+  const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
+    customerConfig?.logoImg
+  }`;
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const FinalData = InvoiceData?.invoice;
 
@@ -753,8 +761,16 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
   }, [queryClient]);
   const handleReset = () => {
     modals.openConfirmModal({
-      title: <MantineText size="md" style={{ fontWeight: "600"}}>Are you sure you want to proceed?</MantineText>,
-      children: <MantineText size="sm">This action will reset the form and redirect you to Step 1.</MantineText>,
+      title: (
+        <MantineText size="md" style={{ fontWeight: "600" }}>
+          Are you sure you want to proceed?
+        </MantineText>
+      ),
+      children: (
+        <MantineText size="sm">
+          This action will reset the form and redirect you to Step 1.
+        </MantineText>
+      ),
       labels: { confirm: "Confirm", cancel: "Cancel" },
       onCancel: () => console.log("Cancel"),
       onConfirm: () => {
@@ -768,57 +784,68 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
   };
   try {
     return (
-      <Stack gap={30} mt={30}>
-        <Group justify="center" wrap="wrap">
-          <Button
-            onClick={handleDownload}
-            disabled={!pdfUrl}
-            leftSection={<IconDownload />}
+      <Paper shadow="sm" pt={10} pb={30} mt={10}>
+        <Stack gap={30} mt={30} align="center" p={10}>
+          <Badge
+            size="xl"
+            variant="gradient"
+            gradient={{ from: "blue", to: "cyan", deg: 90 }}
+            fullWidth
           >
-            Download Invoice
-          </Button>
-          <Button
-            type="button"
-            onClick={() => toggle()}
-            leftSection={<IconEye />}
-            disabled={!pdfUrl}
-          >
-            Preview
-          </Button>
-        </Group>
+            Your Invoice is ready !
+          </Badge>
+          <Group justify="center" wrap="wrap" gap={30} mt={10}>
+            <Button
+              onClick={handleDownload}
+              disabled={!pdfUrl}
+              leftSection={<IconDownload />}
+            >
+              Download Invoice
+            </Button>
+            <Button
+              type="button"
+              onClick={() => toggle()}
+              leftSection={<IconEye />}
+              disabled={!pdfUrl}
+            >
+              Preview
+            </Button>
+          </Group>
 
-        {pdfUrl ? (
-          opened && (
-            // Embed the Blob URL in the iframe's src
-            <iframe
-              style={{ width: "100%", height: "100vh", overflow: "scroll" }}
-              src={pdfUrl}
-              {...metaDataProps}
-              title="some"
-            />
-          )
-        ) : (
-          <div>Loading PDF...</div>
-        )}
+          {pdfUrl ? (
+            opened && (
+              // Embed the Blob URL in the iframe's src
+              <iframe
+                style={{ width: "100%", height: "100vh", overflow: "scroll" }}
+                src={pdfUrl}
+                {...metaDataProps}
+                title="some"
+              />
+            )
+          ) : (
+            <div>Loading PDF...</div>
+          )}
 
-        <Group justify="center" wrap="wrap">
-          <Button
-            type="button"
-            onClick={() => setActiveStep((prev: number) => prev - 1)}
-            leftSection={<IconChevronLeft />}
-          >
-            Go Back
-          </Button>
+          <Group justify="center" wrap="wrap" gap={30}>
+            <Button
+              type="button"
+              onClick={() => setActiveStep((prev: number) => prev - 1)}
+              leftSection={<IconChevronLeft />}
+            >
+              Go Back
+            </Button>
 
-          <Button
-            type="button"
-            onClick={handleReset}
-            leftSection={<IconRestore />}
-          >
-            Reset
-          </Button>
-        </Group>
-      </Stack>
+            <Button
+              type="button"
+              onClick={handleReset}
+              leftSection={<IconRestore />}
+              variant="outline"
+            >
+              Reset
+            </Button>
+          </Group>
+        </Stack>
+      </Paper>
     );
   } catch (error) {
     console.log(error);

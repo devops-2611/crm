@@ -5,18 +5,20 @@ import {
   Group,
   NavLink,
   Transition,
-  Image
+  Image,
+  Skeleton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Link, useLocation } from "react-router-dom";
 import AppRoutes from "../routes/Routes";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { IconChevronUp } from "@tabler/icons-react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { IconEye } from "@tabler/icons-react";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { IconFileInvoice } from "@tabler/icons-react";
 import { IconFilePlus } from "@tabler/icons-react";
+import Static_Logo from "../assets/Static_Logo.jpeg";
 export function BasicAppShell() {
   const [opened, { toggle }] = useDisclosure();
   const [navbarCollapsed, { toggle: toggleNavbar }] = useDisclosure();
@@ -67,16 +69,17 @@ export function BasicAppShell() {
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           {/* <MantineLogo size={30} />
            */}
-          <div>
-          {/* <Image
-      radius="md"
-      h={200}
-      w="auto"
-      fit="contain"
-      src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-9.png"
-    /> */}
-
-          </div>
+          <Suspense fallback={<Skeleton height={20} width={200} />}>
+            <Image
+              radius="md"
+              h={50}
+              // width={300}
+              // w="100px"
+              fit="contain"
+              src={Static_Logo}
+              alt="logo"
+            />
+          </Suspense>
         </Group>
       </AppShell.Header>
       <Transition

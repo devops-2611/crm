@@ -4,13 +4,12 @@ import { Container } from "@mantine/core";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
-import DonwloadButton from "./DownloadButton";
 
 const FormWrapper = () => {
   const [activeStep, setActiveStep] = useState(1);
 
   return (
-    <Container>
+    <Container > 
       <InvoiceStepper active={activeStep} setActiveStep={setActiveStep} />
       {activeStep === 1 && <Step1 setActiveStep={setActiveStep} />}
       {activeStep === 2 && <Step2 setActiveStep={setActiveStep} />}
