@@ -21,11 +21,10 @@ import {
   FileRejection,
   FileWithPath,
 } from "@mantine/dropzone";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { notifications } from "@mantine/notifications";
 import { useFormikContext } from "formik";
 import { FormValueTypes } from "../pages/UploadandGenrateInvoice/Step1";
-import React from "react";
 function findCommonStrings(array1: string[], array2: string[]) {
   const set1 = new Set(array1);
   const commonStrings = array2.filter((item) => set1.has(item));
