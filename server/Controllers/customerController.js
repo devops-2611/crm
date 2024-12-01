@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const CustomerModel = require('../Models/customer'); 
+const CustomerModal = require('../Models/customer'); 
 
 exports.addCustomer = async (req, res) => {
   const { customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip, deliveryOrdersComission, collectionOrdersComission, eatInComission,img } = req.body;
   try {
     // Check if a customer with the same customerId already exists
-    const existingCustomer = await CustomerModel.findOne({ customerEmail });
+    const existingCustomer = await CustomerModal.findOne({ customerEmail });
     if (existingCustomer) {
       return res.status(400).json({ message: 'Customer with this Email already exists' });
     }
@@ -30,11 +30,11 @@ exports.addCustomer = async (req, res) => {
 
     fs.writeFileSync(imgPath, imgBuffer);
 
-    const lastCustomer = await CustomerModel.findOne().sort({ customerId: -1 });
+    const lastCustomer = await CustomerModal.findOne().sort({ customerId: -1 });
   
     const customerId = lastCustomer ? lastCustomer.customerId + 1 : 101;
     // Create a new customer
-    const customer = new CustomerModel({
+    const customer = new CustomerModal({
       customerId,
       customerName,
       customerEmail,
@@ -61,7 +61,7 @@ exports.addCustomer = async (req, res) => {
 
 exports.getAllCustomerDetails = async (req, res) => {
   try {
-    const customers = await CustomerModel.find();
+    const customers = await CustomerModal.find();
     res.status(200).json(customers);
   } catch (err) {
     console.error(err.message);
@@ -71,7 +71,7 @@ exports.getAllCustomerDetails = async (req, res) => {
 
 exports.getAllCustomerList = async (req, res) => {
     try {
-      const customers = await CustomerModel.find({}, 'customerId customerName'); 
+      const customers = await CustomerModal.find({}, 'customerId customerName'); 
       res.status(200).json(customers);
     } catch (err) {
       console.error(err.message);
@@ -83,7 +83,7 @@ exports.getAllCustomerList = async (req, res) => {
     const { id } = req.params;
     const { customerId, customerName, customerEmail, customerMobile, customerAddress, customerArea, customerPost, serviceFee, deliveryCharge, driverTip, deliveryOrdersComission, collectionOrdersComission, eatInComission, img } = req.body;
     try {
-      const customer = await CustomerModel.findOne({ customerId: parseInt(id) });
+      const customer = await CustomerModal.findOne({ customerId: parseInt(id) });
       if (!customer) {
         return res.status(404).json({ message: 'Customer not found' });
       }
@@ -135,14 +135,14 @@ exports.getAllCustomerList = async (req, res) => {
   exports.deleteCustomer = async (req, res) => {    
     const { id } = req.params;
     try {
-      const customer = await CustomerModel.findOneAndDelete({ customerId: parseInt(id) });
+      const customer = await CustomerModal.findOneAndDelete({ customerId: parseInt(id) });
       if (!customer) {
         return res.status(404).json({ message: 'Customer not found' });
       }
 
       const imgPath = customer.img;
 
-    //await CustomerModel.findByIdAndDelete(id);
+    //await CustomerModal.findByIdAndDelete(id);
 
     if (imgPath && fs.existsSync(imgPath)) {
       fs.unlinkSync(imgPath);
@@ -158,7 +158,7 @@ exports.getAllCustomerList = async (req, res) => {
   exports.getCustomerById = async (req, res) => {
     const { id } = req.params; // Assuming 'id' is actually the 'customerId'
     try {
-      const customer = await CustomerModel.findOne({ customerId: id }); 
+      const customer = await CustomerModal.findOne({ customerId: id }); 
       if (!customer) {
         return res.status(404).json({ message: 'Customer not found' });
       }

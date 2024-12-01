@@ -6,6 +6,7 @@ const path = require('path');
 const authRoutes = require('./Routes/authRoutes');
 const invoiceRoutes = require('./Routes/invoiceRoutes');
 const customerRoutes = require('./Routes/customerRoutes');
+const orderRoutes = require('./Routes/orderRoutes');
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/invoice', invoiceRoutes);
 app.use('/api/customer', customerRoutes);
+app.use('/api/order', orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 
