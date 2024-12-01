@@ -9,15 +9,17 @@ import {
   Skeleton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Link, useLocation } from "react-router-dom";
-import AppRoutes from "../routes/Routes";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { Suspense, useState } from "react";
-import { IconChevronUp } from "@tabler/icons-react";
-import { IconChevronDown } from "@tabler/icons-react";
-import { IconEye } from "@tabler/icons-react";
-import { IconLayoutDashboard } from "@tabler/icons-react";
-import { IconFileInvoice } from "@tabler/icons-react";
-import { IconFilePlus } from "@tabler/icons-react";
+import {
+  IconChevronUp,
+  IconChevronDown,
+  IconEye,
+  IconLayoutDashboard,
+  IconFileInvoice,
+  IconFilePlus,
+} from "@tabler/icons-react";
+
 import Static_Logo from "../assets/Static_Logo.jpeg";
 export function BasicAppShell() {
   const [opened, { toggle }] = useDisclosure();
@@ -67,8 +69,6 @@ export function BasicAppShell() {
       <AppShell.Header>
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          {/* <MantineLogo size={30} />
-           */}
           <Suspense fallback={<Skeleton height={20} width={200} />}>
             <Image
               radius="md"
@@ -147,8 +147,7 @@ export function BasicAppShell() {
                 })}
               >
                 {/* Render Submenu Items */}
-                {link.submenu &&
-                  // expandedMenu === link.label && todo
+                {link?.submenu &&
                   link.submenu.map((subLink) => (
                     <NavLink
                       key={subLink.path}
@@ -182,7 +181,7 @@ export function BasicAppShell() {
       </Transition>
 
       <AppShell.Main>
-        <AppRoutes />
+        <Outlet />
       </AppShell.Main>
     </AppShell>
   );

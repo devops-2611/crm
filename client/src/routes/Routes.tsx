@@ -1,19 +1,66 @@
+import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
-import Homepage from "../pages/Homepage";
-import FormWrapper from "../pages/UploadandGenrateInvoice/FormWrapper";
-import CustomerManagement from "../pages/admin/CustomerManagement";
-import NotFoundPage from "../pages/NotFound";
+import { Skeleton } from "@mantine/core";
+import { BasicAppShell } from "../components/BasicAppShell";
+import Orders from "../pages/admin/orders/Orders";
+import { AdminAppShell } from "../pages/admin/AdminAppShell";
+
+const HomePage = lazy(() => import("../pages/Homepage"));
+const FormWrapper = lazy(
+  () => import("../pages/UploadandGenrateInvoice/FormWrapper")
+);
+const NotFoundPage = lazy(() => import("../pages/NotFound"));
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Homepage />} />
-      <Route path="/reports/generate" element={<FormWrapper />} />
-      <Route path="/admin" element={<CustomerManagement />} />
-      <Route path="*" element={<NotFoundPage />} />
+      <Route path="/" element={<BasicAppShell></BasicAppShell>}>
+        <Route
+          index
+          element={
+            <Suspense>
+              <HomePage />
+            </Suspense>
+          }
+        ></Route>
+        <Route
+          path="/reports/generate"
+          element={
+            <Suspense fallback={<Skeleton height={300} width="100%" />}>
+              <FormWrapper />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <Suspense fallback={<Skeleton height={300} width="100%" />}>
+              <HomePage />
+            </Suspense>
+          }
+        />
+      </Route>
 
+      <Route path="/admin" element={<AdminAppShell />}>
+        <Route
+          path={"/admin/orders"}
+          element={
+            <Suspense fallback={<Skeleton height={300} width="100%" />}>
+              <Orders></Orders>
+            </Suspense>
+          }
+        ></Route>
+      </Route>
+      <Route
+        path="*"
+        element={
+          <Suspense fallback={<Skeleton height={300} width="100%" />}>
+            <NotFoundPage />
+          </Suspense>
+        }
+      />
     </Routes>
-  )
+  );
 };
 
 export default AppRoutes;

@@ -5,7 +5,7 @@ const ApiConstants = {
   UPLOAD_CSV: () => `/api/invoice/uploadAndGetInvoiceData`,
   UPLOAD_AND_GET_INVOICE_DATA: () => `/api/invoice/uploadAndGetInvoiceData`,
   SAVE_INVOICE_DATA: () => `/api/invoice/saveInvoiceData`,
-
+  UPLOAD_AND_PARSE_DOCUMENT: () => "api/uploadAndParseDocument",
   //GET API
   CHECK_AUTH: () => `/api/auth/checkAuth`,
   GET_ALL_USERS: () => `/api/auth/getAllUsers`,

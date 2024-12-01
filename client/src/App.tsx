@@ -1,12 +1,12 @@
-import "@mantine/dropzone/styles.css";
-import { BasicAppShell } from "./components/BasicAppShell";
-import "@mantine/notifications/styles.css";
-import '@mantine/dates/styles.css';
 import "@mantine/core/styles.css";
+import "@mantine/dropzone/styles.css";
+import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
+import AppRoutes from "./routes/Routes";
 
 // Do not delete CSS imports
 function App() {
-  return <BasicAppShell />;
+  return <AppRoutes />;
 }
 
 export default App;

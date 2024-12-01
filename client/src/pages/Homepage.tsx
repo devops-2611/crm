@@ -1,12 +1,7 @@
 import { Container } from "@mantine/core";
 
 const Homepage = () => {
-  return (
-    <>
-      <Container>
-      </Container>
-    </>
-  );
+  return <Container>Home page</Container>;
 };
 
 export default Homepage;
