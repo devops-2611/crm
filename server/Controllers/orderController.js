@@ -6,13 +6,13 @@ const AppConstants = require('../constants');
 
 exports.UploadAndParseDocument = async (req, res) => {
     try {
-        
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
         const results = [];
         const errors = [];
+        const uniqueOrderIds = new Set(); // To track unique Order IDs
 
         for (const file of req.files) {
             const fileResults = [];
@@ -29,9 +29,14 @@ exports.UploadAndParseDocument = async (req, res) => {
                         .on('data', (row) => {
                             const missingHeaders = AppConstants.EXPECTED_HEADERS.filter(header => !(header in row));
                             if (missingHeaders.length > 0) {
-                                fileErrors.push(`Missing headers: ${missingHeaders.join(', ')}`);
+                                fileErrors.push(`Missing Columns: ${missingHeaders.join(', ')}`);
                             } else {
-                                fileResults.push(row);
+                                row['MerchantId'] = row['MerchantId'] || '';
+                                // Check for duplicate Order IDs
+                                if (!uniqueOrderIds.has(row['Order ID'])) {
+                                    uniqueOrderIds.add(row['Order ID']);
+                                    fileResults.push({...row, Status: ""})
+                                }
                             }
                         })
                         .on('end', resolve)
@@ -54,14 +59,21 @@ exports.UploadAndParseDocument = async (req, res) => {
                 const headers = rows[0];
                 const missingHeaders = AppConstants.EXPECTED_HEADERS.filter(header => !headers.includes(header));
                 if (missingHeaders.length > 0) {
-                    fileErrors.push(`Missing headers: ${missingHeaders.join(', ')}`);
+                    fileErrors.push(`Missing Columns: ${missingHeaders.join(', ')}`);
                 } else {
-                    rows.slice(1).forEach((row, index) => {
+                    rows.slice(1).forEach((row) => {
                         const rowData = {};
                         headers.forEach((header, i) => {
                             rowData[header] = row[i] || null;
                         });
-                        fileResults.push(rowData);
+
+                        rowData['MerchantId'] = rowData['MerchantId'] || '';
+                        // Check for duplicate Order IDs
+                        if (!uniqueOrderIds.has(rowData['Order ID'])) {
+                            uniqueOrderIds.add(rowData['Order ID']);
+                            rowData['Status'] = ''
+                            fileResults.push(rowData);
+                        }
                     });
                 }
             } else {
@@ -76,7 +88,7 @@ exports.UploadAndParseDocument = async (req, res) => {
             return res.status(400).json({ errors });
         }
 
-        return res.status(200).json({ data: results });
+        return res.status(200).json({ results });
     } catch (error) {
         console.error('Error parsing files:', error);
         return res.status(500).json({ error: 'Internal Server Error', details: error.message });

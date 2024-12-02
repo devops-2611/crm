@@ -72,6 +72,9 @@ const orderSchema = new mongoose.Schema({
     merchantId: {
         type: String
     },  
+    status: {
+        type: String
+    },
     createdAt: {
         type: Date,
         default: Date.now
