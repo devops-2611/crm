@@ -43,7 +43,7 @@ const AppRoutes = () => {
 
       <Route path="/admin" element={<AdminAppShell />}>
         <Route
-          path={"/admin/orders"}
+          path={"swishr-courier/orders"}
           element={
             <Suspense fallback={<Skeleton height={300} width="100%" />}>
               <Orders></Orders>
