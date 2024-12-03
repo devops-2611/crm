@@ -33,7 +33,7 @@ const HEADER_MAPPING = {
 exports.UploadAndParseDocument = async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: 'No file uploaded' });
+            return res.status(400).json({ error: 'No file uploaded', success: false, errors:[] });
         }
 
         const results = [];
@@ -140,8 +140,23 @@ exports.UploadAndParseDocument = async (req, res) => {
             if (fileErrors.length > 0) errors.push(...fileErrors);
         }
 
+        // Validate for duplicates in the database
+        const allOrderIds = results.map(order => order.orderId);
+        const existingOrders = await orderModal.find({ orderId: { $in: allOrderIds } }, { orderId: 1 });
+        const duplicateOrderIds = new Set(existingOrders.map(order => order.orderId));
+
+        if (duplicateOrderIds.size > 0) {
+            return res.status(400).json({
+                error: 'Duplicate Order IDs found in the file.',
+                success: false,
+                errors: [
+                    { Error: Array.from(duplicateOrderIds).join(', '), fileName: req.files?.map(file => file.originalname).join(', ') }
+                ]
+            });
+        }
+
         if (errors.length > 0) {
-            return res.status(400).json({ errors });
+            return res.status(400).json({error: 'Error parsing files', errors, success: false });
         }
 
         if (results.length > 0) {
@@ -151,7 +166,7 @@ exports.UploadAndParseDocument = async (req, res) => {
         return res.status(200).json({ results });
     } catch (error) {
         console.error('Error parsing files:', error);
-        return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        return res.status(500).json({ error: 'Internal Server Error', success: false, errors:[{Error: error.message, fileName: req.files?.map(file => file.originalname).join(', ') }] });
     }
 };
 
