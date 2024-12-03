@@ -1,7 +1,7 @@
-import React from "react";
-import { Formik, Form } from "formik";
+import React, { useRef } from "react";
+import { Formik, Form, FormikProps } from "formik";
 import * as Yup from "yup";
-import { Button, Group, Paper, Stack, Text as MantineText } from "@mantine/core";
+import { Button, Group, Paper, Stack, Text as MantineText, useMantineTheme } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FileWithPath, FileRejection } from "@mantine/dropzone";
 import { FileUpload } from "../../../components/CoreUI/FileUpload";
@@ -17,10 +17,11 @@ const validationSchema = Yup.object({
     .required("CSV file is required."),
 });
 
-const FileUploadWithFormik: React.FC = () => {
+const UplaodOrders: React.FC = () => {
   const initialValues: FormValues = { csvfile: [] };
-
-  const { mutate: uploadFiles, } = useUploadOrdersFiles();
+  const FormikRef = useRef<FormikProps<FormValues>>(null);
+  const theme = useMantineTheme();
+  const { mutate: uploadFiles } = useUploadOrdersFiles();
 
   const handleSubmit = (values: FormValues) => {
     uploadFiles(
@@ -32,7 +33,7 @@ const FileUploadWithFormik: React.FC = () => {
             message: data.message || "Files uploaded successfully!",
             color: "green",
           });
-          console.log("Server Response:", data);
+          FormikRef.current?.resetForm();
         },
         onError: (error: any) => {
           notifications.show({
@@ -54,6 +55,7 @@ const FileUploadWithFormik: React.FC = () => {
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
+          innerRef={FormikRef}
         >
           {({ values, errors, touched, setFieldValue }) => {
             const handleDrop = (newFiles: FileWithPath[]) => {
@@ -97,7 +99,7 @@ const FileUploadWithFormik: React.FC = () => {
                   </div>
                 )}
 
-                <Group align="stretch" mt="md">
+                <Group mt="md" justify="center">
                   <Button type="submit" loading={false}>
                     Submit
                   </Button>
@@ -114,4 +116,4 @@ const FileUploadWithFormik: React.FC = () => {
   );
 };
 
-export default FileUploadWithFormik;
+export default UplaodOrders;

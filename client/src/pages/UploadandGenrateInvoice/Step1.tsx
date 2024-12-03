@@ -1,9 +1,9 @@
 import { FileUpload } from "../../components/Dropzone";
 import {
   Button,
-  Container,
   LoadingOverlay,
   NumberInput,
+  Paper,
   Select,
   Stack,
 } from "@mantine/core";
@@ -83,7 +83,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
     }
   };
   return (
-    <Container p={20} pos={"relative"}>
+    <Paper p={20} pos={"relative"} shadow="sm">
       <Formik
         initialValues={trackOldFormData?.step1 ?? initalValues}
         onSubmit={(values) => {
@@ -160,6 +160,6 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-    </Container>
+    </Paper>
   );
 }

@@ -2,8 +2,8 @@ import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Skeleton } from "@mantine/core";
 import { BasicAppShell } from "../components/BasicAppShell";
-import Orders from "../pages/admin/orders/Orders";
-import { AdminAppShell } from "../pages/admin/AdminAppShell";
+import { AdminAppShell } from "../pages/admin/adminAppShell/AdminAppShell";
+import { OrdersTabsWrapper } from "../pages/admin/orders/OrdersTabsWrapper";
 
 const HomePage = lazy(() => import("../pages/Homepage"));
 const FormWrapper = lazy(
@@ -46,7 +46,7 @@ const AppRoutes = () => {
           path={"swishr-courier/orders"}
           element={
             <Suspense fallback={<Skeleton height={300} width="100%" />}>
-              <Orders></Orders>
+              <OrdersTabsWrapper></OrdersTabsWrapper>
             </Suspense>
           }
         ></Route>
