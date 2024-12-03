@@ -22,11 +22,11 @@ const HEADER_MAPPING = {
     'Delivery Charge': 'deliveryCharge',
     'Service Fee': 'serviceFee',
     'SurCharge': 'surcharge',
-    'Sub Total': 'subTotal',
+    'SubTotal': 'subTotal',
     'Taxes': 'taxes',
     'Total': 'total',
     'Branch Name': 'branchName',
-    'MerchantId': 'merchantId',
+    'Merchant ID': 'merchantId',
     'Status': 'status',
 };
 
@@ -46,6 +46,12 @@ exports.UploadAndParseDocument = async (req, res) => {
                 if (HEADER_MAPPING[header]) {
                     mappedRow[HEADER_MAPPING[header]] = value || ''; // Default empty string for missing values
                 }
+            }
+            if(!mappedRow.merchantId){
+                mappedRow.merchantId = ''
+            }
+            if(!mappedRow.status){
+                mappedRow.status = ''
             }
             return mappedRow;
         };
@@ -95,6 +101,12 @@ exports.UploadAndParseDocument = async (req, res) => {
                 const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
 
                 const headers = rows[0];
+                if(!headers.includes('Merchant ID')){
+                    headers.push('Merchant ID');
+                }
+                if(!headers.includes('Status')){
+                    headers.push('Status');
+                }
                 const missingHeaders = Object.keys(HEADER_MAPPING).filter((header) => !headers.includes(header));
                 if (missingHeaders.length > 0) {
                     fileErrors.push(`Missing Columns: ${missingHeaders.join(', ')}`);
@@ -104,7 +116,6 @@ exports.UploadAndParseDocument = async (req, res) => {
                         headers.forEach((header, i) => {
                             rowData[HEADER_MAPPING[header]] = row[i] || '';
                         });
-
                         if (rowData.orderId && rowData.customerId && rowData.orderDate) {
                             rowData.orderDate = moment(rowData.orderDate, "YYYY-MM-DD HH:mm:ss.S").isValid()
                                 ? moment(rowData.orderDate, "YYYY-MM-DD HH:mm:ss.S").toDate()

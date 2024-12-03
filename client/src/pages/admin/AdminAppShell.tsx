@@ -348,8 +348,8 @@ export function AdminAppShell() {
                           ? theme.colors.green[7]
                           : theme.colors.gray[7],
                         fontWeight: isRouteActive(navItem.path)
-                          ? "bold"
-                          : "normal",
+                          ? "600"
+                          : "normal"
                       },
                       root: { borderRadius: "10px",
              },
@@ -357,7 +357,7 @@ export function AdminAppShell() {
                     }}
                     bg={
                       isRouteActive(navItem.path)
-                        ? theme.colors.green[1]
+                        ? theme.colors.green[0]
                         : undefined
                     }
                   >
@@ -373,7 +373,7 @@ export function AdminAppShell() {
                               ? theme.colors.green[7]
                               : theme.colors.gray[7],
                             fontWeight: isRouteActive(subNavItem.path)
-                              ? "bold"
+                              ? "600"
                               : "normal",
                           },
                           root: { borderRadius: "5px" },
