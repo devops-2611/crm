@@ -7,7 +7,7 @@ import { OrdersTabsWrapper } from "../pages/admin/orders/OrdersTabsWrapper";
 
 const HomePage = lazy(() => import("../pages/Homepage"));
 const FormWrapper = lazy(
-  () => import("../pages/UploadandGenrateInvoice/FormWrapper")
+  () => import("../pages/UploadandGenrateInvoice/FormWrapper"),
 );
 const NotFoundPage = lazy(() => import("../pages/NotFound"));
 
@@ -50,6 +50,14 @@ const AppRoutes = () => {
             </Suspense>
           }
         ></Route>
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<Skeleton height={300} width="100%" />}>
+              <NotFoundPage />
+            </Suspense>
+          }
+        />
       </Route>
       <Route
         path="*"

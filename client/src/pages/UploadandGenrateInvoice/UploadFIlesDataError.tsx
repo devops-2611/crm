@@ -21,11 +21,11 @@ interface FileError {
 const ErrorDetails = forwardRef<HTMLDivElement, ErrorDetailsProps>(
   function ErrorDetails(
     { errorData },
-    ref: Ref<HTMLDivElement> // Ensure ref is typed as HTMLDivElement
+    ref: Ref<HTMLDivElement>, // Ensure ref is typed as HTMLDivElement
   ) {
     const { values } = useFormikContext<FormValueTypes>();
     const [accordionValue, setAccordionValue] = useState<string[]>(
-      errorData?.details?.map((file) => file.fileName) ?? []
+      errorData?.details?.map((file) => file.fileName) ?? [],
     );
 
     if (!errorData) return null;
@@ -35,7 +35,7 @@ const ErrorDetails = forwardRef<HTMLDivElement, ErrorDetailsProps>(
 
     // Filter the final errors based on form files
     const finalErrors = errorData?.details?.filter((item) =>
-      filesPresentInForm?.includes(item.fileName)
+      filesPresentInForm?.includes(item.fileName),
     );
 
     // If no relevant errors, return early
@@ -97,7 +97,7 @@ const ErrorDetails = forwardRef<HTMLDivElement, ErrorDetailsProps>(
         </Stack>
       </Paper>
     );
-  }
+  },
 );
 
 export default ErrorDetails;

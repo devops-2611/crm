@@ -3,13 +3,16 @@ import App from "../App";
 import MantineProviders from "./MantineProviders";
 import AppBasedContextProviders from "./AppBasedContextProviders";
 import { BrowserRouter } from "react-router-dom";
+import { MuiXDateProvider } from "./MuiXDateProvider";
 function AppWithProviders() {
   return (
     <AppBasedContextProviders>
       <MantineProviders>
         <QueryClientProviders>
           <BrowserRouter>
-            <App />
+            <MuiXDateProvider>
+              <App />
+            </MuiXDateProvider>
           </BrowserRouter>
         </QueryClientProviders>
       </MantineProviders>

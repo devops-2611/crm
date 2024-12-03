@@ -1,11 +1,19 @@
 import React, { useRef } from "react";
 import { Formik, Form, FormikProps } from "formik";
 import * as Yup from "yup";
-import { Button, Group, Paper, Stack, Text as MantineText, useMantineTheme } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Paper,
+  Stack,
+  Text as MantineText,
+  useMantineTheme,
+} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FileWithPath, FileRejection } from "@mantine/dropzone";
 import { FileUpload } from "../../../components/CoreUI/FileUpload";
 import { useUploadOrdersFiles } from "../../../hooks/useUploadOrdersFiles";
+import { UploadOrderErrorDisplay } from "./UploadOrderErrorDisplay";
 
 interface FormValues {
   csvfile: FileWithPath[];
@@ -21,7 +29,11 @@ const UplaodOrders: React.FC = () => {
   const initialValues: FormValues = { csvfile: [] };
   const FormikRef = useRef<FormikProps<FormValues>>(null);
   const theme = useMantineTheme();
-  const { mutate: uploadFiles } = useUploadOrdersFiles();
+  const {
+    mutate: uploadFiles,
+    error: ErrorOnUploadingFiles,
+    reset: ResetMutation,
+  } = useUploadOrdersFiles();
 
   const handleSubmit = (values: FormValues) => {
     uploadFiles(
@@ -30,7 +42,7 @@ const UplaodOrders: React.FC = () => {
         onSuccess: (data) => {
           notifications.show({
             title: "Success",
-            message: data.message || "Files uploaded successfully!",
+            message: data.data?.message || "Files uploaded successfully!",
             color: "green",
           });
           FormikRef.current?.resetForm();
@@ -41,9 +53,9 @@ const UplaodOrders: React.FC = () => {
             message: error.response?.data?.message || "Failed to upload files.",
             color: "red",
           });
-          console.error("Upload Error:", error);
+          FormikRef.current?.setErrors(error);
         },
-      }
+      },
     );
   };
 
@@ -56,6 +68,7 @@ const UplaodOrders: React.FC = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
           innerRef={FormikRef}
+          onReset={() => ResetMutation()}
         >
           {({ values, errors, touched, setFieldValue }) => {
             const handleDrop = (newFiles: FileWithPath[]) => {
@@ -73,7 +86,7 @@ const UplaodOrders: React.FC = () => {
 
             const handleDeleteFile = (fileName: string) => {
               const updatedFiles = values.csvfile.filter(
-                (file) => file.name !== fileName
+                (file) => file.name !== fileName,
               );
               setFieldValue("csvfile", updatedFiles);
             };
@@ -111,6 +124,11 @@ const UplaodOrders: React.FC = () => {
             );
           }}
         </Formik>
+        {FormikRef.current?.errors && (
+          <UploadOrderErrorDisplay
+            response={ErrorOnUploadingFiles?.response?.data}
+          />
+        )}
       </Stack>
     </Paper>
   );

@@ -11,7 +11,7 @@ export default function MantineProviders({
   return (
     <MantineProvider
       theme={{
-        primaryColor: "teal", // Sets teal as the primary color
+        primaryColor: "teal",
       }}
     >
       <Notifications zIndex={1000} />

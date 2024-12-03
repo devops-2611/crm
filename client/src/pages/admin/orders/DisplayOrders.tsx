@@ -1,7 +1,7 @@
-import React from "react";
+import AppGridRemoteDataFetching from "../../../components/CoreUI/AppGrids/AppGridRemoteDataFetching";
 
 const DisplayOrders = () => {
-  return <div>DisplayOrders</div>;
+  return <AppGridRemoteDataFetching />;
 };
 
 export default DisplayOrders;

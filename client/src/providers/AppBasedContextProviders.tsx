@@ -11,7 +11,7 @@ interface completeFormData {
   step1?: FormValueTypes;
   step2?: ParsedData;
 }
-const initialAppBasedContextValues:AppBasedContextVariables = {
+const initialAppBasedContextValues: AppBasedContextVariables = {
   customerConfig: undefined, // CustomerData is undefined initially
   setCustomerConfig: (customerConfig: CustomerData) => {}, // Placeholder function
   parsedData: undefined, // ParsedData is undefined initially
@@ -22,18 +22,19 @@ const initialAppBasedContextValues:AppBasedContextVariables = {
   trackOldFormData: undefined, // completeFormData is undefined initially
 };
 export interface AppBasedContextVariables {
-  customerConfig?: CustomerData |undefined;
+  customerConfig?: CustomerData | undefined;
   setCustomerConfig: (customerConfig: CustomerData) => void;
-  parsedData: ParsedData |undefined;
-  setParsedData: (parsedDataData: ParsedData | undefined) => void ;
+  parsedData: ParsedData | undefined;
+  setParsedData: (parsedDataData: ParsedData | undefined) => void;
   InvoiceData: EditAndSaveResponse | undefined;
-  setInvoiceData: (invoiceData: EditAndSaveResponse | undefined) => void ;
+  setInvoiceData: (invoiceData: EditAndSaveResponse | undefined) => void;
   setTrackOldFormData: (data: completeFormData | undefined) => void;
-  trackOldFormData: completeFormData |undefined;
+  trackOldFormData: completeFormData | undefined;
 }
 const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
-  const [contextValue, setContextValue] =
-    useState<AppBasedContextVariables>(initialAppBasedContextValues);
+  const [contextValue, setContextValue] = useState<AppBasedContextVariables>(
+    initialAppBasedContextValues,
+  );
 
   const value = useMemo(
     () => ({
@@ -44,7 +45,7 @@ const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
           customerConfig: customerConfig,
         })),
       parsedData: contextValue?.parsedData ?? undefined,
-      setParsedData: (parsedDataData: ParsedData | undefined) => 
+      setParsedData: (parsedDataData: ParsedData | undefined) =>
         setContextValue((prev) => ({ ...prev, parsedData: parsedDataData })),
       trackOldFormData: contextValue?.trackOldFormData,
       setTrackOldFormData: (data: Partial<completeFormData> | undefined) =>
@@ -53,7 +54,7 @@ const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
           trackOldFormData: { ...prev?.trackOldFormData, ...data },
         })),
       InvoiceData: contextValue?.InvoiceData,
-      setInvoiceData: (invoiceData: EditAndSaveResponse | undefined) => 
+      setInvoiceData: (invoiceData: EditAndSaveResponse | undefined) =>
         setContextValue((prev) => ({ ...prev, InvoiceData: invoiceData })),
     }),
     [
@@ -61,7 +62,7 @@ const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
       contextValue?.parsedData,
       contextValue?.trackOldFormData,
       contextValue?.InvoiceData,
-    ]
+    ],
   );
 
   return (
@@ -72,5 +73,3 @@ const AppBasedContextProviders = ({ children }: AppBAsedProvidersProps) => {
 };
 
 export default AppBasedContextProviders;
-
-

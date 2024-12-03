@@ -71,7 +71,7 @@ export interface ParsedData {
 }
 
 const uploadFiles = async (
-  formValues: FormValueTypes
+  formValues: FormValueTypes,
 ): Promise<AxiosResponse<ParsedData>> => {
   console.log(formValues, "formValues");
   if (!formValues.csvfile || formValues.csvfile.length === 0) {
@@ -87,7 +87,7 @@ const uploadFiles = async (
 
   return await ApiHelpers.POST(
     ApiConstants.UPLOAD_AND_GET_INVOICE_DATA(),
-    formData
+    formData,
   );
 };
 
@@ -131,7 +131,7 @@ export const useUploadandGetCsvData = () => {
         autoClose: 2000,
       });
       setParsedData(data?.data);
-      setTrackOldFormData({ step1: postedData, step2:undefined });
+      setTrackOldFormData({ step1: postedData, step2: undefined });
 
       // Cache the parsed data for future use
       queryClient.setQueryData(["parsedData"], data?.data);

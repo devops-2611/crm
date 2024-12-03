@@ -1,0 +1,16 @@
+{
+  "semi": true, // Add semicolons at the end of statements
+  "trailingComma": "es5", // Add trailing commas where valid in ES5 (objects, arrays, etc.)
+  "singleQuote": true, // Use single quotes instead of double quotes
+  "printWidth": 80, // Wrap lines that exceed 80 characters
+  "tabWidth": 2, // Set indentation width to 2 spaces
+  "useTabs": false, // Use spaces instead of tabs
+  "bracketSpacing": true, // Print spaces between brackets in object literals
+  "jsxBracketSameLine": false, // Put `>` of multi-line JSX tags on a new line
+  "arrowParens": "always", // Always include parentheses around arrow function parameters
+  "endOfLine": "lf", // Use line feed only (`\n`) for end-of-line
+  "quoteProps": "as-needed", // Only add quotes to object properties when required
+  "htmlWhitespaceSensitivity": "css", // Respect the default value of CSS display property
+  "proseWrap": "preserve", // Do not wrap markdown text
+  "embeddedLanguageFormatting": "auto" // Format embedded code if Prettier supports it
+}

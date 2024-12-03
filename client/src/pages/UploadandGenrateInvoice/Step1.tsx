@@ -54,7 +54,7 @@ export default function Demo(props: Readonly<DemoPropTypes>) {
         label: item.customerName,
         value: item.customerId.toString(),
       })) ?? [],
-    [customerList]
+    [customerList],
   );
   const {
     mutateAsync: SubmitFormDataAndCSV,

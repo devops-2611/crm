@@ -64,12 +64,12 @@ export function FileUpload() {
         });
       }
     },
-    [theme]
+    [theme],
   );
 
   const handleDrop = async (files: FileWithPath[]) => {
     const getDuplicateFilesInBulkUpload = findDuplicates(
-      files?.map((file) => file.name)
+      files?.map((file) => file.name),
     );
     if (getDuplicateFilesInBulkUpload?.length) {
       notifications?.show({
@@ -83,7 +83,7 @@ export function FileUpload() {
       const existingFileNames = values?.csvfile?.map((file) => file.name);
       const Duplicates = findCommonStrings(
         files?.map((file) => file.name),
-        existingFileNames
+        existingFileNames,
       );
       if (Duplicates?.length > 0) {
         notifications.show({
@@ -101,7 +101,7 @@ export function FileUpload() {
 
   const handleDeleteUploaded = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    fileName: string
+    fileName: string,
   ) => {
     e.stopPropagation();
     const updatedFiles =

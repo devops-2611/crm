@@ -36,11 +36,11 @@ const convertDate = (inputDateString: DateValue) => {
   const date = new Date(String(inputDateString));
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
-    "0"
+    "0",
   )}-${String(date.getDate()).padStart(2, "0")} ${String(
-    date.getHours()
+    date.getHours(),
   ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(
-    date.getSeconds()
+    date.getSeconds(),
   ).padStart(2, "0")}.0`;
 };
 
@@ -101,7 +101,7 @@ const EditableTable = ({
                     onChange={(val) =>
                       formik.setFieldValue(
                         `${tableKey}.${key}.totalOrderValue`,
-                        Number(val)
+                        Number(val),
                       )
                     }
                     hideControls
@@ -113,7 +113,7 @@ const EditableTable = ({
                     onChange={(val) =>
                       formik.setFieldValue(
                         `${tableKey}.${key}.totalOrders`,
-                        Number(val)
+                        Number(val),
                       )
                     }
                     hideControls
@@ -127,7 +127,7 @@ const EditableTable = ({
                         onChange={(val) =>
                           formik.setFieldValue(
                             `${tableKey}.${key}.commissionRate`,
-                            Number(val)
+                            Number(val),
                           )
                         }
                         hideControls
@@ -139,7 +139,7 @@ const EditableTable = ({
                         onChange={(val) =>
                           formik.setFieldValue(
                             `${tableKey}.${key}.amount`,
-                            Number(val)
+                            Number(val),
                           )
                         }
                         hideControls
@@ -313,7 +313,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
               onChange={(value) =>
                 formik.setFieldValue(
                   "amountToRecieve.cashPayment",
-                  Number(value)
+                  Number(value),
                 )
               }
             />
@@ -323,7 +323,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
               onChange={(value) =>
                 formik.setFieldValue(
                   "amountToRecieve.bankPayment",
-                  Number(value)
+                  Number(value),
                 )
               }
             />

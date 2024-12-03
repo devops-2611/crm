@@ -11,7 +11,7 @@ const ApiConstants = {
   GET_ALL_USERS: () => `/api/auth/getAllUsers`,
   GET_ALL_CUSTOMERS: () => "/api/customer/getAllCustomerList",
   GET_CUSTOMER_CONFIG: (id: string) => `/api/customer/getCustomerById/${id}`,
-
+  GET_ALL_ORDERS: () => `/api/order/getAllOrders`,
   //PUT API
 
   //DELETE API

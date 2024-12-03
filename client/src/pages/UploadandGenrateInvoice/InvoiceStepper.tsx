@@ -1,10 +1,10 @@
 import { Stepper } from "@mantine/core";
-interface InvoiceStepperTypes{
-    active:number,
-    setActiveStep:(step:number)=>void
+interface InvoiceStepperTypes {
+  active: number;
+  setActiveStep: (step: number) => void;
 }
-const InvoiceStepper = (props:InvoiceStepperTypes) => {
-    const {active}=props
+const InvoiceStepper = (props: InvoiceStepperTypes) => {
+  const { active } = props;
   return (
     <Stepper active={active} iconPosition="left">
       <Stepper.Step label="Step 1" description="Upload CSV file" />

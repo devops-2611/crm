@@ -265,7 +265,7 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
       FinalData?.calculationsByOrderType?.COLLECTION?.commissionRate ?? "NA",
     Description_Collection_Commission_Rate_Deliver_Order_value:
       FinalData?.calculationsByOrderType?.COLLECTION?.totalOrderValue.toFixed(
-        2
+        2,
       ) ?? "NA",
     Description_Collection_Commission_VAT: FinalData?.taxRate ?? "NA",
     Description_Collection_Commission_Amount:
@@ -276,7 +276,7 @@ const InvoicePDF = ({ setActiveStep }: InvoicePreviewProps) => {
       FinalData?.calculationsByOrderType?.DELIVERY?.commissionRate ?? "NA",
     Description_Delivery_Commission_Rate_Deliver_Order_value:
       FinalData?.calculationsByOrderType?.DELIVERY?.totalOrderValue.toFixed(
-        2
+        2,
       ) ?? "NA",
     Description_Delivery_Commission_VAT: FinalData?.taxRate ?? "NA",
     Description_Delivery_Commission_Amount:

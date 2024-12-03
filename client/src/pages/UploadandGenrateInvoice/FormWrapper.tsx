@@ -9,7 +9,7 @@ const FormWrapper = () => {
   const [activeStep, setActiveStep] = useState(1);
 
   return (
-    <Container > 
+    <Container>
       <InvoiceStepper active={activeStep} setActiveStep={setActiveStep} />
       {activeStep === 1 && <Step1 setActiveStep={setActiveStep} />}
       {activeStep === 2 && <Step2 setActiveStep={setActiveStep} />}

@@ -132,7 +132,7 @@ export function BasicAppShell() {
                     color:
                       location.pathname === link.path ||
                       link.submenu?.some(
-                        (sub) => location.pathname === sub.path
+                        (sub) => location.pathname === sub.path,
                       )
                         ? theme.colors.blue[7]
                         : theme.colors.dark[7],

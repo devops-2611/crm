@@ -50,8 +50,8 @@ interface OrderTypeDetails {
   commissionRate: number;
   amount: number;
 }
-interface ServiceFeeSection extends OrderTypeDetails{
-  isCashOrders?:boolean
+interface ServiceFeeSection extends OrderTypeDetails {
+  isCashOrders?: boolean;
 }
 interface PaymentTypeDetails {
   totalOrderValue: number;
@@ -59,17 +59,16 @@ interface PaymentTypeDetails {
 }
 
 const saveEditedData = async (
-  formValues: ParsedData
+  formValues: ParsedData,
 ): Promise<AxiosResponse<EditAndSaveResponse, any>> => {
   return await ApiHelpers.POST(ApiConstants.SAVE_INVOICE_DATA(), formValues);
 };
 
 export const useSaveSubmittedData = () => {
-  const { setTrackOldFormData , setInvoiceData} = useAppBasedContext();
+  const { setTrackOldFormData, setInvoiceData } = useAppBasedContext();
   const queryClient = useQueryClient();
   return useMutation<AxiosResponse<EditAndSaveResponse>, Error, ParsedData>({
     // mutationFn: (data: ParsedData) => saveEditedData(data),
-
 
     mutationFn: async (newData: ParsedData) => {
       // Retrieve the previously posted data
@@ -102,7 +101,7 @@ export const useSaveSubmittedData = () => {
         color: "green",
       });
       setTrackOldFormData({ step2: postedFormData });
-      setInvoiceData(data?.data)
+      setInvoiceData(data?.data);
       queryClient.setQueryData(["editedAndSavedData"], data?.data);
     },
     onError: (data) =>

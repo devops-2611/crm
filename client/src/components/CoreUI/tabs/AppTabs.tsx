@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FloatingIndicator, Tabs, useMantineTheme } from "@mantine/core";
+import { FloatingIndicator, rem, Tabs, useMantineTheme } from "@mantine/core";
 import type { TabsProps } from "@mantine/core";
 import classes from "./APPTabs.module.css";
 export interface TabItem {
@@ -13,7 +13,6 @@ interface APPTabsProps extends Omit<TabsProps, "children"> {
 }
 
 export function APPTabs({ tabs, ...props }: APPTabsProps) {
-  const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
   const [value, setValue] = useState<string | null>("1");
   const [controlsRefs, setControlsRefs] = useState<
     Record<string, HTMLButtonElement | null>
@@ -25,34 +24,19 @@ export function APPTabs({ tabs, ...props }: APPTabsProps) {
   const theme = useMantineTheme();
 
   return (
-    <Tabs
-      value={value}
-      onChange={setValue}
-      {...props}
-      styles={{ tab: { active: "2px solid green" } }}
-    >
-      <Tabs.List
-        ref={setRootRef}
-        className={classes.list}
-        grow
-        flex={"flex-start"}
-      >
+    <Tabs value={value} onChange={setValue} {...props}>
+      <Tabs.List className={classes.list} grow flex={"flex-start"}>
         {tabs.map((tab) => (
           <Tabs.Tab
             key={tab.value}
             value={tab.value}
             ref={setControlRef(tab.value)}
             className={classes.tab}
+            styles={{ tabLabel: { fontSize: rem(16) } }}
           >
             {tab.label}
           </Tabs.Tab>
         ))}
-
-        <FloatingIndicator
-          target={value ? controlsRefs[value] : null}
-          parent={rootRef}
-          className={classes.indicator}
-        />
       </Tabs.List>
 
       {tabs.map((tab) => (

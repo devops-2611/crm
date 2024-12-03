@@ -1,44 +1,52 @@
-import { useState, useEffect, useRef } from 'react'
-import { TextInput, Radio, Button, Table, Group, Modal, FileInput } from '@mantine/core'
-import { useForm } from '@mantine/form'
-import { notifications } from '@mantine/notifications'
-import { IconEdit, IconTrash } from '@tabler/icons-react'
-import "./style.css"
-import ApiHelpers from '../../api/ApiHelpers'
+import { useState, useEffect, useRef } from "react";
+import {
+  TextInput,
+  Radio,
+  Button,
+  Table,
+  Group,
+  Modal,
+  FileInput,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { IconEdit, IconTrash } from "@tabler/icons-react";
+import "./style.css";
+import ApiHelpers from "../../api/ApiHelpers";
 
 interface Customer {
-  customerId: number
-  customerName: string
-  customerAddress: string
-  customerArea: string
-  customerPost: number | null | string
-  customerEmail: string
-  customerMobile: string
-  serviceFee: boolean
-  driverTip: boolean
-  deliveryCharge: boolean
-  deliveryOrdersComission: number
-  collectionOrdersComission: number
-  eatInComission: number
-  logoImg: string
+  customerId: number;
+  customerName: string;
+  customerAddress: string;
+  customerArea: string;
+  customerPost: number | null | string;
+  customerEmail: string;
+  customerMobile: string;
+  serviceFee: boolean;
+  driverTip: boolean;
+  deliveryCharge: boolean;
+  deliveryOrdersComission: number;
+  collectionOrdersComission: number;
+  eatInComission: number;
+  logoImg: string;
 }
 
 export default function CustomerManagement() {
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [logoImg, setLogoImg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm({
     initialValues: {
-      customerName: '',
-      customerAddress: '',
-      customerArea: '',
+      customerName: "",
+      customerAddress: "",
+      customerArea: "",
       customerPost: null,
-      customerEmail: '',
-      customerMobile: '',
+      customerEmail: "",
+      customerMobile: "",
       serviceFee: true,
       driverTip: false,
       deliveryCharge: false,
@@ -46,16 +54,16 @@ export default function CustomerManagement() {
       collectionOrdersComission: 0,
       eatInComission: 0,
     },
-  })
+  });
 
   const formEdit = useForm({
     initialValues: {
-      customerName: '',
-      customerAddress: '',
-      customerArea: '',
+      customerName: "",
+      customerAddress: "",
+      customerArea: "",
       customerPost: null,
-      customerEmail: '',
-      customerMobile: '',
+      customerEmail: "",
+      customerMobile: "",
       serviceFee: true,
       driverTip: false,
       deliveryCharge: false,
@@ -63,27 +71,29 @@ export default function CustomerManagement() {
       collectionOrdersComission: 0,
       eatInComission: 0,
     },
-  })
+  });
 
   useEffect(() => {
-    fetchCustomers()
-  }, [])
+    fetchCustomers();
+  }, []);
 
   const fetchCustomers = async () => {
     try {
-      const response = await ApiHelpers.GET('/api/customer/getAllCustomerDetails')
+      const response = await ApiHelpers.GET(
+        "/api/customer/getAllCustomerDetails",
+      );
 
-      if (response.status !== 200) throw new Error('Failed to fetch customers')
+      if (response.status !== 200) throw new Error("Failed to fetch customers");
 
-      setCustomers(response.data)
+      setCustomers(response.data);
     } catch (error) {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to fetch customers',
-        color: 'red',
-      })
+        title: "Error",
+        message: "Failed to fetch customers",
+        color: "red",
+      });
     }
-  }
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -110,54 +120,52 @@ export default function CustomerManagement() {
       deliveryOrdersComission: values.deliveryOrdersComission,
       collectionOrdersComission: values.collectionOrdersComission,
       eatInComission: values.eatInComission,
-      img: logoImg
-    }
-
+      img: logoImg,
+    };
 
     try {
-      const response = await ApiHelpers.POST('/api/customer/add-customer', obj)
-      if (response.status !== 200) throw new Error('Failed to add customer')
+      const response = await ApiHelpers.POST("/api/customer/add-customer", obj);
+      if (response.status !== 200) throw new Error("Failed to add customer");
 
-      await fetchCustomers()
-      form.reset()
-      setLogoImg(null)
+      await fetchCustomers();
+      form.reset();
+      setLogoImg(null);
       notifications.show({
-        title: 'Success',
-        message: 'Customer added successfully',
-        color: 'green',
-      })
+        title: "Success",
+        message: "Customer added successfully",
+        color: "green",
+      });
     } catch (error) {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to add customer',
-        color: 'red',
-      })
+        title: "Error",
+        message: "Failed to add customer",
+        color: "red",
+      });
     }
-  }
+  };
 
   const handleEdit = (customer: Customer) => {
-    setEditingCustomer(customer)
+    setEditingCustomer(customer);
     formEdit.setValues({
-      customerName: customer.customerName || '',
-      customerAddress: customer.customerAddress || '',
-      customerArea: customer.customerArea || '',
+      customerName: customer.customerName || "",
+      customerAddress: customer.customerAddress || "",
+      customerArea: customer.customerArea || "",
       customerPost: customer.customerPost || null,
-      customerEmail: customer.customerEmail || '',
-      customerMobile: customer.customerMobile || '',
+      customerEmail: customer.customerEmail || "",
+      customerMobile: customer.customerMobile || "",
       serviceFee: customer.serviceFee || false,
       driverTip: customer.driverTip || false,
       deliveryCharge: customer.deliveryCharge || false,
       deliveryOrdersComission: customer.deliveryOrdersComission || 0,
       collectionOrdersComission: customer.collectionOrdersComission || 0,
       eatInComission: customer.eatInComission || 0,
-    })
-    setIsModalOpen(true)
-  }
+    });
+    setIsModalOpen(true);
+  };
 
   const handleUpdate = async (values: typeof formEdit.values) => {
-    if (!editingCustomer) return
+    if (!editingCustomer) return;
     try {
-
       const obj: any = {
         customerId: editingCustomer.customerId,
         customerName: values.customerName,
@@ -172,47 +180,52 @@ export default function CustomerManagement() {
         deliveryOrdersComission: values.deliveryOrdersComission,
         collectionOrdersComission: values.collectionOrdersComission,
         eatInComission: values.eatInComission,
-        img: logoImg
-      }
-      const response = await ApiHelpers.PUT(`/api/customer/edit-customer/${editingCustomer.customerId}`, obj)
-      if (response.status !== 200) throw new Error('Failed to update customer')
-      await fetchCustomers()
-      formEdit.reset()
-      setLogoImg(null)
-      setIsModalOpen(false)
-      setEditingCustomer(null)
+        img: logoImg,
+      };
+      const response = await ApiHelpers.PUT(
+        `/api/customer/edit-customer/${editingCustomer.customerId}`,
+        obj,
+      );
+      if (response.status !== 200) throw new Error("Failed to update customer");
+      await fetchCustomers();
+      formEdit.reset();
+      setLogoImg(null);
+      setIsModalOpen(false);
+      setEditingCustomer(null);
       notifications.show({
-        title: 'Success',
-        message: 'Customer updated successfully',
-        color: 'green',
-      })
+        title: "Success",
+        message: "Customer updated successfully",
+        color: "green",
+      });
     } catch (error) {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to update customer',
-        color: 'red',
-      })
+        title: "Error",
+        message: "Failed to update customer",
+        color: "red",
+      });
     }
-  }
+  };
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await ApiHelpers.DELETE(`/api/customer/delete-customer/${id}`)
-      if (response.status !== 200) throw new Error('Failed to delete customer')
-      await fetchCustomers()
+      const response = await ApiHelpers.DELETE(
+        `/api/customer/delete-customer/${id}`,
+      );
+      if (response.status !== 200) throw new Error("Failed to delete customer");
+      await fetchCustomers();
       notifications.show({
-        title: 'Success',
-        message: 'Customer deleted successfully',
-        color: 'green',
-      })
+        title: "Success",
+        message: "Customer deleted successfully",
+        color: "green",
+      });
     } catch (error) {
       notifications.show({
-        title: 'Error',
-        message: 'Failed to delete customer',
-        color: 'red',
-      })
+        title: "Error",
+        message: "Failed to delete customer",
+        color: "red",
+      });
     }
-  }
+  };
 
   return (
     <div className="p-4 space-y-8">
@@ -221,72 +234,68 @@ export default function CustomerManagement() {
           label="Customer Name"
           placeholder="Enter customer name"
           required
-          {...form.getInputProps('customerName')}
+          {...form.getInputProps("customerName")}
         />
         <TextInput
           label="Customer Address"
           placeholder="Enter customer address"
           required
-          {...form.getInputProps('customerAddress')}
+          {...form.getInputProps("customerAddress")}
         />
         <TextInput
           label="Customer Area"
           placeholder="Enter customer area"
           required
-          {...form.getInputProps('customerArea')}
+          {...form.getInputProps("customerArea")}
         />
         <TextInput
           label="Customer Post Code"
           placeholder="Enter customer post code"
           required
-          {...form.getInputProps('customerPost')}
+          {...form.getInputProps("customerPost")}
         />
         <TextInput
           label="Customer Email"
           placeholder="Enter customer email"
           required
-          {...form.getInputProps('customerEmail')}
+          {...form.getInputProps("customerEmail")}
         />
         <TextInput
           label="Customer Mobile"
           placeholder="Enter customer mobile"
           required
-          {...form.getInputProps('customerMobile')}
+          {...form.getInputProps("customerMobile")}
         />
         <TextInput
           label="Delivery Orders Commission"
           placeholder="Enter delivery orders commission"
           type="number"
           required
-          {...form.getInputProps('deliveryOrdersComission')}
+          {...form.getInputProps("deliveryOrdersComission")}
         />
         <TextInput
           label="Collection Orders Commission"
           placeholder="Enter collection orders commission"
           type="number"
           required
-          {...form.getInputProps('collectionOrdersComission')}
+          {...form.getInputProps("collectionOrdersComission")}
         />
         <TextInput
           label="Eat-In Commission"
           placeholder="Enter eat-in commission"
           type="number"
           required
-          {...form.getInputProps('eatInComission')}
+          {...form.getInputProps("eatInComission")}
         />
 
-          <div>
+        <div>
           <label>Upload Logo</label>
-          <input
-            type="file"
-            onChange={handleFileUpload}
-            ref={fileInputRef}
-          />
+          <input type="file" onChange={handleFileUpload} ref={fileInputRef} />
         </div>
 
         <Radio.Group
           label="Service Fee Applicable"
-          {...form.getInputProps('serviceFee')}
+          {...form.getInputProps("serviceFee")}
         >
           <Group mt="xs">
             <Radio value={"true"} label="Yes" />
@@ -295,7 +304,7 @@ export default function CustomerManagement() {
         </Radio.Group>
         <Radio.Group
           label="Driver Tip Applicable"
-          {...form.getInputProps('driverTip')}
+          {...form.getInputProps("driverTip")}
         >
           <Group mt="xs">
             <Radio value={"true"} label="Yes" />
@@ -304,7 +313,7 @@ export default function CustomerManagement() {
         </Radio.Group>
         <Radio.Group
           label="Delivery Charge Applicable"
-          {...form.getInputProps('deliveryCharge')}
+          {...form.getInputProps("deliveryCharge")}
         >
           <Group mt="xs">
             <Radio value={"true"} label="Yes" />
@@ -344,19 +353,36 @@ export default function CustomerManagement() {
               <td>{customer.customerPost}</td>
               <td>{customer.customerEmail}</td>
               <td>{customer.customerMobile}</td>
-              <td>{customer?.logoImg && <img src={`${import.meta.env.VITE_API_BASE_URL}${customer?.logoImg}`} alt="Logo" width="50" />}</td>
+              <td>
+                {customer?.logoImg && (
+                  <img
+                    src={`${import.meta.env.VITE_API_BASE_URL}${customer?.logoImg}`}
+                    alt="Logo"
+                    width="50"
+                  />
+                )}
+              </td>
               <td>{customer.deliveryOrdersComission}</td>
               <td>{customer.collectionOrdersComission}</td>
               <td>{customer.eatInComission}</td>
-              <td>{customer.serviceFee ? 'Yes' : 'No'}</td>
-              <td>{customer.driverTip ? 'Yes' : 'No'}</td>
-              <td>{customer.deliveryCharge ? 'Yes' : 'No'}</td>
+              <td>{customer.serviceFee ? "Yes" : "No"}</td>
+              <td>{customer.driverTip ? "Yes" : "No"}</td>
+              <td>{customer.deliveryCharge ? "Yes" : "No"}</td>
               <td>
                 <Group>
-                  <Button onClick={() => handleEdit(customer)} variant="outline" size="xs">
+                  <Button
+                    onClick={() => handleEdit(customer)}
+                    variant="outline"
+                    size="xs"
+                  >
                     <IconEdit size={16} />
                   </Button>
-                  <Button onClick={() => handleDelete(customer.customerId)} variant="outline" color="red" size="xs">
+                  <Button
+                    onClick={() => handleDelete(customer.customerId)}
+                    variant="outline"
+                    color="red"
+                    size="xs"
+                  >
                     <IconTrash size={16} />
                   </Button>
                 </Group>
@@ -366,78 +392,78 @@ export default function CustomerManagement() {
         </tbody>
       </Table>
 
-      <Modal opened={isModalOpen} onClose={() => setIsModalOpen(false)} title="Edit Customer">
+      <Modal
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Edit Customer"
+      >
         <form onSubmit={formEdit.onSubmit(handleUpdate)} className="space-y-4">
           <TextInput
             label="Customer Name"
             placeholder="Enter customer name"
             required
-            {...formEdit.getInputProps('customerName')}
+            {...formEdit.getInputProps("customerName")}
           />
           <TextInput
             label="Customer Address"
             placeholder="Enter customer address"
             required
-            {...formEdit.getInputProps('customerAddress')}
+            {...formEdit.getInputProps("customerAddress")}
           />
           <TextInput
             label="Customer Area"
             placeholder="Enter customer area"
             required
-            {...formEdit.getInputProps('customerArea')}
+            {...formEdit.getInputProps("customerArea")}
           />
           <TextInput
             label="Customer Post Code"
             placeholder="Enter customer post code"
             required
-            {...formEdit.getInputProps('customerPost')}
+            {...formEdit.getInputProps("customerPost")}
           />
           <TextInput
             label="Customer Email"
             placeholder="Enter customer email"
             required
-            {...formEdit.getInputProps('customerEmail')}
+            {...formEdit.getInputProps("customerEmail")}
           />
           <TextInput
             label="Customer Mobile"
             placeholder="Enter customer mobile"
             required
-            {...formEdit.getInputProps('customerMobile')}
+            {...formEdit.getInputProps("customerMobile")}
           />
           <TextInput
             label="Delivery Orders Commission"
             placeholder="Enter delivery orders commission"
             type="number"
             required
-            {...formEdit.getInputProps('deliveryOrdersComission')}
+            {...formEdit.getInputProps("deliveryOrdersComission")}
           />
           <TextInput
             label="Collection Orders Commission"
             placeholder="Enter collection orders commission"
             type="number"
             required
-            {...formEdit.getInputProps('collectionOrdersComission')}
+            {...formEdit.getInputProps("collectionOrdersComission")}
           />
           <TextInput
             label="Eat-In Commission"
             placeholder="Enter eat-in commission"
             type="number"
             required
-            {...formEdit.getInputProps('eatInComission')}
+            {...formEdit.getInputProps("eatInComission")}
           />
 
-        <div>
-          <label>Upload Logo</label>
-          <input
-            type="file"
-            onChange={handleFileUpload}
-            ref={fileInputRef}
-          />
-        </div>
+          <div>
+            <label>Upload Logo</label>
+            <input type="file" onChange={handleFileUpload} ref={fileInputRef} />
+          </div>
 
           <Radio.Group
             label="Service Fee Applicable"
-            {...formEdit.getInputProps('serviceFee')}
+            {...formEdit.getInputProps("serviceFee")}
           >
             <Group mt="xs">
               <Radio value={"true"} label="Yes" />
@@ -446,7 +472,7 @@ export default function CustomerManagement() {
           </Radio.Group>
           <Radio.Group
             label="Driver Tip Applicable"
-            {...formEdit.getInputProps('driverTip')}
+            {...formEdit.getInputProps("driverTip")}
           >
             <Group mt="xs">
               <Radio value={"true"} label="Yes" />
@@ -455,7 +481,7 @@ export default function CustomerManagement() {
           </Radio.Group>
           <Radio.Group
             label="Delivery Charge Applicable"
-            {...formEdit.getInputProps('deliveryCharge')}
+            {...formEdit.getInputProps("deliveryCharge")}
           >
             <Group mt="xs">
               <Radio value={"true"} label="Yes" />
@@ -466,5 +492,5 @@ export default function CustomerManagement() {
         </form>
       </Modal>
     </div>
-  )
+  );
 }

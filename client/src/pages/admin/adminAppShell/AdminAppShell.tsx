@@ -77,7 +77,7 @@ export function AdminAppShell() {
                         stroke={1.5}
                         style={{
                           color: isRouteActive(navItem.path)
-                            ? theme.colors.green[7]
+                            ? theme.primaryColor
                             : theme.colors.gray[7],
                         }}
                       />
