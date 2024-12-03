@@ -67,21 +67,27 @@ const ErrorDetails = forwardRef<HTMLDivElement, ErrorDetailsProps>(
                 <Accordion.Control>{fileData.fileName}</Accordion.Control>
                 <Accordion.Panel>
                   {fileData.issues.length > 0 && (
-                    <Table striped highlightOnHover>
-                      <thead>
-                        <tr>
+                    <Table
+                      striped
+                      highlightOnHover
+                      withColumnBorders
+                      withRowBorders
+                      withTableBorder
+                    >
+                      <Table.Thead>
+                        <Table.Tr>
                           <th>Invalid Field</th>
                           <th>Invalid Value</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      {fileData.issues.map((issue, issueIndex) => (
-                        <tr key={issueIndex}>
-                            <td>{issue.invalidField}</td>
-                            <td>{issue.invalidValue}</td>
-                          </tr>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>
+                        {fileData.issues.map((issue, issueIndex) => (
+                          <Table.Tr key={issueIndex}>
+                            <Table.Td>{issue.invalidField}</Table.Td>
+                            <Table.Td>{issue.invalidValue}</Table.Td>
+                          </Table.Tr>
                         ))}
-                      </tbody>
+                      </Table.Tbody>
                     </Table>
                   )}
                 </Accordion.Panel>

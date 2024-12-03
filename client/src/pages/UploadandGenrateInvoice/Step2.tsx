@@ -12,6 +12,7 @@ import {
   Stack,
   Divider,
   LoadingOverlay,
+  useMantineTheme,
 } from "@mantine/core";
 import { useSaveSubmittedData } from "../../hooks/useSaveSubmittedData";
 import { useEffect, useState } from "react";
@@ -56,9 +57,6 @@ export interface InvoicePreviewProps {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
 
-
-
-
 const EditableTable = ({
   data,
   formik,
@@ -74,81 +72,87 @@ const EditableTable = ({
   columnsHeaders: string[];
   isPayMentType?: boolean;
 }) => {
+  const theme = useMantineTheme();
   return (
-    <Table.ScrollContainer minWidth={'300px'} type="native">
-    <Table striped highlightOnHover withColumnBorders >
-      <thead>
-        <tr>
-          {columnsHeaders.map((header) => (
-            <th key={header}>{header}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {Object.keys(formik.values?.[tableKey]).map((key) => {
-          const calculation = formik.values?.[tableKey][key];
-          return (
-            <tr key={key}>
-              <td>{key in labels ? labels[key] : key}</td>
-              <td>
-                <NumberInput
-                  value={calculation.totalOrderValue}
-                  onChange={(val) =>
-                    formik.setFieldValue(
-                      `${tableKey}.${key}.totalOrderValue`,
-                      Number(val)
-                    )
-                  }
-                  hideControls
-                />
-              </td>
-              <td>
-                <NumberInput
-                  value={calculation.totalOrders}
-                  onChange={(val) =>
-                    formik.setFieldValue(
-                      `${tableKey}.${key}.totalOrders`,
-                      Number(val)
-                    )
-                  }
-                  hideControls
-                />
-              </td>
-              {!isPayMentType && (
-                <>
-                  <td>
-                    <NumberInput
-                      value={calculation.commissionRate}
-                      onChange={(val) =>
-                        formik.setFieldValue(
-                          `${tableKey}.${key}.commissionRate`,
-                          Number(val)
-                        )
-                      }
-                      hideControls
-                    />
-                  </td>
-                  <td>
-                    <NumberInput
-                      value={calculation.amount}
-                      onChange={(val) =>
-                        formik.setFieldValue(
-                          `${tableKey}.${key}.amount`,
-                          Number(val)
-                        )
-                      }
-                      hideControls
-                    />
-                  </td>
-                </>
-              )}
-            </tr>
-          );
-        })}
-      </tbody>
-    </Table>
-</Table.ScrollContainer>
-
+    <Table.ScrollContainer minWidth={"300px"}>
+      <Table
+        striped
+        highlightOnHover
+        withColumnBorders
+        withTableBorder
+        withRowBorders
+      >
+        <Table.Thead bg={theme.primaryColor} c={"white"}>
+          <Table.Tr p={5}>
+            {columnsHeaders.map((header) => (
+              <Table.Th key={header}>{header}</Table.Th>
+            ))}
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {Object.keys(formik.values?.[tableKey]).map((key) => {
+            const calculation = formik.values?.[tableKey][key];
+            return (
+              <Table.Tr key={key}>
+                <Table.Td>{key in labels ? labels[key] : key}</Table.Td>
+                <Table.Td>
+                  <NumberInput
+                    value={calculation.totalOrderValue}
+                    onChange={(val) =>
+                      formik.setFieldValue(
+                        `${tableKey}.${key}.totalOrderValue`,
+                        Number(val)
+                      )
+                    }
+                    hideControls
+                  />
+                </Table.Td>
+                <Table.Td>
+                  <NumberInput
+                    value={calculation.totalOrders}
+                    onChange={(val) =>
+                      formik.setFieldValue(
+                        `${tableKey}.${key}.totalOrders`,
+                        Number(val)
+                      )
+                    }
+                    hideControls
+                  />
+                </Table.Td>
+                {!isPayMentType && (
+                  <>
+                    <Table.Td>
+                      <NumberInput
+                        value={calculation.commissionRate}
+                        onChange={(val) =>
+                          formik.setFieldValue(
+                            `${tableKey}.${key}.commissionRate`,
+                            Number(val)
+                          )
+                        }
+                        hideControls
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <NumberInput
+                        value={calculation.amount}
+                        onChange={(val) =>
+                          formik.setFieldValue(
+                            `${tableKey}.${key}.amount`,
+                            Number(val)
+                          )
+                        }
+                        hideControls
+                      />
+                    </Table.Td>
+                  </>
+                )}
+              </Table.Tr>
+            );
+          })}
+        </Table.Tbody>
+      </Table>
+    </Table.ScrollContainer>
   );
 };
 
@@ -158,7 +162,11 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
     isSuccess: isSuccessInUpdatingData,
     isPending,
   } = useSaveSubmittedData();
-  const { trackOldFormData, parsedData: CalculatedData, customerConfig } = useAppBasedContext();
+  const {
+    trackOldFormData,
+    parsedData: CalculatedData,
+    customerConfig,
+  } = useAppBasedContext();
   const AccordionConfig = [
     {
       label: "General Information",
@@ -171,7 +179,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
           }}
         />
       ),
-      content: (formik:FormikProps<ParsedData>)=> (
+      content: (formik: FormikProps<ParsedData>) => (
         <>
           <TextInput
             label="Customer ID"
@@ -184,7 +192,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
             label="Store Name"
             // {...formik.getFieldProps("storeName")}
             mt="md"
-            value={customerConfig?.customerName ?? ''}
+            value={customerConfig?.customerName ?? ""}
             disabled={true}
           />
           <DateTimePicker
@@ -215,7 +223,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
           }}
         />
       ),
-      content: (formik:FormikProps<ParsedData>)=> (
+      content: (formik: FormikProps<ParsedData>) => (
         <EditableTable
           data={formik.values?.calculationsByOrderType}
           formik={formik}
@@ -242,7 +250,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
           }}
         />
       ),
-      content: (formik:FormikProps<ParsedData>)=> (
+      content: (formik: FormikProps<ParsedData>) => (
         <EditableTable
           data={formik.values?.calculationsByPaymentType}
           formik={formik}
@@ -264,7 +272,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
           }}
         />
       ),
-      content: (formik:FormikProps<ParsedData>)=> (
+      content: (formik: FormikProps<ParsedData>) => (
         <Stack>
           <Group mt="sm" wrap={"wrap"}>
             <NumberInput
@@ -303,14 +311,20 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
               label="Cash Payment"
               value={formik.values?.amountToRecieve?.cashPayment}
               onChange={(value) =>
-                formik.setFieldValue("amountToRecieve.cashPayment", Number(value))
+                formik.setFieldValue(
+                  "amountToRecieve.cashPayment",
+                  Number(value)
+                )
               }
             />
             <NumberInput
               label="Bank Payment"
               value={formik.values?.amountToRecieve?.bankPayment}
               onChange={(value) =>
-                formik.setFieldValue("amountToRecieve.bankPayment", Number(value))
+                formik.setFieldValue(
+                  "amountToRecieve.bankPayment",
+                  Number(value)
+                )
               }
             />
             <NumberInput
@@ -325,9 +339,9 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
       ),
     },
   ];
-// const initialValues = {...trackOldFormData?.step2, }
+  // const initialValues = {...trackOldFormData?.step2, }
   const formik = useFormik<ParsedData>({
-    initialValues: trackOldFormData?.step2  ?? CalculatedData ?? {},
+    initialValues: trackOldFormData?.step2 ?? CalculatedData ?? {},
     onSubmit: (values) => {
       modals.openConfirmModal({
         title: "Please confirm your action",
@@ -346,7 +360,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
 
   useEffect(() => {
     if (isSuccessInUpdatingData) {
-      setActiveStep((prev:number) => prev + 1);
+      setActiveStep((prev: number) => prev + 1);
     }
   }, [isSuccessInUpdatingData, setActiveStep]);
 
@@ -355,7 +369,7 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
   ]);
 
   return (
-    <Box mx="auto" mt="xl" pos={'relative'}>
+    <Box mx="auto" mt="xl" pos={"relative"}>
       <Accordion
         variant="contained"
         multiple
@@ -393,7 +407,11 @@ const InvoicePreview = ({ setActiveStep }: InvoicePreviewProps) => {
           </form>
         )}
       </Accordion>
-      <LoadingOverlay visible={isPending} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
+      <LoadingOverlay
+        visible={isPending}
+        zIndex={1000}
+        overlayProps={{ radius: "sm", blur: 2 }}
+      />
     </Box>
   );
 };

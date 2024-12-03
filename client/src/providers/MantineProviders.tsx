@@ -9,7 +9,11 @@ export default function MantineProviders({
   children,
 }: Readonly<MantineProvidersProps>) {
   return (
-    <MantineProvider>
+    <MantineProvider
+      theme={{
+        primaryColor: "teal", // Sets teal as the primary color
+      }}
+    >
       <Notifications zIndex={1000} />
       <ModalsProvider />
       {children}
