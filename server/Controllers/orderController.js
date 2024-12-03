@@ -47,10 +47,10 @@ exports.UploadAndParseDocument = async (req, res) => {
                     mappedRow[HEADER_MAPPING[header]] = value || ''; // Default empty string for missing values
                 }
             }
-            if(!mappedRow.merchantId){
+            if (!mappedRow.merchantId) {
                 mappedRow.merchantId = ''
             }
-            if(!mappedRow.status){
+            if (!mappedRow.status) {
                 mappedRow.status = ''
             }
             return mappedRow;
@@ -76,18 +76,18 @@ exports.UploadAndParseDocument = async (req, res) => {
                                     : null;
 
                                 if (!mappedRow.orderDate) {
-                                    fileErrors.push(`Invalid date format in row: ${JSON.stringify(row)}`);
+                                    fileErrors.push({fileName : file.originalname, Error : `File: ${file.originalname} - Invalid date format in row: ${JSON.stringify(row)}`});
                                 } else if (!uniqueOrderIds.has(mappedRow.orderId)) {
                                     uniqueOrderIds.add(mappedRow.orderId);
                                     fileResults.push(mappedRow);
                                 }
                             } else {
-                                fileErrors.push(`Missing required data in row: ${JSON.stringify(row)}`);
+                                fileErrors.push({fileName : file.originalname, Error : `File: ${file.originalname} - Missing required data in row: ${JSON.stringify(row)}`});
                             }
                         })
                         .on('end', resolve)
                         .on('error', (err) => {
-                            fileErrors.push(err.message);
+                            fileErrors.push({fileName : file.originalname, Error : err.message});
                             reject(err);
                         });
                 });
@@ -101,15 +101,15 @@ exports.UploadAndParseDocument = async (req, res) => {
                 const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
 
                 const headers = rows[0];
-                if(!headers.includes('Merchant ID')){
+                if (!headers.includes('Merchant ID')) {
                     headers.push('Merchant ID');
                 }
-                if(!headers.includes('Status')){
+                if (!headers.includes('Status')) {
                     headers.push('Status');
                 }
                 const missingHeaders = Object.keys(HEADER_MAPPING).filter((header) => !headers.includes(header));
                 if (missingHeaders.length > 0) {
-                    fileErrors.push(`Missing Columns: ${missingHeaders.join(', ')}`);
+                    fileErrors.push({fileName : file.originalname, Error : `Missing Columns: ${missingHeaders.join(', ')}`});
                 } else {
                     rows.slice(1).forEach((row) => {
                         const rowData = {};
@@ -122,18 +122,18 @@ exports.UploadAndParseDocument = async (req, res) => {
                                 : null;
 
                             if (!rowData.orderDate) {
-                                fileErrors.push(`Invalid date format in row: ${JSON.stringify(rowData)}`);
+                                fileErrors.push({fileName : file.originalname, Error : `Invalid date format in row: ${JSON.stringify(rowData)}`});
                             } else if (!uniqueOrderIds.has(rowData.orderId)) {
                                 uniqueOrderIds.add(rowData.orderId);
                                 fileResults.push(rowData);
                             }
                         } else {
-                            fileErrors.push(`Missing required data in row: ${JSON.stringify(rowData)}`);
+                            fileErrors.push({fileName : file.originalname, Error : `Missing required data in row: ${JSON.stringify(rowData)}`});
                         }
                     });
                 }
             } else {
-                fileErrors.push('Unsupported file type');
+                fileResults.push({fileName: file.originalname, Error: 'Unsupported file type'});
             }
 
             if (fileResults.length > 0) results.push(...fileResults);
@@ -169,7 +169,8 @@ exports.GetAllOrders = async (req, res) => {
             orderType,
             status,
             paymentStatus,
-            branchName
+            branchName,
+            sort
         } = req.query;
 
         // Ensure pageNo and limit are numbers
@@ -212,13 +213,26 @@ exports.GetAllOrders = async (req, res) => {
             };
         }
 
+        // Define the sort object based on the sort parameter
+        const sortCriteria = {};
+        if (sort === 'ascName') {
+            sortCriteria.customerFirstName = 1; // Sort by customer name (A to Z)
+        } else if (sort === 'descName') {
+            sortCriteria.customerFirstName = -1; // Sort by customer name (Z to A)
+        } else if (sort === 'ascOrder') {
+            sortCriteria.orderDate = 1; // Sort by order date (oldest to newest)
+        } else if (sort === 'descOrder') {
+            sortCriteria.orderDate = -1; // Sort by order date (newest to oldest)
+        }
+
+
         // Fetch the total number of orders for pagination metadata
         const totalOrders = await orderModal.countDocuments(filter);
 
         // Fetch orders with pagination and filtering
         const orders = await orderModal
             .find(filter)
-            .sort({ orderDate: -1 }) // Sort by creation date (most recent first)
+            .sort(sortCriteria) 
             .skip(skip)              // Skip the appropriate number of records
             .limit(limitValue);      // Limit the number of records returned
 
