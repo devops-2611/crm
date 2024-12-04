@@ -7,7 +7,6 @@ import {
   Paper,
   Stack,
   Text as MantineText,
-  useMantineTheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FileWithPath, FileRejection } from "@mantine/dropzone";
@@ -15,7 +14,7 @@ import { FileUpload } from "../../../components/CoreUI/FileUpload";
 import { useUploadOrdersFiles } from "../../../hooks/useUploadOrdersFiles";
 import { UploadOrderErrorDisplay } from "./UploadOrderErrorDisplay";
 
-interface FormValues {
+export interface UploadOrdersFormTypes {
   csvfile: FileWithPath[];
 }
 
@@ -26,24 +25,28 @@ const validationSchema = Yup.object({
 });
 
 const UplaodOrders: React.FC = () => {
-  const initialValues: FormValues = { csvfile: [] };
-  const FormikRef = useRef<FormikProps<FormValues>>(null);
-  const theme = useMantineTheme();
+  const initialValues: UploadOrdersFormTypes = { csvfile: [] };
+  const FormikRef = useRef<FormikProps<UploadOrdersFormTypes>>(null);
   const {
     mutate: uploadFiles,
     error: ErrorOnUploadingFiles,
     reset: ResetMutation,
   } = useUploadOrdersFiles();
 
-  const handleSubmit = (values: FormValues) => {
+  const handleSubmit = (values: UploadOrdersFormTypes) => {
     uploadFiles(
       { csvfile: values.csvfile },
       {
         onSuccess: (data) => {
           notifications.show({
             title: "Success",
-            message: data.data?.message || "Files uploaded successfully!",
+            message:
+              data.data?.message ||
+              "File uploaded successfully. Please change tab to 'ALL orders'!",
             color: "green",
+            position: "top-center",
+            withCloseButton: true,
+            autoClose: true,
           });
           FormikRef.current?.resetForm();
         },
@@ -62,7 +65,10 @@ const UplaodOrders: React.FC = () => {
   return (
     <Paper shadow="sm" p={20}>
       <Stack gap={20}>
-        <MantineText>Some Fancy Text Here</MantineText>
+        <MantineText>
+          Upload Excel or CSV file to store order details. (Multiple files can
+          be uploaded)
+        </MantineText>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -99,14 +105,15 @@ const UplaodOrders: React.FC = () => {
                   uploadedFiles={values.csvfile}
                   onDeleteFile={handleDeleteFile}
                   dropzoneText={{
-                    title: "Upload your CSV files",
+                    title: "Upload files with relevant data",
                     description:
-                      "You can upload multiple CSV files. Each file must be under 5 MB.",
+                      "You can upload at max 10 files with each file size should not exceed 5 MB'",
                     rejectMessage:
                       "Invalid file type. Only CSV files are allowed.",
                   }}
+                  maxFiles={10}
                 />
-                {errors.csvfile && touched.csvfile && (
+                {errors?.csvfile && touched?.csvfile && (
                   <div style={{ color: "red", marginTop: "10px" }}>
                     {errors?.csvfile}
                   </div>
