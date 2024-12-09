@@ -13,8 +13,9 @@ const ApiConstants = {
   GET_CUSTOMER_CONFIG: (id: string) => `/api/customer/getCustomerById/${id}`,
   GET_ALL_ORDERS: () => `/api/order/getAllOrders`,
   //PUT API
-
+  UPDATE_ORDER_BY_ID: () => `/api/order/updateOrder/`,
   //DELETE API
+  DELETE_ORDER_BY_ID: (orderId: string) => `/api/order/deleteOrder/${orderId}`,
 };
 
 export default ApiConstants;

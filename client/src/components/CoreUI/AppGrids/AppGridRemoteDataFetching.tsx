@@ -1,157 +1,314 @@
-import { useMemo, useState } from "react";
 import {
   MaterialReactTable,
+  MRT_EditActionButtons,
+  MRT_RowData,
+  MRT_ShowHideColumnsButton,
+  MRT_TableHeadCellFilterContainer,
+  MRT_TableOptions,
+  MRT_ToggleFullScreenButton,
   useMaterialReactTable,
   type MRT_ColumnDef,
   type MRT_ColumnFiltersState,
   type MRT_PaginationState,
   type MRT_SortingState,
 } from "material-react-table";
-import { IconButton, Tooltip } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import { keepPreviousData, useQuery } from "@tanstack/react-query"; //note: this is TanStack React Query V5
-
-//Your API response shape will probably be different. Knowing a total row count is important though.
-type UserApiResponse = {
-  data: Array<User>;
-  meta: {
-    totalRowCount: number;
-  };
+import {
+  Box,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  lighten,
+  Stack,
+  Tooltip,
+} from "@mui/material";
+import { GridFilterDrawer } from "../GridFilterDrawer/GridFilterDrawer";
+import EditIcon from "@mui/icons-material/Edit";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import { useDeleteOrderByID } from "../../../pages/admin/orders/DisplayOrders/useDeleteOrderByID";
+import { useUpdateOrders } from "../../../pages/admin/orders/DisplayOrders/useUpdateOrders";
+import { modals } from "@mantine/modals";
+import { Text as MantineText } from "@mantine/core";
+import { DeleteForeverRounded } from "@mui/icons-material";
+import { ClearIcon } from "@mui/x-date-pickers";
+import "./ScrollBAr.css";
+import { Order } from "../../../pages/admin/orders/DisplayOrders/useGetAllOrders";
+// Generic props type for the grid
+type DataGridProps<T extends MRT_RowData> = {
+  columns: MRT_ColumnDef<T>[]; // Column definitions to render in the table
+  data: T[]; // Data to be displayed in the table
+  pagination: MRT_PaginationState; // Pagination state
+  sorting: MRT_SortingState; // Sorting state
+  columnFilters: MRT_ColumnFiltersState; // Column filters
+  onPaginationChange: (pagination: MRT_PaginationState) => void; // Pagination change handler
+  onSortingChange: (sorting: MRT_SortingState) => void; // Sorting change handler
+  onColumnFiltersChange: (filters: MRT_ColumnFiltersState) => void; // Filter change handler
+  isLoading?: boolean; // Optional loading state
+  isError?: boolean; // Optional error state
+  totalRowCount: number;
+  OnFilterButonClicked: () => void;
+  OnApplyFiltersClicked: () => void;
+  filterDrawerIsOpen: boolean;
+  enableRowSelection: boolean; // Total row count for pagination
 };
 
-type User = {
-  firstName: string;
-  lastName: string;
-  address: string;
-  state: string;
-  phoneNumber: string;
-  lastLogin: Date;
-};
-
-const AppGridRemoteDataFetching = () => {
-  //manage our own state for stuff we want to pass to the API
-  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
-    [],
-  );
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [sorting, setSorting] = useState<MRT_SortingState>([]);
-  const [pagination, setPagination] = useState<MRT_PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
-  //consider storing this code in a custom hook (i.e useFetchUsers)
+const DataGrid = <T extends object>({
+  columns,
+  data,
+  pagination,
+  sorting,
+  columnFilters,
+  onPaginationChange,
+  onSortingChange,
+  onColumnFiltersChange,
+  isLoading = false,
+  isError = false,
+  totalRowCount,
+  OnFilterButonClicked,
+  filterDrawerIsOpen = false,
+  OnApplyFiltersClicked,
+  enableRowSelection = false,
+}: DataGridProps<T>) => {
   const {
-    data: { data = [], meta } = {}, //your data and api response will probably be different
-    isError,
-    isRefetching,
-    isLoading,
-    refetch,
-  } = useQuery<UserApiResponse>({
-    queryKey: [
-      "table-data",
-      columnFilters, //refetch when columnFilters changes
-      globalFilter, //refetch when globalFilter changes
-      pagination.pageIndex, //refetch when pagination.pageIndex changes
-      pagination.pageSize, //refetch when pagination.pageSize changes
-      sorting, //refetch when sorting changes
-    ],
-    queryFn: async () => {
-      const fetchURL = new URL("/api/data", location.origin);
-
-      //read our state and pass it to the API as query params
-      fetchURL.searchParams.set(
-        "start",
-        `${pagination.pageIndex * pagination.pageSize}`,
-      );
-      fetchURL.searchParams.set("size", `${pagination.pageSize}`);
-      fetchURL.searchParams.set("filters", JSON.stringify(columnFilters ?? []));
-      fetchURL.searchParams.set("globalFilter", globalFilter ?? "");
-      fetchURL.searchParams.set("sorting", JSON.stringify(sorting ?? []));
-
-      //use whatever fetch library you want, fetch, axios, etc
-      const response = await fetch(fetchURL.href);
-      const json = (await response.json()) as UserApiResponse;
-      return json;
-    },
-    placeholderData: keepPreviousData,
-    enabled: false, //don't go to 0 rows when refetching or paginating to next page
-  });
-
-  const columns = useMemo<MRT_ColumnDef<User>[]>(
-    //column definitions...
-    () => [
-      {
-        accessorKey: "firstName",
-        header: "First Name",
+    mutateAsync: deleteOrdersMutateAsync,
+    isPending: isDeletingOrderIds,
+  } = useDeleteOrderByID();
+  const {
+    mutateAsync: updateOrdersMuatateAsync,
+    isPending: IsUpdatingOrderIds,
+  } = useUpdateOrders();
+  const handleDeleteOrder = (IDs: string) => {
+    modals.openConfirmModal({
+      title: (
+        <MantineText size="md" style={{ fontWeight: "600" }}>
+          Are you sure you want to proceed?
+        </MantineText>
+      ),
+      children: (
+        <MantineText size="sm">This action will delete your order.</MantineText>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        deleteOrdersMutateAsync(IDs);
       },
-      {
-        accessorKey: "lastName",
-        header: "Last Name",
-      },
-      {
-        accessorKey: "address",
-        header: "Address",
-      },
-      {
-        accessorKey: "state",
-        header: "State",
-      },
-      {
-        accessorKey: "phoneNumber",
-        header: "Phone Number",
-      },
-      {
-        accessorFn: (row) => new Date(row.lastLogin),
-        id: "lastLogin",
-        header: "Last Login",
-        Cell: ({ cell }) => new Date(cell.getValue<Date>()).toLocaleString(),
-        filterFn: "greaterThan",
-        filterVariant: "date",
-        enableGlobalFilter: false,
-      },
-    ],
-    [],
-    //end
-  );
-
+    });
+  };
+  const handleUpdateOrder: MRT_TableOptions<Order>["onEditingRowSave"] = ({
+    values,
+  }) => {
+    updateOrdersMuatateAsync({ updates: [values] });
+    table.setEditingRow(null);
+  };
   const table = useMaterialReactTable({
     columns,
     data,
-    initialState: { showColumnFilters: false },
-    manualFiltering: true, //turn off built-in client-side filtering
-    manualPagination: true, //turn off built-in client-side pagination
-    manualSorting: true, //turn off built-in client-side sorting
+    initialState: {
+      showColumnFilters: false,
+      density: "compact",
+      columnPinning: {
+        left: ["mrt-row-select", "mrt-row-actions"],
+        // right: ['mrt-row-actions'],
+      },
+    },
+
+    enableMultiSort: false,
+    enableRowSelection,
+    getRowId: (originalRow) => originalRow?.orderId,
+    columnFilterDisplayMode: "custom",
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+
+    muiTableHeadCellProps: {
+      align: "center",
+      sx: (theme) => ({
+        color: "white",
+        // backgroundColor:theme.palette.primary.light,
+        backgroundColor: "#12B886",
+
+        // paddingTop: "5px",
+        // paddingButton: "5px",
+        borderRight: "0.5px solid white",
+      }),
+    },
+    muiPaginationProps: {
+      rowsPerPageOptions: [10, 20, 30, 50],
+      SelectProps: { style: { fontSize: 14 } },
+    },
+
+    positionToolbarAlertBanner: "bottom",
     muiToolbarAlertBannerProps: isError
       ? {
           color: "error",
           children: "Error loading data",
         }
-      : undefined,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    renderTopToolbarCustomActions: () => (
-      <Tooltip arrow title="Refresh Data">
-        <IconButton onClick={() => refetch()}>
-          <RefreshIcon />
-        </IconButton>
-      </Tooltip>
+      : IsUpdatingOrderIds || isDeletingOrderIds
+        ? {
+            color: "info",
+            children: "Please wait...........",
+          }
+        : { color: "success" },
+    muiTableBodyProps: {
+      sx: {
+        //stripe the rows, make odd rows a darker color
+        "& tr:nth-of-type(odd) > td": {
+          backgroundColor: "#f5f5f5",
+        },
+      },
+    },
+    muiTableBodyCellProps: {
+      align: "center",
+      sx: {
+        borderRight: "0.5px solid grey",
+      },
+    },
+    displayColumnDefOptions: {
+      "mrt-row-actions": {
+        header: "Edit",
+      },
+    },
+    muiColumnActionsButtonProps: {
+      style: { color: "white" },
+    },
+    onColumnFiltersChange: onColumnFiltersChange,
+    onSortingChange: onSortingChange,
+    onPaginationChange: onPaginationChange,
+    enableStickyHeader: true,
+    enableRowActions: true,
+    enableEditing: true,
+    onEditingRowSave: handleUpdateOrder,
+    renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
+      <>
+        <DialogTitle variant="h6">Edit Order</DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+        >
+          {internalEditComponents} {/* or render custom edit components here */}
+        </DialogContent>
+        <DialogActions>
+          <MRT_EditActionButtons variant="text" table={table} row={row} />
+        </DialogActions>
+      </>
     ),
-    rowCount: meta?.totalRowCount ?? 0,
+
+    renderRowActions: ({ row, table }) => (
+      <Box sx={{ display: "flex", gap: "1rem" }}>
+        <Tooltip title="Edit">
+          <IconButton onClick={() => table.setEditingRow(row)}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+    renderToolbarInternalActions: ({ table }) => (
+      <>
+        <MRT_ShowHideColumnsButton table={table} />
+        <MRT_ToggleFullScreenButton table={table} />
+      </>
+    ),
+    renderTopToolbarCustomActions: ({ table }) => {
+      const handleDelete = () => {
+        const getOrderIdsofSlectedRows = table
+          .getSelectedRowModel()
+          .flatRows.map((row) => {
+            return row.original?.orderId;
+          })
+          ?.join(",");
+        // table.setRowSelection()
+        handleDeleteOrder(getOrderIdsofSlectedRows);
+      };
+
+      const handleClearFilters = () => {
+        table.resetColumnFilters();
+      };
+
+      return (
+        <Box
+          sx={(theme) => ({
+            backgroundColor: lighten(theme.palette.background.default, 0.05),
+            display: "flex",
+            gap: "0.5rem",
+            p: "8px",
+            justifyContent: "space-between",
+          })}
+        >
+          <Box
+            sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+          ></Box>
+          <Box>
+            <Box sx={{ display: "flex", gap: "0.5rem" }}>
+              <Tooltip title="Delete selected rows" placement="top">
+                <IconButton
+                  color="error"
+                  disabled={
+                    !table.getIsAllPageRowsSelected() &&
+                    !table.getIsSomeRowsSelected()
+                  }
+                  onClick={handleDelete}
+                  size="small"
+                >
+                  <DeleteForeverRounded />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Clear Filters" placement="top">
+                <IconButton
+                  onClick={handleClearFilters}
+                  color="primary"
+                  size="small"
+                >
+                  <ClearIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Apply Filters" placement="top">
+                <IconButton
+                  onClick={OnFilterButonClicked}
+                  color="primary"
+                  size="small"
+                >
+                  <FilterAltIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+        </Box>
+      );
+    },
+    rowCount: totalRowCount, // Pass total row count for pagination
     state: {
       columnFilters,
-      globalFilter,
       isLoading,
       pagination,
       showAlertBanner: isError,
-      showProgressBars: isRefetching,
       sorting,
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      <MaterialReactTable table={table} />
+      <GridFilterDrawer
+        close={OnApplyFiltersClicked}
+        opened={filterDrawerIsOpen}
+        children={
+          <Stack p="8px" gap="8px">
+            {table.getLeafHeaders().map((header) => {
+              if (header.column.getCanFilter()) {
+                return (
+                  <MRT_TableHeadCellFilterContainer
+                    key={header.id}
+                    header={header}
+                    table={table}
+                    in
+                  />
+                );
+              }
+            })}
+          </Stack>
+        }
+      />
+    </>
+  );
 };
 
-export default AppGridRemoteDataFetching;
+export default DataGrid;

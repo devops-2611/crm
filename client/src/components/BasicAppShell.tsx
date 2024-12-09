@@ -7,6 +7,8 @@ import {
   Transition,
   Image,
   Skeleton,
+  Button,
+  useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Link, Outlet, useLocation } from "react-router-dom";
@@ -55,9 +57,7 @@ export function BasicAppShell() {
     console.log(label, "label");
     setExpandedMenu((prev) => (prev === label ? null : label));
   };
-  // const logoUrl = `${import.meta.env.VITE_API_BASE_URL}${
-  //   customerConfig?.logoImg
-  // }`;
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -176,6 +176,20 @@ export function BasicAppShell() {
                   ))}
               </NavLink>
             ))}
+
+            <Group mt="auto">
+              <Button
+                component={Link}
+                to="/admin"
+                size="sm"
+                // color="blue"
+                fullWidth
+                radius="md"
+                // color={theme.colors.gray[7]}
+              >
+                Go to Admin Panel
+              </Button>
+            </Group>
           </AppShell.Navbar>
         )}
       </Transition>

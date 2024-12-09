@@ -7,12 +7,16 @@ import {
   Paper,
   Stack,
   Text as MantineText,
+  useMantineTheme,
+  Flex,
+  LoadingOverlay,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FileWithPath, FileRejection } from "@mantine/dropzone";
 import { FileUpload } from "../../../components/CoreUI/FileUpload";
 import { useUploadOrdersFiles } from "../../../hooks/useUploadOrdersFiles";
 import { UploadOrderErrorDisplay } from "./UploadOrderErrorDisplay";
+import { IconThumbUp } from "@tabler/icons-react";
 
 export interface UploadOrdersFormTypes {
   csvfile: FileWithPath[];
@@ -31,7 +35,11 @@ const UplaodOrders: React.FC = () => {
     mutate: uploadFiles,
     error: ErrorOnUploadingFiles,
     reset: ResetMutation,
+    isPending: IsUplaodingdocs,
   } = useUploadOrdersFiles();
+
+  const [showActionText, setShowActionText] = React.useState(false);
+  const theme = useMantineTheme();
 
   const handleSubmit = (values: UploadOrdersFormTypes) => {
     uploadFiles(
@@ -40,15 +48,14 @@ const UplaodOrders: React.FC = () => {
         onSuccess: (data) => {
           notifications.show({
             title: "Success",
-            message:
-              data.data?.message ||
-              "File uploaded successfully. Please change tab to 'ALL orders'!",
+            message: data.data?.message || "File uploaded successfully.",
             color: "green",
             position: "top-center",
             withCloseButton: true,
             autoClose: true,
           });
           FormikRef.current?.resetForm();
+          setShowActionText(true);
         },
         onError: (error: any) => {
           notifications.show({
@@ -57,15 +64,16 @@ const UplaodOrders: React.FC = () => {
             color: "red",
           });
           FormikRef.current?.setErrors(error);
+          setShowActionText(false);
         },
       },
     );
   };
-
+  console.log(IsUplaodingdocs, "IsUplaodingdocs");
   return (
     <Paper shadow="sm" p={20}>
-      <Stack gap={20}>
-        <MantineText>
+      <Stack gap={20} pos={"relative"}>
+        <MantineText size="lg" style={{ fontWeight: "600" }}>
           Upload Excel or CSV file to store order details. (Multiple files can
           be uploaded)
         </MantineText>
@@ -95,6 +103,7 @@ const UplaodOrders: React.FC = () => {
                 (file) => file.name !== fileName,
               );
               setFieldValue("csvfile", updatedFiles);
+              ResetMutation();
             };
 
             return (
@@ -107,7 +116,7 @@ const UplaodOrders: React.FC = () => {
                   dropzoneText={{
                     title: "Upload files with relevant data",
                     description:
-                      "You can upload at max 10 files with each file size should not exceed 5 MB'",
+                      "You can upload at max 10 files with size not exceeding 5 MB",
                     rejectMessage:
                       "Invalid file type. Only CSV files are allowed.",
                   }}
@@ -131,10 +140,32 @@ const UplaodOrders: React.FC = () => {
             );
           }}
         </Formik>
+        <LoadingOverlay
+          visible={IsUplaodingdocs}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 2 }}
+        />
         {FormikRef.current?.errors && (
           <UploadOrderErrorDisplay
             response={ErrorOnUploadingFiles?.response?.data}
           />
+        )}
+        {showActionText && (
+          <Flex direction="column" align="center" mt="10px">
+            <IconThumbUp stroke={2} size={40} color={theme.colors.green[6]} />
+            <MantineText
+              size="lg"
+              style={{
+                fontWeight: "600",
+                color: theme.colors.gray[7],
+                textAlign: "center",
+              }}
+            >
+              {" "}
+              Orders are saved successfully. You can see uploaded orders by
+              switching tab to "All Orders".
+            </MantineText>
+          </Flex>
         )}
       </Stack>
     </Paper>

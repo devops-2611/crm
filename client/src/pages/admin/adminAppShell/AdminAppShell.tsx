@@ -13,7 +13,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { Suspense } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { navLinks } from "./AadminNavlinks";
+import { navLinks } from "./AdminNavlinks";
 import Static_Logo from "../../../assets/Static_Logo.jpeg";
 
 export function AdminAppShell() {
@@ -22,6 +22,7 @@ export function AdminAppShell() {
   const [opened, { toggle }] = useDisclosure();
   const isRouteActive = (route: string) => location.pathname.includes(route);
   const theme = useMantineTheme();
+
   return (
     <AppShell
       header={{ height: 60 }}

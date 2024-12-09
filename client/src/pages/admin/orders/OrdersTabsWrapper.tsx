@@ -1,5 +1,5 @@
 import { APPTabs } from "../../../components/CoreUI/tabs/AppTabs";
-import DisplayOrders from "./DisplayOrders";
+import DisplayOrders from "./DisplayOrders/DisplayOrdersGrid";
 import UplaodOrders from "./UploadOrders";
 export function OrdersTabsWrapper() {
   const tabs = [

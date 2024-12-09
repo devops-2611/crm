@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
     driverTip: { type: Number },
     deliveryCharge: { type: Number },
     serviceFee: { type: Number },
-    surCharge: { type: Number },
+    surcharge: { type: Number },
     subTotal: { type: Number },
     taxes: { type: Number },
     total: { type: Number },
