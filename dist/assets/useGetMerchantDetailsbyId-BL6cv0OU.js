@@ -1,0 +1,1 @@
+import{u as t,A as r,a as n}from"./ApiConstants-B3vWYKSo.js";function s(e){return r.GET(n.GET_MERCHANT_DETAILS_BY_ID(e))}const u=e=>t({queryKey:["merchantdetails",e],queryFn:()=>s(e),refetchOnWindowFocus:!1,enabled:!!e,refetchOnMount:!1,retry:2});export{u};
