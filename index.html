@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to CD</title>
+    <meta name="description" content="Expert DevOps, Software Dev consulting and training services">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-bg-overlay"></div>
+            <div class="container">
+                <div class="hero-icons">
+                    <i data-lucide="cloud" size="40"></i>
+                    <i data-lucide="terminal" size="40"></i>
+                    <i data-lucide="database" size="40"></i>
+                </div>
+                <div class="title-container">
+                    <h1>Welcome to CD</h1>
+                    <img src="cd_logo.jpg" alt="CD Logo" class="logo">
+                </div>
+
+                <p class="subtitle">Empowering applications with Industry-Ready Skills</p>
+                <p class="hero-text">
+                    Your one-stop destination for professional training and innovative software solutions. Join us on this journey of growth and innovation!
+                </p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn btn-primary">Message us</a>
+                    <a href="#services" class="btn btn-outline">View Services</a>
+                    <a href="https://wa.me/919220531072?text=Hello%20CD%20Team,%20I%20am%20interested%20in%20your%20DevOps%20training!" target="_blank" class="btn btn-whatsapp">
+                        <i data-lucide="message-circle"></i> WhatsApp us
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Students Trained</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Enterprise Projects</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">8+</div>
+                        <div class="stat-label">Years Experience</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Client Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Course Benefits Section -->
+        <section class="benefits" id="benefits">
+            <div class="container">
+                <h2>Why to Choose CareerDeveloper</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <i data-lucide="trending-up" size="32"></i>
+                        <h3>Career Growth</h3>
+                        <p>Average salary increase of 40% after course completion</p>
+                    </div>
+                    <div class="benefit-card">
+                        <i data-lucide="code" size="32"></i>
+                        <h3>Hands-on Experience</h3>
+                        <p>Real-world projects and practical implementations</p>
+                    </div>
+                    <div class="benefit-card">
+                        <i data-lucide="users" size="32"></i>
+                        <h3>Industry Network</h3>
+                        <p>Connect with DevOps professionals and hiring managers</p>
+                    </div>
+                    <div class="benefit-card">
+                        <i data-lucide="award" size="32"></i>
+                        <h3>Certification Support</h3>
+                        <p>Guidance for AWS, Azure, and GCP certifications</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about" id="about">
+            <div class="container">
+                <h2>Your DevOps Journey Starts Here</h2>
+                <div class="about-grid">
+                    <div class="about-content">
+                        <h3>About us</h3>
+                        <p>
+                            At CD, we are passionate about empowering individuals and businesses with the latest skills in DevOps, software development (frontend & backend), cloud computing, and more. Our expert-led training programs are designed to bridge the gap between learning and real-world application, ensuring that our students and professionals stay ahead in the fast-evolving tech industry.
+
+                            But we don’t stop at training! We also take on cutting-edge projects from clients across the globe, delivering tailored software solutions that drive success. From startups to enterprises, our team of skilled developers, engineers, and consultants work collaboratively to build scalable, secure, and high-performing applications.
+                            
+                           
+                        </p>
+                        <p>
+                            Whether you’re looking to enhance your career with in-demand skills or bring your next big software idea to life, CareerDeveloper is here to make it happen.
+                        </p>
+                        <div class="features">
+                            <div class="feature">
+                                <i data-lucide="clock" size="20"></i>
+                                <span>24/7 Support</span>
+                            </div>
+                            <div class="feature">
+                                <i data-lucide="award" size="20"></i>
+                                <span>Certified Expert</span>
+                            </div>
+                            <div class="feature">
+                                <i data-lucide="target" size="20"></i>
+                                <span>Result Oriented</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600" 
+                             alt="DevOps Infrastructure" 
+                             class="rounded-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services" id="services">
+            <div class="container">
+                <h2>Services</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-image">
+                            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=600" 
+                                 alt="Cloud Infrastructure">
+                        </div>
+                        <i data-lucide="cloud" size="32"></i>
+                        <h3>DevOps Consulting</h3>
+                        <p>
+                            Unlock the full potential of your development and operations teams with our expert DevOps Consulting services. We help businesses streamline workflows, enhance collaboration, and automate processes, ensuring faster and more reliable software delivery. Our DevOps experts assess your current infrastructure, identify bottlenecks, and implement CI/CD pipelines, cloud integration, containerization (Docker, Kubernetes), and security best practices to accelerate your digital transformation.
+                        </p>
+                        <ul class="service-features">
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Cloud Architecture Design</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Performance Optimization</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Cost Optimization</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Faster software delivery</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Improved collaboration between Dev & Ops</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="service-card">
+                        <div class="service-image">
+                            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=600" 
+                                 alt="Infrastructure Automation">
+                        </div>
+                        <i data-lucide="code" size="32"></i>
+                        <h3>Infrastructure Automation</h3>
+                        <p>
+                            Manual infrastructure management is a thing of the past! With our Infrastructure Automation solutions, we help businesses eliminate repetitive tasks, improve efficiency, and reduce operational costs. Whether it’s through Infrastructure as Code (IaC), configuration management, or cloud automation, we ensure your systems are scalable, reliable, and easy to maintain. Our expertise spans tools like Terraform, Ansible, Chef, and AWS CloudFormation, enabling seamless deployment and management of your IT infrastructure.
+                        </p>
+                        <ul class="service-features">
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Terraform Implementation</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Configuration Management</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Faster deployment with zero downtime</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Consistent, repeatable, and scalable infrastructure</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Cost and resource optimization</span>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-image">
+                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600" 
+                                 alt="Training Programs">
+                        </div>
+                        <i data-lucide="book" size="32"></i>
+                        <h3>Workshops</h3>
+                        <p>
+                            Stay ahead in the tech industry with our comprehensive workshop programs tailored for beginners and experienced professionals alike. We offer hands-on training in DevOps, cloud computing, frontend & backend development, and automation technologies. Our industry-expert trainers provide real-world case studies, live projects, and certification guidance, ensuring you gain practical skills that boost your career prospects.
+                        </p>
+                        <ul class="service-features">
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Hands-on Workshops, project-based learning</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>1-on-1 Mentoring</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Industry-recognized certifications</span>
+                            </li>
+                            <li>
+                                <i data-lucide="check-circle" size="16"></i>
+                                <span>Flexible training modes – online & in-person</span>
+                            </li>                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Training Programs -->
+        <section class="training">
+            <div class="container">
+                <h2>Our courses</h2>
+                <div class="training-grid">
+                    <div class="training-card">
+                        <div class="training-image">
+                            <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600" 
+                                 alt="DevOps Training">
+                        </div>
+                        <div class="card-header">
+                            <i data-lucide="terminal" size="32"></i>
+                            <span class="badge badge-blue">Most Popular</span>
+                        </div>
+                        <h3>DevOps Mastery – Become a DevOps Expert!</h3>
+                        <p>
+                            Master the DevOps lifecycle with our in-depth training, designed for beginners and professionals looking to advance their skills. This program covers CI/CD pipelines, containerization (Docker, Kubernetes), cloud infrastructure (AWS, Azure, GCP), Infrastructure as Code (Terraform, Ansible), monitoring, and security. Our hands-on approach ensures you gain real-world experience with live projects and industry best practices.
+                        </p>
+                        <ul class="training-features">
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Learn CI/CD, automation, and cloud integration</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Work on live DevOps projects</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Certification preparation & job assistance</span>
+                            </li>
+                        </ul>
+                        <div class="course-meta">
+                            <div class="meta-item">
+                                <i data-lucide="calendar" size="16"></i>
+                                <span>4 Months</span>
+                            </div>
+                            <div class="meta-item">
+                                <i data-lucide="users" size="16"></i>
+                                <span>Live Sessions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="training-card">
+                        <div class="training-image">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600" 
+                                 alt="Cloud Engineering">
+                        </div>
+                        <div class="card-header">
+                            <i data-lucide="zap" size="32"></i>
+                            <span class="badge badge-green">Beginner Friendly</span>
+                        </div>
+                        <h3>Software Development (Full Stack) – Build Scalable Applications</h3>
+                        <p>
+                            Learn to design, develop, and deploy full-stack applications with our expert-led training. This course covers both frontend (React, Angular, Vue.js) and backend (Node.js, Python, Java, .NET) development, along with databases (SQL, NoSQL), APIs, and cloud deployment. Whether you're a beginner or looking to upskill, this program will help you become a job-ready full-stack developer.
+                        </p>
+                        <ul class="training-features">
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Master frontend & backend technologies</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Work with real-world projects & modern frameworks</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Learn best coding practices & deployment strategies</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Cost Optimization</span>
+                            </li>
+                        </ul>
+                        <div class="course-meta">
+                            <div class="meta-item">
+                                <i data-lucide="calendar" size="16"></i>
+                                <span>3 Months</span>
+                            </div>
+                            <div class="meta-item">
+                                <i data-lucide="users" size="16"></i>
+                                <span>Live Sessions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="training-card">
+                        <div class="training-image">
+                            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=600" 
+                                 alt="Enterprise DevOps">
+                        </div>
+                        <div class="card-header">
+                            <i data-lucide="briefcase" size="32"></i>
+                            <span class="badge badge-purple">Advanced</span>
+                        </div>
+                        <h3>Project Implementation – Hands-on Real-World Experience</h3>
+                        <p>
+                            Gain practical experience by working on real industry projects across domains like finance, e-commerce, healthcare, and automation. This program is designed for professionals and students who want to apply their skills in real-time scenarios, solving complex business challenges with the latest technologies. With mentorship from industry experts, you'll build a portfolio that makes you stand out to employers and clients.
+                        </p>
+                        <ul class="training-features">
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Work on real-world client projects</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Learn Agile methodologies & best practices</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Get mentorship & career guidance</span>
+                            </li>
+                            <li>
+                                <i data-lucide="star" size="16"></i>
+                                <span>Enterprise Integration</span>
+                            </li>
+                        </ul>
+                        <div class="course-meta">
+                            <div class="meta-item">
+                                <i data-lucide="calendar" size="16"></i>
+                                <span>4 Months</span>
+                            </div>
+                            <div class="meta-item">
+                                <i data-lucide="users" size="16"></i>
+                                <span>Live Sessions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact" id="contact">
+            <div class="container">
+                <h2>Get in Touch</h2>
+                <div class="contact-grid">
+                    <div class="contact-form">
+                        <h3>Send Me a Message</h3>
+                        <form id="enquiryForm" onsubmit="sendEmail(event)">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Mobile Number</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Your Message</label>
+                                <textarea id="message" name="message" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                    <div class="contact-info">
+                        <h3>Contact Information</h3>
+                        <div class="contact-links">
+                            <a href="tel:+919220531072" class="contact-link">
+                                <i data-lucide="phone" size="20"></i>
+                                <span>+91 92205 31072</span>
+                            </a>
+                            <a href="mailto:sharma.vishal009.11@gmail.com" class="contact-link">
+                                <i data-lucide="mail" size="20"></i>
+                                <span>info@careerdeveloper.info</span>
+                            </a>
+                            <a href="https://careerdeveloper.info/" target="_blank" rel="noopener noreferrer" 
+                                class="contact-link">
+                                <i data-lucide="globe" size="20"></i>
+                                <span>www.careerdeveloper.info</span>
+                            </a>
+                            <a href="https://linkedin.com/in/vishalsharma" target="_blank" rel="noopener noreferrer"
+                                class="contact-link">
+                                <i data-lucide="linkedin" size="20"></i>
+                                <span>linkedin.com/in/vishalsharma</span>
+                            </a>
+                            <a href="https://github.com/vishalsharma" target="_blank" rel="noopener noreferrer"
+                                class="contact-link">
+                                <i data-lucide="github" size="20"></i>
+                                <span>github.com/vishalsharma</span>
+                            </a>
+                        </div>
+                        <div class="quick-connect">
+                            <h3>Quick Connect</h3>
+                            <div class="connect-info">
+                                <div class="connect-item">
+                                    <i data-lucide="message-square" size="20"></i>
+                                    <span>Available for freelance projects</span>
+                                </div>
+                                <div class="connect-item">
+                                    <i data-lucide="users" size="20"></i>
+                                    <span>Corporate training available</span>
+                                </div>
+                                <div class="connect-item">
+                                    <i data-lucide="clock" size="20"></i>
+                                    <span>24/7 Support for clients</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-icons">
+                        <i data-lucide="cloud" size="24"></i>
+                        <i data-lucide="terminal" size="24"></i>
+                        <i data-lucide="database" size="24"></i>
+                    </div>
+                    <p class="copyright">© 2025 CD. All rights reserved.</p>
+                    <p class="tagline">Empowering the next generation technologies</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("LCFHxTP2xg2PCJaQ5"); // Your Public Key
+        })();
+    
+        function sendEmail(event) {
+            event.preventDefault();
+    
+            const serviceID = "service_8as7sph"; // Your Service ID
+            const templateID = "template_fui7pbi"; // Your Template ID
+    
+            const templateParams = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                message: document.getElementById("message").value,
+            };
+    
+            emailjs.send(serviceID, templateID, templateParams)
+            .then(response => {
+                alert("Thank you! Your message has been sent.");
+                document.getElementById("enquiryForm").reset();
+            }, error => {
+                alert("Oops! Something went wrong: " + error.text);
+            });
+        }
+    </script>
+    
+</body>
+</html>
