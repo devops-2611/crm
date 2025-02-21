@@ -719,4 +719,32 @@ footer {
     }
 }
 
+/* Mobile View */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.2rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .logo {
+        max-width: 35px;
+        margin: 10px auto;
+    }
+}
+
+/* Desktop View */
+@media (min-width: 768px) {
+    .title-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .logo {
+        max-width: 70px;
+        margin-left: 15px;
+    }
+}
 
